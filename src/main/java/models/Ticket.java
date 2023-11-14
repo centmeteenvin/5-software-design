@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Data
-public class Ticket {
+public class Ticket implements Model {
     private final long id = System.nanoTime();
     private double cost;
     private Long ticketCategoryId;
