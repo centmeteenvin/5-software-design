@@ -49,5 +49,5 @@ public abstract class Database<T extends Model> {
     protected abstract Optional<T> updateImplementation(T model);
     protected abstract void deleteByIdImplementation(Long id);
 
-    protected abstract Optional<T> createImplementation(T Model);
+    protected abstract Optional<T> createImplementation(T model);
 }

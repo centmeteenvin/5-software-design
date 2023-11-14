@@ -1,11 +1,17 @@
 package database;
 
+import lombok.Getter;
 import models.Model;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class DatabaseHashMap<T extends Model> extends Database<T> {
+
+    @Getter
+    private final Map<Long, T> data = new HashMap<>();
     @Override
     public Optional<T> getById(Long id) {
         return Optional.empty(); //TODO
@@ -27,7 +33,11 @@ public class DatabaseHashMap<T extends Model> extends Database<T> {
     }
 
     @Override
-    protected Optional<T> createImplementation(T Model) {
-        return Optional.empty(); //TODO
+    protected Optional<T> createImplementation(T model) {
+        if (data.containsKey(model.getId())) {
+            return Optional.empty();
+        }
+        data.put(model.getId(), model);
+        return Optional.of(model);
     }
 }
