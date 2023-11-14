@@ -10,6 +10,6 @@ import java.util.List;
 public class Person implements Model {
  private final Long id = System.nanoTime();
  private String name;
- private double debt;
+ private double debt = 0;
  private final List<Long> ticketsId = new ArrayList<>();
 }
