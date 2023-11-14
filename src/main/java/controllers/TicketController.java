@@ -13,4 +13,7 @@ public interface TicketController {
     void changeWeight(Long id, Long personId, double newWeight);
     void delete(Long id);
     void calculate(Long id);
+
+    void setPersonController(PersonController personController);
+    void setTicketCategoryController(TicketCategoryController ticketCategoryController);
 }

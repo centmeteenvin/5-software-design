@@ -8,4 +8,6 @@ public interface TicketCategoryController {
     void removeTicket(Long id, Long ticketId);
     void rename(Long id, String newName);
     void delete(Long id);
+
+    void setTicketController(TicketController ticketController);
 }
