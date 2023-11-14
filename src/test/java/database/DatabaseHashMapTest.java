@@ -13,6 +13,18 @@ class DatabaseHashMapTest {
 
     @Test
     void getById() {
+        final DatabaseHashMap<TestModel> databaseHashMap = new DatabaseHashMap<>();
+        TestModel testModel = new TestModel(1L, "Test Data");
+        TestModel testModel2 = new TestModel(2L, "Test Data 2");
+        databaseHashMap.getData().put(1L, testModel);
+        databaseHashMap.getData().put(2L, testModel2);
+
+        assertTrue(databaseHashMap.getById(3L).isEmpty());
+        assertTrue(databaseHashMap.getById(1L).isPresent());
+        assertTrue(databaseHashMap.getById(2L).isPresent());
+
+        assertEquals(databaseHashMap.getById(1L).get(), testModel);
+        assertEquals(databaseHashMap.getById(2L).get(), testModel2);
 
     }
 

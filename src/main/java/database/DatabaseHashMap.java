@@ -14,7 +14,7 @@ public class DatabaseHashMap<T extends Model> extends Database<T> {
     private final Map<Long, T> data = new HashMap<>();
     @Override
     public Optional<T> getById(Long id) {
-        return Optional.empty(); //TODO
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override
