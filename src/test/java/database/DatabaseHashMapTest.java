@@ -4,10 +4,10 @@ import lombok.Getter;
 import models.Model;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class DatabaseHashMapTest {
 
@@ -30,6 +30,15 @@ class DatabaseHashMapTest {
 
     @Test
     void getAll() {
+        final DatabaseHashMap<TestModel> databaseHashMap = new DatabaseHashMap<>();
+        TestModel testModel = new TestModel(1L, "Test Data");
+        TestModel testModel2 = new TestModel(2L, "Test Data 2");
+        databaseHashMap.getData().put(1L, testModel);
+        databaseHashMap.getData().put(2L, testModel2);
+
+        assertFalse(databaseHashMap.getAll().isEmpty());
+        assertEquals(databaseHashMap.getAll().size(), 2);
+        assertEquals(databaseHashMap.getAll(), List.of(testModel, testModel2));
     }
 
     @Test

@@ -19,7 +19,7 @@ public class DatabaseHashMap<T extends Model> extends Database<T> {
 
     @Override
     public List<T> getAll() {
-        return null; //TODO
+        return data.values().stream().toList();
     }
 
     @Override
