@@ -29,7 +29,7 @@ public class DatabaseHashMap<T extends Model> extends Database<T> {
 
     @Override
     protected void deleteByIdImplementation(Long id) {
-        //TODO
+        data.remove(id);
     }
 
     @Override

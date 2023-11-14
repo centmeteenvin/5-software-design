@@ -59,6 +59,20 @@ class DatabaseHashMapTest {
 
     @Test
     void deleteByIdImplementation() {
+        final DatabaseHashMap<TestModel> databaseHashMap = new DatabaseHashMap<>();
+        TestModel testModel = new TestModel(1L, "Test Data");
+        TestModel testModel2 = new TestModel(2L, "Test Data 2");
+        databaseHashMap.getData().put(1L, testModel);
+        databaseHashMap.getData().put(2L, testModel2);
+
+        databaseHashMap.deleteById(testModel.id);
+        assertEquals(databaseHashMap.getData().size(), 1);
+
+        databaseHashMap.deleteById(testModel.id);
+        assertEquals(databaseHashMap.getData().size(), 1);
+
+        databaseHashMap.deleteById(testModel2.id);
+        assertEquals(databaseHashMap.getData().size(), 0);
     }
 
     @Test
