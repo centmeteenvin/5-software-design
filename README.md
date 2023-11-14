@@ -1,6 +1,6 @@
 # 5-software-design
 Project money tracker
-##TODO:
+## TODO:
  - Groepsnaam -> the script kiddos
  - KLAD protype schema -ish
  - Github private
@@ -8,5 +8,12 @@ Project money tracker
  - naamconventies
  - testConventies
  - dependency injectie
- - github conventies
- - 
+ - github conventies -> done
+
+### Github conventies:
+- Main branch: niet pushen, enkel pull via Github
+- Features/*feature* branch: feature/example
+- Extend branch met /*githubnaam* wanneer tegelijkertijd aan feature bezig
+- Enkel toplevel feature branch mergen in Main
+- Main moet ALTIJD werken
+- Verwijder branches die af zijn
