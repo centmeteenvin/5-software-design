@@ -30,11 +30,11 @@ public abstract class Database<T extends Model> {
     }
 
     /**
-     * updates the model with the same id in the database. returns the previous entry. null if not present.
+     * updates the model with the same id in the database. returns the previous entry. empty if not present.
      * If the entry does not exist a new one will be created.
      */
     public final Optional<T> update(T model) {
-        changes.firePropertyChange("Model Modification", getById(model.getId()).get(), model);
+        changes.firePropertyChange("Model Modification", getById(model.getId()).orElse(null), model);
         return updateImplementation(model);
     }
 
@@ -42,7 +42,7 @@ public abstract class Database<T extends Model> {
      * Deletes the entry from the database.
      */
     public final void deleteById(Long id) {
-        changes.firePropertyChange("Model Deletion", getById(id).get(), null);
+        changes.firePropertyChange("Model Deletion", getById(id).orElse(null), null);
         deleteByIdImplementation(id);
     }
 

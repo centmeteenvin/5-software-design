@@ -24,7 +24,7 @@ public class DatabaseHashMap<T extends Model> extends Database<T> {
 
     @Override
     protected Optional<T> updateImplementation(T model) {
-        return Optional.empty(); //TODO
+        return Optional.ofNullable(data.put(model.getId(), model));
     }
 
     @Override

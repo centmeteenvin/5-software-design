@@ -43,6 +43,18 @@ class DatabaseHashMapTest {
 
     @Test
     void updateImplementation() {
+        final DatabaseHashMap<TestModel> databaseHashMap = new DatabaseHashMap<>();
+        TestModel testModel = new TestModel(1L, "Test Data");
+        TestModel testModel2 = new TestModel(1L, "Test Data 2");
+
+        Optional<TestModel> receivedModel = databaseHashMap.update(testModel);
+        assertTrue(receivedModel.isEmpty());
+        assertEquals(databaseHashMap.getData().get(testModel.id), testModel);
+
+        receivedModel = databaseHashMap.update(testModel2);
+        assertTrue(receivedModel.isPresent());
+        assertEquals(receivedModel.get(), testModel);
+        assertEquals(databaseHashMap.getData().get(testModel.id), testModel2);
     }
 
     @Test
