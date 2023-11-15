@@ -2,6 +2,7 @@ package database;
 
 import models.Model;
 
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.HashMap;
 import java.util.List;
@@ -50,4 +51,12 @@ public abstract class Database<T extends Model> {
     protected abstract void deleteByIdImplementation(Long id);
 
     protected abstract Optional<T> createImplementation(T model);
+
+    public void addListener(PropertyChangeListener listener) {
+        changes.addPropertyChangeListener(listener);
+    }
+
+    public void removeListener(PropertyChangeListener listener) {
+        changes.removePropertyChangeListener(listener);
+    }
 }
