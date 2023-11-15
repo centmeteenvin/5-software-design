@@ -9,7 +9,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DatabaseHashMapTest {
+class DatabaseHashMapTest extends DatabaseTest{
 
     @Test
     void getById() {
@@ -91,19 +91,8 @@ class DatabaseHashMapTest {
         assertEquals(databaseHashMap.getData().get(1L).getData(), "Test Data");
     }
 
-    @Getter
-    private static class TestModel implements Model {
-        private final Long id;
-        private final String data;
-
-        private TestModel(Long id, String data) {
-            this.id = id;
-            this.data = data;
-        }
-
-        @Override
-        public Long getId() {
-            return this.id;
-        }
+    @Override
+    protected Database<TestModel> getDatabase() {
+        return new DatabaseHashMap<>();
     }
 }
