@@ -1,13 +1,16 @@
 package controllers;
 
 import database.Database;
+import models.Ticket;
 import models.TicketCategory;
 
 public abstract class TicketCategoryController {
     private final Database<TicketCategory> ticketCategoryDatabase;
+    private final Database<Ticket> ticketDatabase;
 
-    protected TicketCategoryController(Database<TicketCategory> ticketCategoryDatabase) {
+    protected TicketCategoryController(Database<TicketCategory> ticketCategoryDatabase, Database<Ticket> ticketDatabase) {
         this.ticketCategoryDatabase = ticketCategoryDatabase;
+        this.ticketDatabase = ticketDatabase;
     }
 
     /**

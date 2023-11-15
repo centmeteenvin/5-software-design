@@ -15,9 +15,9 @@ public interface AbstractApplicationFactory {
     Database<Ticket> createTicketDataBase();
     Database<TicketCategory> createTicketCategoryDatabase();
 
-    PersonController createPersonController(Database<Person> personDatabase);
-    TicketController createTicketController(Database<Ticket> ticketDatabase);
-    TicketCategoryController createTicketCategoryController(Database<TicketCategory> ticketCategoryDatabase);
+    PersonController createPersonController(Database<Person> personDatabase, Database<Ticket> ticketDatabase);
+    TicketController createTicketController(Database<Ticket> ticketDatabase, Database<Person> personDatabase, Database<TicketCategory> ticketCategoryDatabase);
+    TicketCategoryController createTicketCategoryController(Database<TicketCategory> ticketCategoryDatabase, Database<Ticket> ticketDatabase);
 
     View createView(Database<Person> personDatabase, Database<Ticket> ticketDatabase, Database<TicketCategory> ticketCategoryDatabase,
             PersonController personController, TicketController ticketController, TicketCategoryController ticketCategoryController
