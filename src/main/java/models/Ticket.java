@@ -7,8 +7,15 @@ import java.util.Map;
 
 @Data
 public class Ticket implements Model {
-    private final Long id = System.nanoTime();
+    private final Long id;
     private double cost;
     private Long ticketCategoryId;
-    private Map<Long, Double> distribution = new HashMap<>();
+    private final Map<Long, Double> distribution = new HashMap<>();
+
+    public Ticket(Long id, double cost, Long ticketCategoryId) {
+        this.id = id;
+        this.cost = cost;
+        this.ticketCategoryId = ticketCategoryId;
+    }
+
 }

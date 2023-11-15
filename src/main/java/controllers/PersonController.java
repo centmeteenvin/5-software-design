@@ -2,12 +2,14 @@ package controllers;
 
 import database.Database;
 import models.Person;
+import models.Ticket;
 
 public abstract class PersonController {
     private final Database<Person> personDatabase;
-
-    protected PersonController(Database<Person> personDatabase) {
+    private final Database<Ticket> ticketDatabase;
+    protected PersonController(Database<Person> personDatabase, Database<Ticket> ticketDatabase) {
         this.personDatabase = personDatabase;
+        this.ticketDatabase = ticketDatabase;
     }
 
     public abstract void setTicketController(TicketController ticketController);
