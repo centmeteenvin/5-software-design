@@ -5,10 +5,7 @@ import models.Person;
 import models.Ticket;
 import models.TicketCategory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 
 public class TicketControllerImplementation extends TicketController {
@@ -79,7 +76,16 @@ public class TicketControllerImplementation extends TicketController {
      */
     @Override
     public void changeCategory(Long id, Long newCategoryId) {
-
+        Optional<Ticket> ticket = ticketDatabase.getById(id);
+        if (ticket.isEmpty()) return;
+        Optional<TicketCategory> newCategory = ticketCategoryDatabase.getById(newCategoryId);
+        if (newCategory.isEmpty()) return;
+        if (Objects.equals(ticket.get().getTicketCategoryId(), newCategoryId)) return;
+        Long oldTicketCategoryId = ticket.get().getTicketCategoryId();
+        ticket.get().setTicketCategoryId(newCategoryId);
+        ticketDatabase.update(ticket.get());
+        ticketCategoryController.removeTicket(oldTicketCategoryId, id);
+        ticketCategoryController.addTicket(newCategoryId, id);
     }
 
     /**
@@ -87,7 +93,10 @@ public class TicketControllerImplementation extends TicketController {
      */
     @Override
     public void changeCost(Long id, double newTotalCost) {
-
+        Optional<Ticket> ticket = ticketDatabase.getById(id);
+        if (ticket.isEmpty()) return;
+        ticket.get().setCost(newTotalCost);
+        ticketDatabase.update(ticket.get());
     }
 
     /**
@@ -95,7 +104,11 @@ public class TicketControllerImplementation extends TicketController {
      */
     @Override
     public void changeWeight(Long id, Long personId, double newWeight) {
-
+        Optional<Ticket> ticket = ticketDatabase.getById(id);
+        if (ticket.isEmpty()) return;
+        if (!ticket.get().getDistribution().containsKey(personId)) return;
+        ticket.get().getDistribution().put(personId, newWeight);
+        ticketDatabase.update(ticket.get());
     }
 
     /**
@@ -103,7 +116,13 @@ public class TicketControllerImplementation extends TicketController {
      */
     @Override
     public void delete(Long id) {
-
+        Optional<Ticket> ticket = ticketDatabase.getById(id);
+        if (ticket.isEmpty()) return;
+        ticketDatabase.deleteById(id);
+        ticketCategoryController.removeTicket(ticket.get().getTicketCategoryId(), id);
+        for (Long personId : ticket.get().getDistribution().keySet()) {
+            personController.removeTicket(personId, id);
+        }
     }
 
     /**

@@ -10,6 +10,7 @@ public class Ticket implements Model {
     private final Long id;
     private double cost;
     private Long ticketCategoryId;
+    private Long payerId;
     private final Map<Long, Double> distribution = new HashMap<>();
 
     public Ticket(Long id, double cost, Long ticketCategoryId) {

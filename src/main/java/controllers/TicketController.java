@@ -37,7 +37,7 @@ public abstract class TicketController {
     public abstract void removePerson(Long id, Long personId);
 
     /**
-     * Changes the current category.
+     * Changes the current category. SHOULD call {@link TicketCategoryController#removeTicket(Long, Long)} and {@link TicketCategoryController#addTicket(Long, Long)}
      */
     public abstract void changeCategory(Long id, Long newCategoryId);
 
