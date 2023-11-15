@@ -2,6 +2,7 @@ package database;
 
 import models.Model;
 
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +26,7 @@ public abstract class Database<T extends Model> {
      * creates and returns a model. null on failure.
      */
     public final Optional<T> create(T model) {
-        changes.firePropertyChange("Model Creation", null, model);
+        changes.firePropertyChange(Property.CREATE.name, null, model);
         return createImplementation(model);
     }
 
@@ -34,7 +35,7 @@ public abstract class Database<T extends Model> {
      * If the entry does not exist a new one will be created.
      */
     public final Optional<T> update(T model) {
-        changes.firePropertyChange("Model Modification", getById(model.getId()).orElse(null), model);
+        changes.firePropertyChange(Property.UPDATE.name, getById(model.getId()).orElse(null), model);
         return updateImplementation(model);
     }
 
@@ -42,7 +43,7 @@ public abstract class Database<T extends Model> {
      * Deletes the entry from the database.
      */
     public final void deleteById(Long id) {
-        changes.firePropertyChange("Model Deletion", getById(id).orElse(null), null);
+        changes.firePropertyChange(Property.DELETE.name, getById(id).orElse(null), null);
         deleteByIdImplementation(id);
     }
 
@@ -50,4 +51,12 @@ public abstract class Database<T extends Model> {
     protected abstract void deleteByIdImplementation(Long id);
 
     protected abstract Optional<T> createImplementation(T model);
+
+    public void addListener(PropertyChangeListener listener) {
+        changes.addPropertyChangeListener(listener);
+    }
+
+    public void removeListener(PropertyChangeListener listener) {
+        changes.removePropertyChangeListener(listener);
+    }
 }
