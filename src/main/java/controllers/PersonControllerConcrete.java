@@ -4,7 +4,6 @@ import database.Database;
 import models.Person;
 import models.Ticket;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
