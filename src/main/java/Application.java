@@ -26,9 +26,9 @@ public class Application {
         ticketDatabase = factory.createTicketDataBase();
         ticketCategoryDatabase = factory.createTicketCategoryDatabase();
 
-        personController = factory.createPersonController(personDatabase);
-        ticketController = factory.createTicketController(ticketDatabase);
-        ticketCategoryController = factory.createTicketCategoryController(ticketCategoryDatabase);
+        personController = factory.createPersonController(personDatabase, ticketDatabase);
+        ticketController = factory.createTicketController(ticketDatabase, personDatabase, ticketCategoryDatabase);
+        ticketCategoryController = factory.createTicketCategoryController(ticketCategoryDatabase, ticketDatabase);
 
         factory.resolve(personController, ticketController, ticketCategoryController);
 

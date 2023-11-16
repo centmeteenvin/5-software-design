@@ -3,20 +3,28 @@ package controllers;
 import database.Database;
 import models.Person;
 import models.Ticket;
+import models.TicketCategory;
 
 import java.util.List;
+import java.util.Optional;
 
 public abstract class TicketController {
-    private final Database<Ticket> ticketDatabase;
+    protected final Database<Ticket> ticketDatabase;
+    protected final Database<Person> personDatabase;
+    protected final Database<TicketCategory> ticketCategoryDatabase;
 
-    protected TicketController(Database<Ticket> ticketDatabase) {
+    protected PersonController personController;
+    protected TicketCategoryController ticketCategoryController;
+    protected TicketController(Database<Ticket> ticketDatabase, Database<Person> personDatabase, Database<TicketCategory> ticketCategoryDatabase) {
         this.ticketDatabase = ticketDatabase;
+        this.personDatabase = personDatabase;
+        this.ticketCategoryDatabase = ticketCategoryDatabase;
     }
 
     /**
-     * Creates a new ticket and stores it in the db.
+     * Creates a new ticket and stores it in the db. If the categoryId does not exist or any of the personIds do not exist. it will return empty.
      */
-    public abstract Ticket create(Long categoryId, double totalCost, List<Long> personsId);
+    public abstract Optional<Ticket> create(Long categoryId, double totalCost, List<Long> personsId);
 
     /**
      * Adds a person to the ticket. SHOULD call {@link PersonController#addTicket(Long, Long)}.
@@ -29,7 +37,7 @@ public abstract class TicketController {
     public abstract void removePerson(Long id, Long personId);
 
     /**
-     * Changes the current category.
+     * Changes the current category. SHOULD call {@link TicketCategoryController#removeTicket(Long, Long)} and {@link TicketCategoryController#addTicket(Long, Long)}
      */
     public abstract void changeCategory(Long id, Long newCategoryId);
 
@@ -53,6 +61,10 @@ public abstract class TicketController {
      * @param id
      */
     public abstract void calculate(Long id);
-    public abstract void setPersonController(PersonController personController);
-    public abstract void setTicketCategoryController(TicketCategoryController ticketCategoryController);
+    public final void setPersonController(PersonController personController) {
+        this.personController = personController;
+    }
+    public final void setTicketCategoryController(TicketCategoryController ticketCategoryController) {
+        this.ticketCategoryController = ticketCategoryController;
+    }
 }

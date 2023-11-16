@@ -6,7 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 @Data
 public class TicketCategory implements Model {
-    private final Long id = System.nanoTime();
+    private final Long id;
     private String name;
     private final List<Long> ticketIds = new ArrayList<>();
+
+    public TicketCategory(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }
