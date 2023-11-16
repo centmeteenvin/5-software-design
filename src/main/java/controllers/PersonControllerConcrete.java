@@ -4,6 +4,7 @@ import database.Database;
 import models.Person;
 import models.Ticket;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -80,11 +81,13 @@ public class PersonControllerConcrete extends PersonController {
     public void delete(Long id) {
         Optional<Person> person = personDatabase.getById(id);
         if (person.isPresent()) {
-            personDatabase.deleteById(id);
-            for (long ticketId : person.get().getTicketsId()) {
+            Iterator<Long> it = person.get().getTicketsId().iterator();
+            while (it.hasNext()){
+                long ticketId = it.next();
                 ticketController.removePerson(id, ticketId);
-                person.get().getTicketsId().remove(ticketId);
+                it.remove();
             }
+            personDatabase.deleteById(id);
         }
     }
 

@@ -77,6 +77,7 @@ public class PersonControllerImplementationTest {
         assertEquals(testPerson.getTicketsId().size(), 1);
         assertEquals(testPerson.getTicketsId().get(0), 2L);
 
+        // Make sure ticketController is not used, otherwise cyclic reference
         verifyNoInteractions(mockTicketController);
     }
 
@@ -99,5 +100,87 @@ public class PersonControllerImplementationTest {
 
         verify(mockPersonDatabase, times(1)).update(any());
         assertTrue(testPerson.getTicketsId().isEmpty());
+
+        // Make sure ticketController is not used, otherwise cyclic reference
+        verifyNoInteractions(mockTicketController);
+    }
+
+    @Test
+    void Delete() {
+        doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
+        doNothing().when(mockPersonDatabase).deleteById(any());
+        doNothing().when(mockTicketController).removePerson(any(), any());
+
+        Person testPerson = spy(new Person(1L, "foo", 0));
+
+        // Do nothing (Check)
+        controller.delete(1L);
+
+        verify(mockPersonDatabase, never()).deleteById(any());
+        verify(mockTicketController, never()).removePerson(any(), any());
+
+        doReturn(Optional.of(testPerson)).when(mockPersonDatabase).getById(1L);
+
+        // Only run "deleteById" once (Check)
+        controller.delete(1L);
+
+        verify(mockPersonDatabase, times(1)).deleteById(any());
+        verify(mockTicketController, never()).removePerson(any(), any());
+
+        doReturn(Optional.of(testPerson)).when(mockPersonDatabase).getById(1L);
+
+        testPerson.getTicketsId().add(1L);
+        testPerson.getTicketsId().add(2L);
+
+        // Run "deleteById" once and "removePerson" twice
+        controller.delete(1L);
+
+        verify(mockPersonDatabase, times(2)).deleteById(any());
+        verify(mockTicketController, times(2)).removePerson(any(),any());
+        assertTrue(testPerson.getTicketsId().isEmpty());
+    }
+
+    @Test
+    void rename(){
+        doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
+        doReturn(Optional.empty()).when(mockPersonDatabase).update(any());
+
+        Person testPerson = spy(new Person(1L,"foo",0));
+
+        controller.rename(1L,"faa");
+
+        assertEquals(testPerson.getName(),"foo");
+        verify(mockPersonDatabase, times(1)).getById(any());
+        verify(mockPersonDatabase, never()).update(any());
+
+        doReturn(Optional.of(testPerson)).when(mockPersonDatabase).getById(any());
+
+        controller.rename(1L,"faa");
+
+        assertEquals(testPerson.getName(),"faa");
+        verify(mockPersonDatabase, times(2)).getById(any());
+        verify(mockPersonDatabase, times(1)).update(any());
+    }
+
+    @Test
+    void modifyDebt() {
+        doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
+        doReturn(Optional.empty()).when(mockPersonDatabase).update(any());
+
+        Person testPerson = spy(new Person(1L,"foo",0));
+
+        controller.modifyDebt(1L,10);
+
+        assertEquals(testPerson.getDebt(),0);
+        verify(mockPersonDatabase, times(1)).getById(any());
+        verify(mockPersonDatabase, never()).update(any());
+
+        doReturn(Optional.of(testPerson)).when(mockPersonDatabase).getById(any());
+
+        controller.modifyDebt(1L,10);
+
+        assertEquals(testPerson.getDebt(),10);
+        verify(mockPersonDatabase, times(2)).getById(any());
+        verify(mockPersonDatabase, times(1)).update(any());
     }
 }
