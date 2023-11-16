@@ -76,6 +76,8 @@ public class PersonControllerImplementationTest {
 
         assertEquals(testPerson.getTicketsId().size(), 1);
         assertEquals(testPerson.getTicketsId().get(0), 2L);
+
+        verifyNoInteractions(mockTicketController);
     }
 
     @Test
@@ -90,7 +92,7 @@ public class PersonControllerImplementationTest {
 
         assertEquals(testPerson.getTicketsId().get(0), 1L);
         verify(mockPersonDatabase, never()).update(any());
-        
+
         doReturn(Optional.of(testPerson)).when(mockPersonDatabase).getById(any());
 
         controller.removeTicket(testPerson.getId(), 1L);
