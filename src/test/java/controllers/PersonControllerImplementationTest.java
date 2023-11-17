@@ -21,7 +21,7 @@ public class PersonControllerImplementationTest {
     private Database<TicketCategory> mockTicketCategoryDatabase;
 
     private TicketController mockTicketController;
-    private PersonControllerConcrete controller;
+    private PersonControllerImplementation controller;
     private TicketCategoryController mockTicketCategoryController;
 
     @BeforeEach
@@ -33,7 +33,7 @@ public class PersonControllerImplementationTest {
         mockTicketController = mock(TicketController.class);
         mockTicketCategoryController = mock(TicketCategoryController.class);
 
-        controller = new PersonControllerConcrete(mockPersonDatabase, mockTicketDatabase);
+        controller = new PersonControllerImplementation(mockPersonDatabase, mockTicketDatabase);
         controller.setTicketController(mockTicketController);
     }
 
