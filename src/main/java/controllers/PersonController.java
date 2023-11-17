@@ -9,12 +9,15 @@ import java.util.Optional;
 public abstract class PersonController {
     protected final Database<Person> personDatabase;
     protected final Database<Ticket> ticketDatabase;
+    protected TicketController ticketController;
     protected PersonController(Database<Person> personDatabase, Database<Ticket> ticketDatabase) {
         this.personDatabase = personDatabase;
         this.ticketDatabase = ticketDatabase;
     }
 
-    public abstract void setTicketController(TicketController ticketController);
+    public final void setTicketController(TicketController ticketController) {
+        this.ticketController = ticketController;
+    }
 
     /**
      * Creates a new person. Identifier is generated randomly. debt is initialized at 0.
