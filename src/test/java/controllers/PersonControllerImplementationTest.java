@@ -170,7 +170,7 @@ public class PersonControllerImplementationTest {
         Person testPerson1 = new Person(1L,"foo");
         Person testPerson2 = new Person(2L,"bar");
 
-        controller.modifyDebt(1L,2L, 10);
+        controller.modifyDebt(1L,2L, 100);
 
         assertTrue(testPerson1.getDebts().isEmpty());
         assertTrue(testPerson2.getDebts().isEmpty());
@@ -179,7 +179,7 @@ public class PersonControllerImplementationTest {
 
         doReturn(Optional.of(testPerson1)).when(mockPersonDatabase).getById(1L);
 
-        controller.modifyDebt(1L,2L, 10);
+        controller.modifyDebt(1L,2L, 100);
 
         assertTrue(testPerson1.getDebts().isEmpty());
         assertTrue(testPerson2.getDebts().isEmpty());
@@ -188,7 +188,7 @@ public class PersonControllerImplementationTest {
 
         doReturn(Optional.of(testPerson2)).when(mockPersonDatabase).getById(2L);
 
-        controller.modifyDebt(1L,2L, 10);
+        controller.modifyDebt(1L,2L, 100);
 
         assertFalse(testPerson1.getDebts().isEmpty());
         assertTrue(testPerson1.getDebts().containsKey(2L));
@@ -196,5 +196,8 @@ public class PersonControllerImplementationTest {
         assertTrue(testPerson2.getDebts().isEmpty());
         verify(mockPersonDatabase, times(6)).getById(any());
         verify(mockPersonDatabase, times(1)).update(any());
+
+        controller.modifyDebt(1L, 2L, -50);
+        assertEquals(testPerson1.getDebts().get(2L),50);
     }
 }

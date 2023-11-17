@@ -103,6 +103,17 @@ public class PersonControllerImplementation extends PersonController {
      */
     @Override
     public void modifyDebt(Long id, Long otherId,double difference) {
+        Optional<Person> person = personDatabase.getById(id);
+        Optional<Person> subject = personDatabase.getById(otherId);
+        if (person.isEmpty() || subject.isEmpty()) return;
+        if (!person.get().getDebts().containsKey(otherId)) {
+            person.get().getDebts().put(otherId, difference);
+        }
+        else {
+            double previousDebt = person.get().getDebts().get(otherId);
+            person.get().getDebts().put(otherId, previousDebt + difference);
+        }
+        personDatabase.update(person.get());
 //        Optional<Person> person = personDatabase.getById(id);
 //        if (person.isPresent()) {
 //            person.get().setDebt(person.get().getDebt() + difference);
