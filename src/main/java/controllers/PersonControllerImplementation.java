@@ -16,15 +16,6 @@ public class PersonControllerImplementation extends PersonController {
     }
 
     /**
-     * Sets the instance of the ticketController
-     * @param ticketController
-     */
-    @Override
-    public void setTicketController(TicketController ticketController) {
-        this.ticketController = ticketController;
-    }
-
-    /**
      * Creates the person and puts it in the database.
      * @param name
      * @return
