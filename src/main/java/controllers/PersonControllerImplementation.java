@@ -8,10 +8,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-public class PersonControllerConcrete extends PersonController {
+public class PersonControllerImplementation extends PersonController {
+    private TicketController ticketController;
 
-    protected PersonControllerConcrete(Database<Person> personDatabase, Database<Ticket> ticketDatabase) {
+    protected PersonControllerImplementation(Database<Person> personDatabase, Database<Ticket> ticketDatabase) {
         super(personDatabase, ticketDatabase);
+    }
+
+    /**
+     * Sets the instance of the ticketController
+     * @param ticketController
+     */
+    @Override
+    public void setTicketController(TicketController ticketController) {
+        this.ticketController = ticketController;
     }
 
     /**
