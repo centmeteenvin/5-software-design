@@ -132,4 +132,20 @@ public class TicketControllerImplementation extends TicketController {
     public void calculate(Long id) {
 
     }
+
+    /**
+     * Sets the payer in the ticket to the id of a Person or null when given specifically
+     * @param id
+     * @param payerId
+     */
+    @Override
+    public void setPayer(Long id, Long payerId) {
+        Optional<Ticket> ticket = ticketDatabase.getById(id);
+        if (ticket.isEmpty()) return;
+        Optional<Person> person = personDatabase.getById(payerId);
+        if (payerId == null || person.isPresent()) {
+            ticket.get().setPayerId(payerId);
+            ticketDatabase.update(ticket.get());
+        }
+    }
 }
