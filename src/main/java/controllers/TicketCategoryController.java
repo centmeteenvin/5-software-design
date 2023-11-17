@@ -9,6 +9,7 @@ import java.util.Optional;
 public abstract class TicketCategoryController {
     protected final Database<TicketCategory> ticketCategoryDatabase;
     protected final Database<Ticket> ticketDatabase;
+    protected TicketController ticketController;
 
     protected TicketCategoryController(Database<TicketCategory> ticketCategoryDatabase, Database<Ticket> ticketDatabase) {
         this.ticketCategoryDatabase = ticketCategoryDatabase;
@@ -39,5 +40,8 @@ public abstract class TicketCategoryController {
      * Deletes the category. SHOULD call {@link TicketController#changeCategory(Long, Long)}.
      */
     public abstract void delete(Long id);
-    public abstract void setTicketController(TicketController ticketController);
+
+    public final void setTicketController(TicketController ticketController) {
+        this.ticketController = ticketController;
+    }
 }
