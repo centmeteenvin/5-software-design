@@ -3,12 +3,9 @@ Project money tracker
 ## TODO:
  - Groepsnaam -> the script kiddos
  - KLAD protype schema -ish
- - Github private
  - UML diagrammen
- - naamconventies
- - testConventies
- - dependency injectie
- - github conventies -> done
+ - Vincent: Integration test (Controllers + database)
+ - Joeri: getPayer, calculate
 
 ### Github conventies:
 - Main branch: niet pushen, enkel pull via Github
