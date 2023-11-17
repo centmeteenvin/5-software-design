@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class PersonControllerImplementation extends PersonController {
-    private TicketController ticketController;
 
     protected PersonControllerImplementation(Database<Person> personDatabase, Database<Ticket> ticketDatabase) {
         super(personDatabase, ticketDatabase);
@@ -114,11 +113,5 @@ public class PersonControllerImplementation extends PersonController {
             person.get().getDebts().put(otherId, previousDebt + difference);
         }
         personDatabase.update(person.get());
-//        Optional<Person> person = personDatabase.getById(id);
-//        if (person.isPresent()) {
-//            person.get().setDebt(person.get().getDebt() + difference);
-//            personDatabase.update(person.get());
-//        }
-        //TODO
     }
 }
