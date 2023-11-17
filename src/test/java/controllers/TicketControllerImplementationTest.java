@@ -59,7 +59,7 @@ class TicketControllerImplementationTest {
         receivedTicket = controller.create(1L, 100, List.of(2L));
         assertTrue(receivedTicket.isEmpty());
 
-        Person person = new Person(2L, "bar", 0);
+        Person person = new Person(2L, "bar");
         Ticket ticket = new Ticket(3L, 100, 1L);
         ticket.getDistribution().put(1L, 100D);
         doReturn(Optional.of(person)).when(mockPersonDatabase).getById(2L);
@@ -81,7 +81,7 @@ class TicketControllerImplementationTest {
 
 
         controller.addPerson(1L, 1L);
-        Person person = new Person(2L, "bar", 0);
+        Person person = new Person(2L, "bar");
         Ticket ticket = new Ticket(3L, 100, 1L);
 
         doReturn(Optional.of(person)).when(mockPersonDatabase).getById(any());
@@ -112,7 +112,7 @@ class TicketControllerImplementationTest {
 
 
         controller.removePerson(1L, 1L);
-        Person person = new Person(1L, "bar", 0);
+        Person person = new Person(1L, "bar");
         Ticket ticket = new Ticket(1L, 100, 1L);
 
         doReturn(Optional.of(ticket)).when(mockTicketDatabase).getById(any());

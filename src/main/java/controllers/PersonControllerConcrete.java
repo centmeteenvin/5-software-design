@@ -23,7 +23,7 @@ public class PersonControllerConcrete extends PersonController {
     public Optional<Person> create(String name) {
         long id = System.nanoTime();
 
-        Optional<Person> person = personDatabase.create(new Person(id, name, 0));
+        Optional<Person> person = personDatabase.create(new Person(id, name));
 
         return person;
 
@@ -97,17 +97,16 @@ public class PersonControllerConcrete extends PersonController {
     }
 
     /**
-     * Adds the difference to the persons debt
-     *
-     * @param id
+     * Adds the difference to the person's debt.
      * @param difference the difference that is ADDED to the current person's debt.
      */
     @Override
-    public void modifyDebt(Long id, double difference) {
-        Optional<Person> person = personDatabase.getById(id);
-        if (person.isPresent()) {
-            person.get().setDebt(person.get().getDebt() + difference);
-            personDatabase.update(person.get());
-        }
+    public void modifyDebt(Long id, Long otherId,double difference) {
+//        Optional<Person> person = personDatabase.getById(id);
+//        if (person.isPresent()) {
+//            person.get().setDebt(person.get().getDebt() + difference);
+//            personDatabase.update(person.get());
+//        }
+        //TODO
     }
 }

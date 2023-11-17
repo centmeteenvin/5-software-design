@@ -24,6 +24,7 @@ public class PersonControllerImplementationTest {
     private PersonControllerConcrete controller;
     private TicketCategoryController mockTicketCategoryController;
 
+    @SuppressWarnings("unchecked")
     @BeforeEach
     void setup() {
         mockTicketDatabase = (Database<Ticket>) mock(Database.class);
@@ -48,7 +49,7 @@ public class PersonControllerImplementationTest {
         Optional<Person> receivedPerson = controller.create("foo");
         assertTrue(receivedPerson.isEmpty());
 
-        Person person = new Person(1L, "foo1", 0);
+        Person person = new Person(1L, "foo1");
         doReturn(Optional.of(person)).when(mockPersonDatabase).create(any());
         receivedPerson = controller.create("foo1");
         assertTrue(receivedPerson.isPresent());
@@ -60,7 +61,7 @@ public class PersonControllerImplementationTest {
         doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
         doReturn(Optional.empty()).when(mockTicketDatabase).getById(any());
 
-        Person testPerson = new Person(1L, "foo", 0);
+        Person testPerson = new Person(1L, "foo");
         Ticket testTicket = new Ticket(2L, 100, 1L);
         controller.addTicket(testPerson.getId(), 2L);
 
@@ -86,7 +87,7 @@ public class PersonControllerImplementationTest {
         doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
         doReturn(Optional.empty()).when(mockPersonDatabase).update(any());
 
-        Person testPerson = new Person(1L, "foo", 0);
+        Person testPerson = new Person(1L, "foo");
         testPerson.getTicketsId().add(1L);
 
         controller.removeTicket(testPerson.getId(), 1L);
@@ -111,7 +112,7 @@ public class PersonControllerImplementationTest {
         doNothing().when(mockPersonDatabase).deleteById(any());
         doNothing().when(mockTicketController).removePerson(any(), any());
 
-        Person testPerson = spy(new Person(1L, "foo", 0));
+        Person testPerson = spy(new Person(1L, "foo"));
 
         // Do nothing (Check)
         controller.delete(1L);
@@ -145,7 +146,7 @@ public class PersonControllerImplementationTest {
         doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
         doReturn(Optional.empty()).when(mockPersonDatabase).update(any());
 
-        Person testPerson = spy(new Person(1L,"foo",0));
+        Person testPerson = spy(new Person(1L,"foo"));
 
         controller.rename(1L,"faa");
 
@@ -162,25 +163,25 @@ public class PersonControllerImplementationTest {
         verify(mockPersonDatabase, times(1)).update(any());
     }
 
-    @Test
-    void modifyDebt() {
-        doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
-        doReturn(Optional.empty()).when(mockPersonDatabase).update(any());
-
-        Person testPerson = spy(new Person(1L,"foo",0));
-
-        controller.modifyDebt(1L,10);
-
-        assertEquals(testPerson.getDebt(),0);
-        verify(mockPersonDatabase, times(1)).getById(any());
-        verify(mockPersonDatabase, never()).update(any());
-
-        doReturn(Optional.of(testPerson)).when(mockPersonDatabase).getById(any());
-
-        controller.modifyDebt(1L,10);
-
-        assertEquals(testPerson.getDebt(),10);
-        verify(mockPersonDatabase, times(2)).getById(any());
-        verify(mockPersonDatabase, times(1)).update(any());
-    }
+//    @Test TODO
+//    void modifyDebt() {
+//        doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
+//        doReturn(Optional.empty()).when(mockPersonDatabase).update(any());
+//
+//        Person testPerson = spy(new Person(1L,"foo",0));
+//
+//        controller.modifyDebt(1L,10);
+//
+//        assertEquals(testPerson.getDebt(),0);
+//        verify(mockPersonDatabase, times(1)).getById(any());
+//        verify(mockPersonDatabase, never()).update(any());
+//
+//        doReturn(Optional.of(testPerson)).when(mockPersonDatabase).getById(any());
+//
+//        controller.modifyDebt(1L,10);
+//
+//        assertEquals(testPerson.getDebt(),10);
+//        verify(mockPersonDatabase, times(2)).getById(any());
+//        verify(mockPersonDatabase, times(1)).update(any());
+//    }
 }

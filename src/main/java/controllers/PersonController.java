@@ -47,8 +47,10 @@ public abstract class PersonController {
 
     /**
      * Modifies the person's debt.
+     * @param id The id of the person's debts we want to modify.
+     * @param otherPersonId The id of the other person. This is the line in the Person's debt we want to change.
      * @param difference the difference that is ADDED to the current person's debt.
      */
-    public abstract void modifyDebt(Long id, double difference);
+    public abstract void modifyDebt(Long id, Long otherPersonId, double difference);
 
 }
