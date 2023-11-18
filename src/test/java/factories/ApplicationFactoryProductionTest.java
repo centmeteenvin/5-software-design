@@ -9,39 +9,42 @@ import models.TicketCategory;
 import org.junit.jupiter.api.Test;
 import views.View;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ApplicationFactoryProductionTest {
-    private final ApplicationFactoryProduction factory = new ApplicationFactoryProductionConcrete();
-
+class ApplicationFactoryProductionTest extends ApplicationFactoryTest {
     @Test
     void createPersonDataBase() {
-        assertTrue(factory.createPersonDataBase() instanceof DatabaseHashMap<Person>);
+        assertTrue(getFactory().createPersonDataBase() instanceof DatabaseHashMap<Person>);
     }
 
     @Test
     void createTicketDataBase() {
-        assertTrue(factory.createTicketDataBase() instanceof DatabaseHashMap<Ticket>);
+        assertTrue(getFactory().createTicketDataBase() instanceof DatabaseHashMap<Ticket>);
     }
 
     @Test
     void createTicketCategoryDatabase() {
-        assertTrue(factory.createTicketCategoryDatabase() instanceof DatabaseHashMap<TicketCategory>);
+        assertTrue(getFactory().createTicketCategoryDatabase() instanceof DatabaseHashMap<TicketCategory>);
     }
 
     @Test
     void createPersonController() {
-        assertTrue(factory.createPersonController(null, null) instanceof PersonControllerImplementation);
+        assertTrue(getFactory().createPersonController(null, null) instanceof PersonControllerImplementation);
     }
 
     @Test
     void createTicketController() {
-        assertTrue(factory.createTicketController(null, null, null) instanceof TicketControllerImplementation);
+        assertTrue(getFactory().createTicketController(null, null, null) instanceof TicketControllerImplementation);
     }
 
     @Test
     void createTicketCategoryController() {
-        assertTrue(factory.createTicketCategoryController(null, null) instanceof TicketCategoryControllerImplementation);
+        assertTrue(getFactory().createTicketCategoryController(null, null) instanceof TicketCategoryControllerImplementation);
+    }
+
+    @Override
+    protected ApplicationFactory getFactory() {
+        return new ApplicationFactoryProductionConcrete();
     }
 
     private static class ApplicationFactoryProductionConcrete extends ApplicationFactoryProduction {
