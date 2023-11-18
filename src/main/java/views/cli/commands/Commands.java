@@ -11,7 +11,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 public enum Commands {
-    HELP(CommandHelp.commandString, CommandHelp.class);
+    HELP(CommandHelp.commandString, CommandHelp.class),
+    PERSONS(CommandPersons.commandString, CommandPersons.class)
+    ;
 
     Commands(String commandLineString, Class<? extends Command> commandClass) {
         this.commandString = commandLineString;
