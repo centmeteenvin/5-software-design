@@ -1,5 +1,6 @@
 package views.cli.commands;
 
+import views.cli.ViewCommandLine;
 import views.cli.io.Input;
 import views.cli.io.Output;
 
@@ -12,8 +13,8 @@ public class CommandHelp extends Command {
     /**
      * @param args the arguments that are given with the command. [0] equals {@link #commandString}.
      */
-    public CommandHelp(String[] args, Input input, Output output) {
-        super(args, input, output);
+    public CommandHelp(String[] args, ViewCommandLine view) {
+        super(args, view);
     }
 
     public CommandHelp() {
@@ -36,14 +37,14 @@ public class CommandHelp extends Command {
 
     @Override
     public void execute() {
-        assert output != null;
         if (args.length == 1) {
             allShortDescription(Commands.getAllCommands());
         }
         else {
             Optional<Command> parsedCommand = parse(args);
             if (parsedCommand.isEmpty()) {
-                output.print("! Command Not Found\n");
+                assert view != null;
+                view.output.print("! Command Not Found\n");
                 return;
             }
             specificDescription(parsedCommand.get());
@@ -51,21 +52,21 @@ public class CommandHelp extends Command {
     }
 
     public void specificDescription(Command command) {
-        assert output != null;
-        output.print(command.description());
+        assert view != null;
+        view.output.print(command.description());
     }
 
     public void allShortDescription(Command[] commands) {
-        assert output != null;
-        output.print(description());
+        assert view != null;
+        view.output.print(description());
         for (Command command : commands) {
-            output.print("%\t" + command.getCommandString() + " - " + command.shortDescription() + "\n");
+            view.output.print("%\t" + command.getCommandString() + " - " + command.shortDescription() + "\n");
         }
     }
 
     protected Optional<Command> parse(String[] args) {
         String[] shortenedArgs = Arrays.copyOfRange(args, 1, args.length);
-        return Commands.parse(args, null, null);
+        return Commands.parse(args, view);
     }
 
     @Override

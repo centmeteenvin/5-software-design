@@ -4,6 +4,8 @@ import controllers.PersonController;
 import controllers.TicketCategoryController;
 import controllers.TicketController;
 import database.Database;
+import lombok.Getter;
+import lombok.Singular;
 import models.Person;
 import models.Ticket;
 import models.TicketCategory;
@@ -18,6 +20,7 @@ import views.cli.io.OutputStandard;
 import java.util.Objects;
 import java.util.Optional;
 
+@Getter
 public class ViewCommandLine extends View {
     public final Output output;
     public final Input input;
@@ -48,7 +51,7 @@ public class ViewCommandLine extends View {
             output.print(" > ");
             String inputString = input.input("");
             if (Objects.equals(inputString, "exit")) break;
-            Optional<Command> command = Commands.parse(inputString.split(" "), input, output);
+            Optional<Command> command = Commands.parse(inputString.split(" "), this);
             if (command.isEmpty()) output.print("! Command Not Found\n");
             else {
                 command.get().execute();

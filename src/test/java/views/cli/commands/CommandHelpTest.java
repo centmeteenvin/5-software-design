@@ -1,6 +1,7 @@
 package views.cli.commands;
 
 import org.junit.jupiter.api.Test;
+import views.cli.ViewCommandLine;
 import views.cli.io.Input;
 import views.cli.io.Output;
 
@@ -16,7 +17,11 @@ class CommandHelpTest {
     void allShortDescription() {
         String[] args = new String[]{CommandHelp.commandString};
         Output output = mock(Output.class);
-        CommandHelp command = spy(new CommandHelpEmpty(args, null, output));
+        ViewCommandLine view = new ViewCommandLine(
+                null, null, null,
+                null, null, null,
+                null, output);
+        CommandHelp command = spy(new CommandHelpEmpty(args, view));
         doNothing().when(output).print(any());
 
         command.allShortDescription(new CommandHelp[]{command, command});
@@ -29,7 +34,11 @@ class CommandHelpTest {
     void specificDescription() {
         String[] args = new String[]{CommandHelp.commandString};
         Output output = mock(Output.class);
-        CommandHelp command = spy(new CommandHelpEmpty(args, null, output));
+        ViewCommandLine view = new ViewCommandLine(
+                null, null, null,
+                null, null, null,
+                null, output);
+        CommandHelp command = spy(new CommandHelpEmpty(args, view));
         doNothing().when(output).print(any());
 
         command.specificDescription(command);
@@ -40,7 +49,11 @@ class CommandHelpTest {
     void execute() {
         String[] args = new String[]{CommandHelp.commandString};
         Output output = mock(Output.class);
-        CommandHelp command = spy(new CommandHelpEmpty(args, null, output));
+        ViewCommandLine view = new ViewCommandLine(
+                null, null, null,
+                null, null, null,
+                null, output);
+        CommandHelp command = spy(new CommandHelpEmpty(args, view));
         doNothing().when(output).print(any());
 
         command.execute();
@@ -49,7 +62,7 @@ class CommandHelpTest {
         verify(command, never()).specificDescription(any());
 
         args = new String[]{CommandHelp.commandString, "fake"};
-        command = spy(new CommandHelpEmpty(args, null, output));
+        command = spy(new CommandHelpEmpty(args, view));
 
         command.execute();
 
@@ -58,7 +71,7 @@ class CommandHelpTest {
         verify(output, times(1)).print("! Command Not Found\n");
 
         args = new String[]{CommandHelp.commandString, "real"};
-        command = spy(new CommandHelpEmpty(args, null, output));
+        command = spy(new CommandHelpEmpty(args, view));
 
         command.execute();
 
@@ -70,11 +83,9 @@ class CommandHelpTest {
 
         /**
          * @param args   the arguments that are given with the command. [0] equals {@link #commandString}.
-         * @param input
-         * @param output
          */
-        public CommandHelpEmpty(String[] args, Input input, Output output) {
-            super(args, input, output);
+        public CommandHelpEmpty(String[] args, ViewCommandLine view) {
+            super(args, view);
         }
 
         @Override

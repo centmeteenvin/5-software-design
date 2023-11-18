@@ -1,6 +1,7 @@
 package views.cli.commands;
 
 import lombok.SneakyThrows;
+import views.cli.ViewCommandLine;
 import views.cli.io.Input;
 import views.cli.io.Output;
 
@@ -26,13 +27,13 @@ public enum Commands {
      * @return returns the specified command, empty if not present.
      */
     @SneakyThrows
-    public static Optional<Command> parse(String[] args, Input input, Output output) {
+    public static Optional<Command> parse(String[] args, ViewCommandLine view) {
         String commandString = args[0];
         Optional<Commands> result = Arrays.stream(Commands.values()).filter(commands -> Objects.equals(commands.commandString, commandString)).findFirst();
         if (result.isEmpty()) return Optional.empty();
         Class<? extends Command> commandClass = result.get().commandClass;
-        Constructor<? extends Command> constructor = commandClass.getConstructor(String[].class, Input.class, Output.class);
-        return Optional.of(constructor.newInstance((Object) args, input, output));
+        Constructor<? extends Command> constructor = commandClass.getConstructor(String[].class, ViewCommandLine.class);
+        return Optional.of(constructor.newInstance((Object) args, view));
     }
 
     public static Command[] getAllCommands() {

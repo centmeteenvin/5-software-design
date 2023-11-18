@@ -10,7 +10,7 @@ class CommandsTest {
 
     @Test
     void parse() {
-        Optional<Command> result = Commands.parse(new String[]{CommandHelp.commandString}, null, null);
+        Optional<Command> result = Commands.parse(new String[]{CommandHelp.commandString}, null);
         assertTrue(result.isPresent());
         assertTrue(result.get() instanceof CommandHelp);
     }
