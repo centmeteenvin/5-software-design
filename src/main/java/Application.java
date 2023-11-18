@@ -2,7 +2,7 @@ import controllers.PersonController;
 import controllers.TicketCategoryController;
 import controllers.TicketController;
 import database.Database;
-import factories.AbstractApplicationFactory;
+import factories.ApplicationFactory;
 import models.Person;
 import models.Ticket;
 import models.TicketCategory;
@@ -20,7 +20,7 @@ public class Application {
 
     private final View view;
 
-    public Application(AbstractApplicationFactory factory) {
+    public Application(ApplicationFactory factory) {
 
         personDatabase = factory.createPersonDataBase();
         ticketDatabase = factory.createTicketDataBase();

@@ -11,7 +11,7 @@ import models.TicketCategory;
  * This is the factory that returns all the concrete Implementations of the controllers and the databases.
  * It does not yet define the view it will use.
  */
-public abstract class ApplicationFactoryProduction implements AbstractApplicationFactory{
+public abstract class ApplicationFactoryProduction implements ApplicationFactory {
     @Override
     public final Database<Person> createPersonDataBase() {
         return new DatabaseHashMap<>();

@@ -8,6 +8,7 @@ import models.Person;
 import models.Ticket;
 import models.TicketCategory;
 import views.View;
+import views.ViewCommandLine;
 
 /**
  * This implements all the controller en database implementation
@@ -15,6 +16,6 @@ import views.View;
 public class ApplicationFactoryProductionCLI extends ApplicationFactoryProduction{
     @Override
     public View createView(Database<Person> personDatabase, Database<Ticket> ticketDatabase, Database<TicketCategory> ticketCategoryDatabase, PersonController personController, TicketController ticketController, TicketCategoryController ticketCategoryController) {
-        return null;
+        return new ViewCommandLine(personDatabase, ticketDatabase, ticketCategoryDatabase, personController, ticketController, ticketCategoryController);
     }
 }
