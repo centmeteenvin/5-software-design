@@ -15,7 +15,7 @@ public abstract class TicketController {
 
     protected PersonController personController;
     protected TicketCategoryController ticketCategoryController;
-    protected TicketController(Database<Ticket> ticketDatabase, Database<Person> personDatabase, Database<TicketCategory> ticketCategoryDatabase) {
+    public TicketController(Database<Ticket> ticketDatabase, Database<Person> personDatabase, Database<TicketCategory> ticketCategoryDatabase) {
         this.ticketDatabase = ticketDatabase;
         this.personDatabase = personDatabase;
         this.ticketCategoryDatabase = ticketCategoryDatabase;

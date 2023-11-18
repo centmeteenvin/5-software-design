@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.Optional;
 
 public class TicketCategoryControllerImplementation extends TicketCategoryController {
-    protected TicketCategoryControllerImplementation(Database<TicketCategory> ticketCategoryDatabase, Database<Ticket> ticketDatabase) {
+    public TicketCategoryControllerImplementation(Database<TicketCategory> ticketCategoryDatabase, Database<Ticket> ticketDatabase) {
         super(ticketCategoryDatabase, ticketDatabase);
     }
 
