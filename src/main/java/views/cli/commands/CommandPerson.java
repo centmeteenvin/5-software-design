@@ -23,16 +23,21 @@ public class CommandPerson extends Command{
 
     @Override
     public String shortDescription() {
-        return null; //TODO
+        return "Entry point for most person related commands";
     }
 
     @Override
     public String description() {
-        return null; //TODO
+        return """
+                % Entry point for most of the person related commands
+                %
+                %  - create {name}
+                %       Creates a person with a give name.
+                """;
     }
 
     @Override
     public String getCommandString() {
-        return null; //TODO
+        return CommandPerson.commandString;
     }
 }
