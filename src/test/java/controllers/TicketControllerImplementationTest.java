@@ -8,11 +8,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class TicketControllerImplementationTest {
@@ -241,5 +241,43 @@ class TicketControllerImplementationTest {
 
     @Test
     void calculate() {
+    }
+    @Test
+    void setPayer() {
+        doReturn(Optional.empty()).when(mockTicketDatabase).getById(any());
+        doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
+        doReturn(Optional.empty()).when(mockTicketDatabase).update(any());
+
+        Ticket testTicket = new Ticket(1L, 0, 1L);
+
+        controller.setPayer(1L,1L);
+
+        verify(mockTicketDatabase, times(1)).getById(any());
+        verify(mockPersonDatabase, never()).getById(any());
+        verify(mockTicketDatabase, never()).update(any());
+        assertNull(testTicket.getPayerId());
+
+        doReturn(Optional.of(testTicket)).when(mockTicketDatabase).getById(any());
+        controller.setPayer(1L,1L);
+
+        verify(mockTicketDatabase, times(2)).getById(any());
+        verify(mockPersonDatabase, times(1)).getById(any());
+        verify(mockTicketDatabase, never()).update(any());
+        assertNull(testTicket.getPayerId());
+
+        Person testPerson = new Person(1L, "foo");
+        doReturn(Optional.of(testPerson)).when(mockPersonDatabase).getById(any());
+
+        controller.setPayer(1L,1L);
+        verify(mockTicketDatabase, times(3)).getById(any());
+        verify(mockPersonDatabase, times(2)).getById(any());
+        verify(mockTicketDatabase, times(1)).update(any());
+        assertEquals(testTicket.getPayerId(), 1L);
+
+        controller.setPayer(1L,null);
+        verify(mockTicketDatabase, times(4)).getById(any());
+        verify(mockPersonDatabase, times(3)).getById(any());
+        verify(mockTicketDatabase, times(2)).update(any());
+        assertNull(testTicket.getPayerId());
     }
 }
