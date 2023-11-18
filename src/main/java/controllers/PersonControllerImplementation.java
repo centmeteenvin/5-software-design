@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class PersonControllerImplementation extends PersonController {
 
-    protected PersonControllerImplementation(Database<Person> personDatabase, Database<Ticket> ticketDatabase) {
+    public PersonControllerImplementation(Database<Person> personDatabase, Database<Ticket> ticketDatabase) {
         super(personDatabase, ticketDatabase);
     }
 

@@ -11,7 +11,7 @@ import java.util.*;
 public class TicketControllerImplementation extends TicketController {
 
 
-    protected TicketControllerImplementation(Database<Ticket> ticketDatabase, Database<Person> personDatabase, Database<TicketCategory> ticketCategoryDatabase) {
+    public TicketControllerImplementation(Database<Ticket> ticketDatabase, Database<Person> personDatabase, Database<TicketCategory> ticketCategoryDatabase) {
         super(ticketDatabase, personDatabase, ticketCategoryDatabase);
     }
 
