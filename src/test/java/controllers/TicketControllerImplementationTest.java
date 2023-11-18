@@ -244,7 +244,7 @@ class TicketControllerImplementationTest {
         int timesTicketDatabase = 0;
         doReturn(Optional.empty()).when(mockTicketDatabase).getById(any());
         doNothing().when(mockTicketDatabase).deleteById(any());
-        doNothing().when(mockPersonController).modifyDebt(any(),any(), any());
+        doNothing().when(mockPersonController).modifyDebt(any(Long.class),any(Long.class), any(Double.class));
 
         controller.calculate(1L);
 
@@ -310,7 +310,7 @@ class TicketControllerImplementationTest {
 
         doReturn(Optional.of(testPerson1)).when(mockPersonDatabase).getById(1L);
         doReturn(Optional.of(testPerson2)).when(mockPersonDatabase).getById(2L);
-        doReturn(null).when(mockPersonController).modifyDebt(any(),any(),any());
+        doNothing().when(mockPersonController).modifyDebt(anyLong(),anyLong(),anyDouble());
 
 
         assertTrue(testPerson1.getDebts().isEmpty());
