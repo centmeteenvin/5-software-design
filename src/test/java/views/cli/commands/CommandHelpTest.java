@@ -55,7 +55,7 @@ class CommandHelpTest {
 
         verify(command, never()).allShortDescription(any());
         verify(command, never()).specificDescription(any());
-        verify(output, times(1)).print("! Command Not Found");
+        verify(output, times(1)).print("! Command Not Found\n");
 
         args = new String[]{CommandHelp.commandString, "real"};
         command = spy(new CommandHelpEmpty(args, null, output));

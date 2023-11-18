@@ -43,7 +43,7 @@ public class CommandHelp extends Command {
         else {
             Optional<Command> parsedCommand = parse(args);
             if (parsedCommand.isEmpty()) {
-                output.print("! Command Not Found");
+                output.print("! Command Not Found\n");
                 return;
             }
             specificDescription(parsedCommand.get());
