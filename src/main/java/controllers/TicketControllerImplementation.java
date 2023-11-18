@@ -7,6 +7,8 @@ import models.TicketCategory;
 
 import java.util.*;
 
+import static java.lang.Long.sum;
+
 
 public class TicketControllerImplementation extends TicketController {
 
@@ -35,7 +37,7 @@ public class TicketControllerImplementation extends TicketController {
         ticketCategoryController.addTicket(categoryId, ticket.get().getId());
         for (Long personId : personsId) {
             personController.addTicket(personId, ticket.get().getId());
-            ticket.get().getDistribution().put(personId, totalCost/personsId.size());
+            ticket.get().getDistribution().put(personId, totalCost / personsId.size());
         }
         return ticket;
     }
@@ -130,11 +132,36 @@ public class TicketControllerImplementation extends TicketController {
      */
     @Override
     public void calculate(Long id) {
+        // Check the ticket is in the database
+        Optional<Ticket> ticket = ticketDatabase.getById(id);
+        if (ticket.isEmpty()) return;
 
+        // Check that the total payed by everyone in the group is equal to the total cost of the ticket
+        Map<Long, Double> distribution = ticket.get().getDistribution();
+        if (distribution.values().stream().reduce(0., Double::sum) != ticket.get().getCost()) return;
+
+        Optional<Person> payer;
+        // Check if the payer is not null
+        if (ticket.get().getPayerId() != null) {
+            // Check if the payer still exists
+            payer = personDatabase.getById(ticket.get().getPayerId());
+            if (payer.isEmpty()) return;
+
+            for (Long debtHolder : distribution.keySet()) {
+                // Check if the debtHolder still exists
+                Optional<Person> person = personDatabase.getById(debtHolder);
+                if (person.isEmpty()) return;
+
+                double difference = distribution.get(person);
+                personController.modifyDebt(payer.get().getId(), debtHolder, difference);
+                personController.modifyDebt(debtHolder, payer.get().getId(), -difference);
+            }
+        }
     }
 
     /**
      * Sets the payer in the ticket to the id of a Person or null when given specifically
+     *
      * @param id
      * @param payerId
      */
