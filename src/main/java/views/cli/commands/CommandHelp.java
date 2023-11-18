@@ -66,7 +66,7 @@ public class CommandHelp extends Command {
 
     protected Optional<Command> parse(String[] args) {
         String[] shortenedArgs = Arrays.copyOfRange(args, 1, args.length);
-        return Commands.parse(args, view);
+        return Commands.parse(shortenedArgs, view);
     }
 
     @Override
