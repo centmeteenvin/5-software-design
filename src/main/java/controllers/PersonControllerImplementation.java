@@ -9,19 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 public class PersonControllerImplementation extends PersonController {
-    private TicketController ticketController;
 
-    protected PersonControllerImplementation(Database<Person> personDatabase, Database<Ticket> ticketDatabase) {
+    public PersonControllerImplementation(Database<Person> personDatabase, Database<Ticket> ticketDatabase) {
         super(personDatabase, ticketDatabase);
-    }
-
-    /**
-     * Sets the instance of the ticketController
-     * @param ticketController
-     */
-    @Override
-    public void setTicketController(TicketController ticketController) {
-        this.ticketController = ticketController;
     }
 
     /**

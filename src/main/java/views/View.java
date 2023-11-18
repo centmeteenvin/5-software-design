@@ -19,7 +19,7 @@ public abstract class View {
     private final TicketCategoryController ticketCategoryController;
 
 
-    protected View(Database<Person> personDatabase, Database<Ticket> ticketDatabase, Database<TicketCategory> ticketCategoryDatabase, PersonController personController, TicketController ticketController, TicketCategoryController ticketCategoryController) {
+    public View(Database<Person> personDatabase, Database<Ticket> ticketDatabase, Database<TicketCategory> ticketCategoryDatabase, PersonController personController, TicketController ticketController, TicketCategoryController ticketCategoryController) {
         this.personDatabase = personDatabase;
         this.ticketDatabase = ticketDatabase;
         this.ticketCategoryDatabase = ticketCategoryDatabase;

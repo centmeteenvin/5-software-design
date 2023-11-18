@@ -9,7 +9,7 @@ import models.Ticket;
 import models.TicketCategory;
 import views.View;
 
-public interface AbstractApplicationFactory {
+public interface ApplicationFactory {
 
     Database<Person> createPersonDataBase();
     Database<Ticket> createTicketDataBase();

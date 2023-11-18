@@ -10,7 +10,7 @@ public abstract class PersonController {
     protected final Database<Person> personDatabase;
     protected final Database<Ticket> ticketDatabase;
     protected TicketController ticketController;
-    protected PersonController(Database<Person> personDatabase, Database<Ticket> ticketDatabase) {
+    public PersonController(Database<Person> personDatabase, Database<Ticket> ticketDatabase) {
         this.personDatabase = personDatabase;
         this.ticketDatabase = ticketDatabase;
     }
