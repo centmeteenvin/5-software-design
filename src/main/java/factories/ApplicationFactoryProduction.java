@@ -1,9 +1,8 @@
 package factories;
 
-import controllers.PersonController;
-import controllers.TicketCategoryController;
-import controllers.TicketController;
+import controllers.*;
 import database.Database;
+import database.DatabaseHashMap;
 import models.Person;
 import models.Ticket;
 import models.TicketCategory;
@@ -15,31 +14,31 @@ import models.TicketCategory;
 public abstract class ApplicationFactoryProduction implements AbstractApplicationFactory{
     @Override
     public final Database<Person> createPersonDataBase() {
-        return null;
+        return new DatabaseHashMap<>();
     }
 
     @Override
     public final Database<Ticket> createTicketDataBase() {
-        return null;
+        return new DatabaseHashMap<>();
     }
 
     @Override
     public final Database<TicketCategory> createTicketCategoryDatabase() {
-        return null;
+        return new DatabaseHashMap<>();
     }
 
     @Override
     public final PersonController createPersonController(Database<Person> personDatabase, Database<Ticket> ticketDatabase) {
-        return null;
+        return new PersonControllerImplementation(personDatabase, ticketDatabase);
     }
 
     @Override
     public final TicketController createTicketController(Database<Ticket> ticketDatabase, Database<Person> personDatabase, Database<TicketCategory> ticketCategoryDatabase) {
-        return null;
+        return new TicketControllerImplementation(ticketDatabase, personDatabase, ticketCategoryDatabase);
     }
 
     @Override
     public final TicketCategoryController createTicketCategoryController(Database<TicketCategory> ticketCategoryDatabase, Database<Ticket> ticketDatabase) {
-        return null;
+        return new TicketCategoryControllerImplementation(ticketCategoryDatabase, ticketDatabase);
     }
 }
