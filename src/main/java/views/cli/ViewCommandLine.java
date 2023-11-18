@@ -1,4 +1,4 @@
-package views;
+package views.cli;
 
 import controllers.PersonController;
 import controllers.TicketCategoryController;
@@ -7,6 +7,7 @@ import database.Database;
 import models.Person;
 import models.Ticket;
 import models.TicketCategory;
+import views.View;
 
 public class ViewCommandLine extends View {
 

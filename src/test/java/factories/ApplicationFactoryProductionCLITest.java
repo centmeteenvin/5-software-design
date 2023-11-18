@@ -1,7 +1,7 @@
 package factories;
 
 import org.junit.jupiter.api.Test;
-import views.ViewCommandLine;
+import views.cli.ViewCommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

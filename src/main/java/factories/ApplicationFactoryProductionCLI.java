@@ -8,7 +8,7 @@ import models.Person;
 import models.Ticket;
 import models.TicketCategory;
 import views.View;
-import views.ViewCommandLine;
+import views.cli.ViewCommandLine;
 
 /**
  * This implements all the controller en database implementation
