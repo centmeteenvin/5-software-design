@@ -1,6 +1,10 @@
 package views.cli.commands;
 
+import controllers.PersonController;
+import models.Person;
 import views.cli.ViewCommandLine;
+
+import java.util.Optional;
 
 public class CommandPerson extends Command{
     public static final String commandString = "person";
@@ -50,6 +54,17 @@ public class CommandPerson extends Command{
     }
 
     public void executeCreate() {
-        //TODO
+        assert view != null;
+        if (args.length != 3) {
+            view.output.print(incorrectNumberOfArguments(3, args.length));
+            return;
+        }
+        PersonController personController = view.getPersonController();
+        Optional<Person> person = personController.create(args[2]);
+        if (person.isEmpty()) {
+            view.output.print("! Failed to create person with name \"%s\"\n".formatted(args[2]));
+            return;
+        }
+        view.output.print("%% Successfully created person with name \"%s\" with id: %s\n".formatted(person.get().getName(), person.get().getId()));
     }
 }
