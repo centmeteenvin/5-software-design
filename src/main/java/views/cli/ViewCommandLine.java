@@ -26,4 +26,14 @@ public class ViewCommandLine extends View {
         this.output = output;
         this.input = input;
     }
+
+    @Override
+    public void run() {
+        output.print("""
+                Welcome To The Script Kiddos' Money Tracker AKA: SKMT.
+                
+                To get started you can type "help".
+                This will show you all available commands.
+                """);
+    }
 }

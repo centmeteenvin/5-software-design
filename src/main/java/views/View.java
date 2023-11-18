@@ -27,4 +27,6 @@ public abstract class View {
         this.ticketController = ticketController;
         this.ticketCategoryController = ticketCategoryController;
     }
+
+    public abstract void run();
 }
