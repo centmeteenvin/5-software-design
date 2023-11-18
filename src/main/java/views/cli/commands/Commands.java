@@ -1,6 +1,7 @@
 package views.cli.commands;
 
 import lombok.SneakyThrows;
+import views.cli.ViewCommandLine;
 import views.cli.io.Input;
 import views.cli.io.Output;
 
@@ -11,7 +12,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 public enum Commands {
-    HELP(CommandHelp.commandString, CommandHelp.class);
+    HELP(CommandHelp.commandString, CommandHelp.class),
+    PERSONS(CommandPersons.commandString, CommandPersons.class)
+    ;
 
     Commands(String commandLineString, Class<? extends Command> commandClass) {
         this.commandString = commandLineString;
@@ -24,13 +27,13 @@ public enum Commands {
      * @return returns the specified command, empty if not present.
      */
     @SneakyThrows
-    public static Optional<Command> parse(String[] args, Input input, Output output) {
+    public static Optional<Command> parse(String[] args, ViewCommandLine view) {
         String commandString = args[0];
         Optional<Commands> result = Arrays.stream(Commands.values()).filter(commands -> Objects.equals(commands.commandString, commandString)).findFirst();
         if (result.isEmpty()) return Optional.empty();
         Class<? extends Command> commandClass = result.get().commandClass;
-        Constructor<? extends Command> constructor = commandClass.getConstructor(String[].class, Input.class, Output.class);
-        return Optional.of(constructor.newInstance((Object) args, input, output));
+        Constructor<? extends Command> constructor = commandClass.getConstructor(String[].class, ViewCommandLine.class);
+        return Optional.of(constructor.newInstance((Object) args, view));
     }
 
     public static Command[] getAllCommands() {

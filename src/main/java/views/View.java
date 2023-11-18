@@ -4,10 +4,12 @@ import controllers.PersonController;
 import controllers.TicketCategoryController;
 import controllers.TicketController;
 import database.Database;
+import lombok.Getter;
 import models.Person;
 import models.Ticket;
 import models.TicketCategory;
 
+@Getter
 public abstract class View {
 
     private final Database<Person> personDatabase;
