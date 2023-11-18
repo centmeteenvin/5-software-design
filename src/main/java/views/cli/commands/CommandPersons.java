@@ -10,12 +10,15 @@ public class CommandPersons extends Command {
 
     @Override
     public String shortDescription() {
-        return null; //TODO
+        return "Show all people and their ids";
     }
 
     @Override
     public String description() {
-        return null;//TODO
+        return """
+                % Shows all people that currently exist and their id.
+                % The id can be used to fetch a persons information via "person {id}".
+                """;
     }
 
     @Override
