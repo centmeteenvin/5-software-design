@@ -128,7 +128,7 @@ public class TicketControllerImplementation extends TicketController {
     }
 
     /**
-     * Updates {@link Person#getDebt()} for every person in the ticket via {@link PersonController#modifyDebt(Long, double)}.
+
      */
     @Override
     public void calculate(Long id) {
