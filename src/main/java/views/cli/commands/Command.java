@@ -29,4 +29,6 @@ public abstract class Command {
     public abstract String shortDescription();
 
     public abstract String description();
+
+    public abstract String getCommandString();
 }

@@ -14,11 +14,15 @@ import static org.mockito.Mockito.*;
 class CommandHelpTest {
 
     @Test
-    void shortDescription() {
-    }
+    void allShortDescription() {
+        String[] args = new String[]{CommandHelp.commandString};
+        Output output = mock(Output.class);
+        CommandHelp command = spy(new CommandHelpEmpty(args, null, output));
+        doNothing().when(output).print(any());
 
-    @Test
-    void description() {
+        command.allShortDescription(new CommandHelp[]{command, command});
+
+        verify(output, times(2)).print("%\t" + CommandHelp.commandString + " - " + command.shortDescription() + "\n");
     }
 
     @Test
@@ -69,7 +73,7 @@ class CommandHelpTest {
 
         @Override
         public String description() {
-            return "";
+            return "long description";
         }
 
         @Override
