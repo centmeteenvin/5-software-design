@@ -1,6 +1,10 @@
 package views.cli.commands;
 
+import database.Database;
+import models.Person;
 import views.cli.ViewCommandLine;
+
+import java.util.List;
 
 public class CommandPersons extends Command {
     public static final String commandString = "persons";
@@ -17,7 +21,16 @@ public class CommandPersons extends Command {
 
     @Override
     public void execute() {
-        //TODO
+        assert view != null;
+        if (args.length != 1) {
+            view.output.print(incorrectNumberOfArguments(1, args.length));
+            return;
+        }
+        Database<Person> personDatabase = view.getPersonDatabase();
+        List<Person> persons = personDatabase.getAll();
+        for (Person person : persons) {
+            view.output.print("% " + person.getId() + " -> " + person.getName() + "\n");
+        }
     }
 
     @Override
