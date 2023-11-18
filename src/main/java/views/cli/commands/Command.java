@@ -29,4 +29,11 @@ public abstract class Command {
     public abstract String description();
 
     public abstract String getCommandString();
+
+    public static String incorrectNumberOfArguments(int expected, int actual) {
+        return """
+                ! Incorrect number of arguments
+                ! Expected %s but received %s
+                """.formatted(expected, actual);
+    }
 }
