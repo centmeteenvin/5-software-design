@@ -18,7 +18,15 @@ public class CommandPerson extends Command{
 
     @Override
     public void execute() {
-        //TODO
+        assert view != null;
+        if (args.length == 1) {
+            view.output.print(incorrectNumberOfArguments(2, 1));
+            return;
+        }
+        switch (args[1]) {
+            case "create" -> executeCreate();
+            default -> view.output.print("! Incorrect arguments, consult [help person]\n");
+        }
     }
 
     @Override
@@ -39,5 +47,9 @@ public class CommandPerson extends Command{
     @Override
     public String getCommandString() {
         return CommandPerson.commandString;
+    }
+
+    public void executeCreate() {
+        //TODO
     }
 }
