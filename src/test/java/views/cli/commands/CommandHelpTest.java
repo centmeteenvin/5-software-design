@@ -7,7 +7,6 @@ import views.cli.io.Output;
 import java.util.Objects;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -23,8 +22,20 @@ class CommandHelpTest {
         command.allShortDescription(new CommandHelp[]{command, command});
 
         verify(output, times(2)).print("%\t" + CommandHelp.commandString + " - " + command.shortDescription() + "\n");
+        verify(output, times(1)).print(command.description());
     }
 
+    @Test
+    void specificDescription() {
+        String[] args = new String[]{CommandHelp.commandString};
+        Output output = mock(Output.class);
+        CommandHelp command = spy(new CommandHelpEmpty(args, null, output));
+        doNothing().when(output).print(any());
+
+        command.specificDescription(command);
+
+        verify(output, times(1)).print(command.description());
+    }
     @Test
     void execute() {
         String[] args = new String[]{CommandHelp.commandString};
@@ -35,7 +46,7 @@ class CommandHelpTest {
         command.execute();
 
         verify(command, times(1)).allShortDescription(any());
-        verify(command, never()).specificShortDescription(any());
+        verify(command, never()).specificDescription(any());
 
         args = new String[]{CommandHelp.commandString, "fake"};
         command = spy(new CommandHelpEmpty(args, null, output));
@@ -43,7 +54,7 @@ class CommandHelpTest {
         command.execute();
 
         verify(command, never()).allShortDescription(any());
-        verify(command, never()).specificShortDescription(any());
+        verify(command, never()).specificDescription(any());
         verify(output, times(1)).print("! Command Not Found");
 
         args = new String[]{CommandHelp.commandString, "real"};
@@ -52,7 +63,7 @@ class CommandHelpTest {
         command.execute();
 
         verify(command, never()).allShortDescription(any());
-        verify(command, times(1)).specificShortDescription(command);
+        verify(command, times(1)).specificDescription(command);
     }
 
     private static class CommandHelpEmpty extends CommandHelp {

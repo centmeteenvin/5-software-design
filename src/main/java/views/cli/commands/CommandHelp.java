@@ -3,7 +3,6 @@ package views.cli.commands;
 import views.cli.io.Input;
 import views.cli.io.Output;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -47,16 +46,18 @@ public class CommandHelp extends Command {
                 output.print("! Command Not Found");
                 return;
             }
-            specificShortDescription(parsedCommand.get());
+            specificDescription(parsedCommand.get());
         }
     }
 
-    public void specificShortDescription(Command command) {
-
+    public void specificDescription(Command command) {
+        assert output != null;
+        output.print(command.description());
     }
 
     public void allShortDescription(Command[] commands) {
         assert output != null;
+        output.print(description());
         for (Command command : commands) {
             output.print("%\t" + command.getCommandString() + " - " + command.shortDescription() + "\n");
         }
