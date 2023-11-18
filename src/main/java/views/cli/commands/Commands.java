@@ -1,8 +1,11 @@
 package views.cli.commands;
 
 import lombok.SneakyThrows;
+import views.cli.io.Input;
+import views.cli.io.Output;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,15 +24,26 @@ public enum Commands {
      * @return returns the specified command, empty if not present.
      */
     @SneakyThrows
-    public static Optional<Command> parse(String[] args) {
+    public static Optional<Command> parse(String[] args, Input input, Output output) {
         String commandString = args[0];
         Optional<Commands> result = Arrays.stream(Commands.values()).filter(commands -> Objects.equals(commands.commandString, commandString)).findFirst();
         if (result.isEmpty()) return Optional.empty();
         Class<? extends Command> commandClass = result.get().commandClass;
-        Constructor<? extends Command> constructor = commandClass.getConstructor(String[].class);
-        return Optional.of(constructor.newInstance((Object) args));
+        Constructor<? extends Command> constructor = commandClass.getConstructor(String[].class, Input.class, Output.class);
+        return Optional.of(constructor.newInstance((Object) args, input, output));
     }
 
-    private final String commandString;
-    private final Class<? extends Command> commandClass;
+    public static Command[] getAllCommands() {
+        return Arrays.stream(Commands.values()).map(command -> {
+            try {
+                return command.commandClass.getConstructor().newInstance();
+            } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
+                     IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }).toArray(Command[]::new);
+    }
+
+    final String commandString;
+    final Class<? extends Command> commandClass;
 }

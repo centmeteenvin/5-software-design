@@ -36,19 +36,20 @@ public class ViewCommandLine extends View {
     @Override
     public void run() {
         output.print("""
-                Welcome To The Script Kiddos' Money Tracker AKA: SKMT.
-                                
-                To get started you can type "help".
-                This will show you all available commands.
-                                
-                To exit the program type: "exit".
+                # Welcome To The Script Kiddos' Money Tracker AKA: SKMT.
+                #
+                # To get started you can type "help".
+                # This will show you all available commands.
+                #
+                # To exit the program type: "exit".
                 """);
 
         while (true) {
+            output.print(" > ");
             String inputString = input.input("");
             if (Objects.equals(inputString, "exit")) break;
-            Optional<Command> command = Commands.parse(inputString.split(" "));
-            if (command.isEmpty()) output.print("Command Not Found\n");
+            Optional<Command> command = Commands.parse(inputString.split(" "), input, output);
+            if (command.isEmpty()) output.print("! Command Not Found\n");
             else {
                 command.get().execute();
             }
