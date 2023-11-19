@@ -35,7 +35,7 @@ public class CommandCategories extends Command {
 
     @Override
     public String getCommandString() {
-        return null;
+        return CommandCategories.commandString;
     }
 
     @Override
