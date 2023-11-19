@@ -8,11 +8,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class TicketControllerImplementationTest {
@@ -59,7 +59,7 @@ class TicketControllerImplementationTest {
         receivedTicket = controller.create(1L, 100, List.of(2L));
         assertTrue(receivedTicket.isEmpty());
 
-        Person person = new Person(2L, "bar", 0);
+        Person person = new Person(2L, "bar");
         Ticket ticket = new Ticket(3L, 100, 1L);
         ticket.getDistribution().put(1L, 100D);
         doReturn(Optional.of(person)).when(mockPersonDatabase).getById(2L);
@@ -81,7 +81,7 @@ class TicketControllerImplementationTest {
 
 
         controller.addPerson(1L, 1L);
-        Person person = new Person(2L, "bar", 0);
+        Person person = new Person(2L, "bar");
         Ticket ticket = new Ticket(3L, 100, 1L);
 
         doReturn(Optional.of(person)).when(mockPersonDatabase).getById(any());
@@ -112,7 +112,7 @@ class TicketControllerImplementationTest {
 
 
         controller.removePerson(1L, 1L);
-        Person person = new Person(1L, "bar", 0);
+        Person person = new Person(1L, "bar");
         Ticket ticket = new Ticket(1L, 100, 1L);
 
         doReturn(Optional.of(ticket)).when(mockTicketDatabase).getById(any());
@@ -241,5 +241,128 @@ class TicketControllerImplementationTest {
 
     @Test
     void calculate() {
+        int timesTicketDatabase = 0;
+        doReturn(Optional.empty()).when(mockTicketDatabase).getById(any());
+        doNothing().when(mockTicketDatabase).deleteById(any());
+        doNothing().when(mockPersonController).modifyDebt(any(Long.class),any(Long.class), any(Double.class));
+
+        controller.calculate(1L);
+
+        verify(mockTicketDatabase, times(++timesTicketDatabase)).getById(any());
+        verify(mockPersonDatabase, never()).getById(any());
+        verify(mockPersonController, never()).removeTicket(any(), any());
+
+        Ticket testTicket = new Ticket(1L,100,1L);
+
+        assertTrue(testTicket.getDistribution().isEmpty());
+
+        doReturn(Optional.of(testTicket)).when(mockTicketDatabase).getById(any());
+        controller.calculate(1L);
+
+        verify(mockTicketDatabase, times(++timesTicketDatabase)).getById(any());
+        verify(mockPersonDatabase, never()).getById(any());
+        verify(mockPersonController, never()).removeTicket(any(), any());
+
+
+        testTicket.getDistribution().put(1L,20.);
+        testTicket.getDistribution().put(2L,20.);
+
+        Person testPerson1 = new Person(1L,"foo");
+        Person testPerson2 = new Person(2L,"bar");
+        Person testPerson3 = new Person(3L,"baz");
+
+        assertFalse(testTicket.getDistribution().isEmpty());
+
+        controller.calculate(1L);
+
+        verify(mockTicketDatabase, times(++timesTicketDatabase)).getById(any());
+        verify(mockPersonDatabase, never()).getById(any());
+        verify(mockPersonController, never()).removeTicket(any(), any());
+
+        testTicket.getDistribution().put(1L,50.);
+        testTicket.getDistribution().put(2L,50.);
+
+        assertNull(testTicket.getPayerId());
+
+        controller.calculate(1L);
+
+        verify(mockTicketDatabase, times(++timesTicketDatabase)).getById(any());
+        verify(mockPersonDatabase, never()).getById(any());
+        verify(mockPersonController, never()).removeTicket(any(), any());
+
+        testTicket.setPayerId(3L);
+        assertEquals(testTicket.getPayerId(),3L);
+
+        controller.calculate(1L);
+
+        verify(mockTicketDatabase, times(++timesTicketDatabase)).getById(any());
+        verify(mockPersonDatabase, times(1)).getById(3L);
+        verify(mockPersonController, never()).removeTicket(any(), any());
+
+        doReturn(Optional.of(testPerson3)).when(mockPersonDatabase).getById(3L);
+
+        controller.calculate(1L);
+
+        verify(mockTicketDatabase, times(++timesTicketDatabase)).getById(any());
+        verify(mockPersonDatabase, times(2)).getById(3L);
+        verify(mockPersonDatabase, times(1)).getById(1L);
+        verify(mockPersonController, never()).removeTicket(any(), any());
+
+        doReturn(Optional.of(testPerson1)).when(mockPersonDatabase).getById(1L);
+        doReturn(Optional.of(testPerson2)).when(mockPersonDatabase).getById(2L);
+        doNothing().when(mockPersonController).modifyDebt(anyLong(),anyLong(),anyDouble());
+
+
+        assertTrue(testPerson1.getDebts().isEmpty());
+        assertTrue(testPerson2.getDebts().isEmpty());
+        assertTrue(testPerson3.getDebts().isEmpty());
+
+        controller.calculate(1L);
+
+        verify(mockTicketDatabase, times(++timesTicketDatabase)).getById(any());
+        verify(mockPersonDatabase, times(3)).getById(3L);
+        verify(mockPersonDatabase, times(2)).getById(1L);
+        verify(mockPersonDatabase, times(2)).getById(2L);
+        verify(mockPersonController, times(1)).modifyDebt(3L, 1L, 20);
+        verify(mockPersonController, times(1)).modifyDebt(3L, 2L, 20);
+        verify(mockPersonController, times(2)).modifyDebt(any(), 3L, -20);
+    }
+    @Test
+    void setPayer() {
+        doReturn(Optional.empty()).when(mockTicketDatabase).getById(any());
+        doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
+        doReturn(Optional.empty()).when(mockTicketDatabase).update(any());
+
+        Ticket testTicket = new Ticket(1L, 0, 1L);
+
+        controller.setPayer(1L,1L);
+
+        verify(mockTicketDatabase, times(1)).getById(any());
+        verify(mockPersonDatabase, never()).getById(any());
+        verify(mockTicketDatabase, never()).update(any());
+        assertNull(testTicket.getPayerId());
+
+        doReturn(Optional.of(testTicket)).when(mockTicketDatabase).getById(any());
+        controller.setPayer(1L,1L);
+
+        verify(mockTicketDatabase, times(2)).getById(any());
+        verify(mockPersonDatabase, times(1)).getById(any());
+        verify(mockTicketDatabase, never()).update(any());
+        assertNull(testTicket.getPayerId());
+
+        Person testPerson = new Person(1L, "foo");
+        doReturn(Optional.of(testPerson)).when(mockPersonDatabase).getById(any());
+
+        controller.setPayer(1L,1L);
+        verify(mockTicketDatabase, times(3)).getById(any());
+        verify(mockPersonDatabase, times(2)).getById(any());
+        verify(mockTicketDatabase, times(1)).update(any());
+        assertEquals(testTicket.getPayerId(), 1L);
+
+        controller.setPayer(1L,null);
+        verify(mockTicketDatabase, times(4)).getById(any());
+        verify(mockPersonDatabase, times(3)).getById(any());
+        verify(mockTicketDatabase, times(2)).update(any());
+        assertNull(testTicket.getPayerId());
     }
 }

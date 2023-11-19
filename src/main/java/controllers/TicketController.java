@@ -61,6 +61,13 @@ public abstract class TicketController {
      * @param id
      */
     public abstract void calculate(Long id);
+
+    /**
+     * Sets the payer to a certain id
+     * @param id
+     */
+    public abstract void setPayer(Long id, Long payerId);
+
     public final void setPersonController(PersonController personController) {
         this.personController = personController;
     }
