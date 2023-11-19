@@ -111,7 +111,21 @@ public class CommandTicket extends Command{
     }
 
     public void executeAdd() {
-
+        assert view != null;
+        if (args.length != 4) {
+            view.output.print(incorrectNumberOfArguments(4, args.length));
+            return;
+        }
+        if(view.getTicketDatabase().getById(Long.valueOf(args[2])).isEmpty()) {
+            view.output.print("! Ticket does not exist\n");
+            return;
+        }
+        if (view.getPersonDatabase().getById(Long.valueOf(args[3])).isEmpty()) {
+            view.output.print("! Person does not exist\n");
+            return;
+        }
+        view.getTicketController().addPerson(Long.valueOf(args[2]), Long.valueOf(args[3]));
+        view.output.print("%% Successfully added person %s to ticket %s\n".formatted(args[3], args[2]));
     }
 
     public String ticketRepresentation(Ticket ticket) {

@@ -2,6 +2,7 @@ package views.cli.commands;
 
 import controllers.TicketController;
 import database.Database;
+import models.Person;
 import models.Ticket;
 import models.TicketCategory;
 import org.junit.jupiter.api.Test;
@@ -157,6 +158,58 @@ class CommandTicketTest extends CommandTest {
         command.executeGet();
 
         verify(command, times(1)).ticketRepresentation(ticket);
+    }
+
+    @Test
+    void executeAdd() {
+        //noinspection unchecked
+        Database<Ticket> ticketDatabase = (Database<Ticket>) mock(Database.class);
+        //noinspection unchecked
+        Database<Person> personDatabase = (Database<Person>) mock(Database.class);
+        TicketController ticketController = mock(TicketController.class);
+        Output output = mock(Output.class);
+        ViewCommandLine view = new ViewCommandLine(personDatabase, ticketDatabase, null,
+                null, ticketController, null,
+                null, output);
+        String[] args = new String[]{CommandTicket.commandString, "add"};
+        CommandTicket command = new CommandTicket(args, view);
+        doNothing().when(output).print(anyString());
+
+        command.executeAdd();
+
+        verify(output, times(1)).print(Command.incorrectNumberOfArguments(4, 2));
+
+        args = new String[]{CommandTicket.commandString, "add", "1"};
+        command = new CommandTicket(args, view);
+
+        command.executeAdd();
+
+        verify(output, times(1)).print(Command.incorrectNumberOfArguments(4, 3));
+
+        args = new String[]{CommandTicket.commandString, "add", "1", "2"};
+        command = new CommandTicket(args, view);
+        doReturn(Optional.empty()).when(ticketDatabase).getById(1L);
+
+        command.executeAdd();
+
+        verify(output, times(1)).print("! Ticket does not exist\n");
+
+        Ticket ticket = new Ticket(1L, 100, 3L);
+        doReturn(Optional.of(ticket)).when(ticketDatabase).getById(1L);
+        doReturn(Optional.empty()).when(personDatabase).getById(2L);
+
+        command.executeAdd();
+
+        verify(output, times(1)).print("! Person does not exist\n");
+
+        Person person = new Person(2L, "foo");
+        doReturn(Optional.of(person)).when(personDatabase).getById(2L);
+        doNothing().when(ticketController).addPerson(1L, 2L);
+
+        command.executeAdd();
+
+        verify(ticketController, times(1)).addPerson(1L, 2L);
+        verify(output, times(1)).print("% Successfully added person 2 to ticket 1\n");
     }
 
     @Test
