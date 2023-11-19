@@ -93,7 +93,17 @@ public class CommandTicket extends Command{
     }
 
     public void executeGet() {
-
+        assert view != null;
+        if (args.length != 3) {
+            view.output.print(incorrectNumberOfArguments(3, args.length));
+            return;
+        }
+        Optional<Ticket> ticket = view.getTicketDatabase().getById(Long.valueOf(args[2]));
+        if (ticket.isEmpty()) {
+            view.output.print("! Ticket does not exist\n");
+            return;
+        }
+        view.output.print(ticketRepresentation(ticket.get()));
     }
 
     public String ticketRepresentation(Ticket ticket) {

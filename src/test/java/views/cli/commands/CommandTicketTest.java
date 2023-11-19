@@ -120,6 +120,39 @@ class CommandTicketTest extends CommandTest {
     }
 
     @Test
+    void executeGet() {
+        //noinspection unchecked
+        Database<Ticket> db = (Database<Ticket>) mock(Database.class);
+        Output output = mock(Output.class);
+        ViewCommandLine view = new ViewCommandLine(null, db, null,
+                null, null, null,
+                null, output);
+        String[] args = new String[]{CommandTicket.commandString, "get"};
+        CommandTicket command = new CommandTicket(args, view);
+        doNothing().when(output).print(anyString());
+
+        command.executeGet();
+
+        verify(output, times(1)).print(Command.incorrectNumberOfArguments(3, 2));
+
+        args = new String[]{CommandTicket.commandString, "get", "2"};
+        command = spy(new CommandTicket(args, view));
+        doReturn(Optional.empty()).when(db).getById(2L);
+
+        command.executeGet();
+
+        verify(output, times(1)).print("! Ticket does not exist\n");
+        verify(db, times(1)).getById(2L);
+
+        Ticket ticket = new Ticket(2L, 100, 3L);
+        doReturn(Optional.of(ticket)).when(db).getById(2L);
+
+        command.executeGet();
+
+        verify(command, times(1)).ticketRepresentation(ticket);
+    }
+
+    @Test
     void ticketPresentation() {
         Ticket ticket = new Ticket(1L, 100.00, 2L);
         ticket.getDistribution().put(3L, 120.00);
