@@ -25,6 +25,9 @@ public class CommandCategory extends Command {
     public String description() {
         return """
                 % Main entrypoint for ticket category related commands
+                %
+                % create {name}:
+                %   creates a new category with the given name.
                 """;
     }
 
