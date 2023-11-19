@@ -43,6 +43,13 @@ class CommandPersonTest extends CommandTest {
         command.execute();
 
         verify(command, times(1)).executeCreate();
+
+        args = new String[]{CommandPersons.commandString, "get"};
+        command = spy(new CommandPerson(args, view));
+
+        command.execute();
+
+        verify(command, times(1)).executeGet();
     }
 
     @Test

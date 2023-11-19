@@ -29,6 +29,7 @@ public class CommandPerson extends Command{
         }
         switch (args[1]) {
             case "create" -> executeCreate();
+            case "get" -> executeGet();
             default -> view.output.print("! Incorrect arguments, consult [help person]\n");
         }
     }
@@ -71,5 +72,9 @@ public class CommandPerson extends Command{
             return;
         }
         view.output.print("%% Successfully created person with name \"%s\" with id: %s\n".formatted(person.get().getName(), person.get().getId()));
+    }
+
+    public void executeGet() {
+
     }
 }
