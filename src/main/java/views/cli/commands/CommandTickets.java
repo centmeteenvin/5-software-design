@@ -23,12 +23,16 @@ public class CommandTickets extends Command {
 
     @Override
     public String shortDescription() {
-        return null; //TODO
+        return "Lists all stored tickets";
     }
 
     @Override
     public String description() {
-        return null; //TODO
+        return """
+                % Lists all stored tickets.
+                % Following format is used:
+                % {ticket id} -> {cost}
+                """;
     }
 
     @Override
