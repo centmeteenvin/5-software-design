@@ -31,6 +31,12 @@ public class CommandCategory extends Command {
                 %
                 % create {name}:
                 %   creates a new category with the given name.
+                %
+                % get {id}:
+                %   Fetches a person from the database and shows the following data:
+                %    - id
+                %    - name
+                %    - associated tickets.
                 """;
     }
 
@@ -47,7 +53,8 @@ public class CommandCategory extends Command {
             return;
         }
         switch (args[1]) {
-            case "create" -> executeCreate();
+            case "create"   -> executeCreate();
+            case "get"      -> executeGet();
             default -> view.output.print("! Command not found, try consulting {help category}\n");
         }
     }
@@ -64,5 +71,37 @@ public class CommandCategory extends Command {
             return;
         }
         view.output.print("%% Successfully created category %s with id %s\n".formatted(category.get().getName(), category.get().getId()));
+    }
+
+    public void executeGet() {
+        assert view != null;
+        if (args.length != 3) {
+            view.output.print(incorrectNumberOfArguments(3, args.length));
+            return;
+        }
+        Optional<TicketCategory> category = view.getTicketCategoryDatabase().getById(Long.valueOf(args[2]));
+        if (category.isEmpty()) {
+            view.output.print("! Category not found\n");
+            return;
+        }
+        view.output.print(categoryPresentation(category.get()));
+    }
+
+    public String categoryPresentation(TicketCategory category) {
+        String id = category.getId().toString();
+        String name = category.getName();
+        StringBuilder ticketIds = new StringBuilder("[ ");
+        if (!category.getTicketIds().isEmpty()) {
+            for (Long ticketId : category.getTicketIds()) {
+                ticketIds.append(ticketId).append(", ");
+            }
+            ticketIds.delete(ticketIds.length() - 2, ticketIds.length() - 1);
+        }
+        ticketIds.append("]");
+        return """
+                %% id: %s
+                %% name: %s
+                %% tickets: %s
+                """.formatted(id, name, ticketIds);
     }
 }
