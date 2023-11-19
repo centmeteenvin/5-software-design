@@ -45,6 +45,11 @@ public class CommandPerson extends Command{
                 %
                 %  - create {name}
                 %       Creates a person with a give name.
+                %
+                %  - get {id}
+                %       Fetches a person and shows the following data:
+                %        - All the present tickets.
+                %        - All the current debts.
                 """;
     }
 
