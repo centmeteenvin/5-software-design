@@ -15,19 +15,6 @@ public class CommandTicket extends Command{
 
     public CommandTicket() {
     }
-
-    @Override
-    public void execute() {
-        assert view != null;
-        if (args.length == 1) {
-            view.output.print(incorrectNumberOfArguments(2, 1));
-            return;
-        }
-        switch (args[1]) {
-            default -> view.output.print("! Command not found, consider consulting {help ticket}\n");
-        }
-    }
-
     @Override
     public String shortDescription() {
         return "Main entrypoint for most ticket related commands";
@@ -37,8 +24,30 @@ public class CommandTicket extends Command{
     public String description() {
         return """
                 % Main entrypoint for most ticket related commands
+                %
+                % create {cost}:
+                %   Creates a ticket with the given cost
                 """;
     }
+
+    @Override
+    public void execute() {
+        assert view != null;
+        if (args.length == 1) {
+            view.output.print(incorrectNumberOfArguments(2, 1));
+            return;
+        }
+        switch (args[1]) {
+            case "create" -> executeCreate();
+            default -> view.output.print("! Command not found, consider consulting {help ticket}\n");
+        }
+    }
+
+    public void executeCreate() {
+
+    }
+
+
 
     @Override
     public String getCommandString() {

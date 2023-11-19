@@ -29,6 +29,18 @@ class CommandTicketTest extends CommandTest {
 
         commandTicket.execute();
         verify(output, times(1)).print("! Command not found, consider consulting {help ticket}\n");
+
+        args = new String[]{"ticket", "create"};
+        commandTicket = spy(new CommandTicket(args, view));
+
+        commandTicket.execute();
+
+        verify(commandTicket, times(1)).executeCreate();
+    }
+
+    @Test
+    void executeCreate() {
+
     }
 
     @Override
