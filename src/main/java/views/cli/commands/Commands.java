@@ -15,6 +15,7 @@ public enum Commands {
     HELP(CommandHelp.commandString, CommandHelp.class),
     PERSON(CommandPerson.commandString, CommandPerson.class),
     PERSONS(CommandPersons.commandString, CommandPersons.class),
+    TICKET(CommandTicket.commandString, CommandTicket.class),
     TICKETS(CommandTickets.commandString, CommandTickets.class),
     ;
 
