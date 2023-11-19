@@ -12,7 +12,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class CommandPersonsTest {
+class CommandPersonsTest extends CommandTest {
 
     @Test
     void execute() {
@@ -41,5 +41,10 @@ class CommandPersonsTest {
 
         verify(output, times(1)).print("% 1 -> foo\n");
         verify(output, times(1)).print("% 2 -> bar\n");
+    }
+
+    @Override
+    public Command getCommand() {
+        return new CommandPersons();
     }
 }

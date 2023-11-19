@@ -11,7 +11,7 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class CommandHelpTest {
+class CommandHelpTest extends CommandTest {
 
     @Test
     void allShortDescription() {
@@ -77,6 +77,11 @@ class CommandHelpTest {
 
         verify(command, never()).allShortDescription(any());
         verify(command, times(1)).specificDescription(command);
+    }
+
+    @Override
+    public Command getCommand() {
+        return new CommandHelp();
     }
 
     private static class CommandHelpEmpty extends CommandHelp {

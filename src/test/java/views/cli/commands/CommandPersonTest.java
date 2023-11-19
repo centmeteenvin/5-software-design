@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-class CommandPersonTest {
+class CommandPersonTest extends CommandTest {
 
     @Test
     void execute() {
@@ -78,5 +78,10 @@ class CommandPersonTest {
 
         verify(personController, times(2)).create("foo");
         verify(output, times(1)).print("% Successfully created person with name \"foo\" with id: 1\n");
+    }
+
+    @Override
+    public Command getCommand() {
+        return new CommandPerson();
     }
 }
