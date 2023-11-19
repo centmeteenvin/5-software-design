@@ -1,6 +1,11 @@
 package views.cli.commands;
 
+import models.Ticket;
 import views.cli.ViewCommandLine;
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.List;
 
 public class CommandTickets extends Command {
     public static final String commandString = "tickets";
@@ -18,7 +23,18 @@ public class CommandTickets extends Command {
 
     @Override
     public void execute() {
-        //TODO
+        assert view != null;
+        if (args.length != 1) {
+            view.output.print(incorrectNumberOfArguments(1, args.length));
+            return;
+        }
+        List<Ticket> tickets = view.getTicketDatabase().getAll();
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        DecimalFormat format = new DecimalFormat("0.00", symbols);
+        for (Ticket ticket : tickets) {
+            view.output.print("%% %s -> %s EUR\n".formatted(ticket.getId(), format.format(ticket.getCost())));
+        }
     }
 
     @Override
