@@ -42,6 +42,9 @@ public class CommandTicket extends Command{
                 %    - cost
                 %    - category
                 %    - distribution
+                %
+                % add {ticket id} {person id}:
+                %   adds the given person to the given ticket with cost 0.
                 """;
     }
 
@@ -55,6 +58,7 @@ public class CommandTicket extends Command{
         switch (args[1]) {
             case "create"   -> executeCreate();
             case "get"      -> executeGet();
+            case "add"      -> executeAdd();
             default -> view.output.print("! Command not found, consider consulting {help ticket}\n");
         }
     }
@@ -104,6 +108,10 @@ public class CommandTicket extends Command{
             return;
         }
         view.output.print(ticketRepresentation(ticket.get()));
+    }
+
+    public void executeAdd() {
+
     }
 
     public String ticketRepresentation(Ticket ticket) {
