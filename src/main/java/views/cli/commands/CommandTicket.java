@@ -1,6 +1,7 @@
 package views.cli.commands;
 
 import models.Ticket;
+import models.TicketCategory;
 import views.cli.ViewCommandLine;
 
 import java.text.DecimalFormat;
@@ -31,8 +32,8 @@ public class CommandTicket extends Command{
         return """
                 % Main entrypoint for most ticket related commands
                 %
-                % create {cost}:
-                %   Creates a ticket with the given cost
+                % create {cost} {category id}:
+                %   Creates a ticket with the given cost in the given category.
                 """;
     }
 
@@ -51,8 +52,8 @@ public class CommandTicket extends Command{
 
     public void executeCreate() {
         assert view != null;
-        if (args.length != 3) {
-            view.output.print(incorrectNumberOfArguments(3, args.length));
+        if (args.length != 4) {
+            view.output.print(incorrectNumberOfArguments(4, args.length));
             return;
         }
         double cost;
@@ -69,7 +70,12 @@ public class CommandTicket extends Command{
             view.output.print("! %s EUR is not a valid cost\n".formatted(format.format(cost)));
             return;
         }
-        Optional<Ticket> ticket = view.getTicketController().create(null, cost, List.of());
+        Optional<TicketCategory> category = view.getTicketCategoryDatabase().getById(Long.valueOf(args[3]));
+        if (category.isEmpty()) {
+            view.output.print("! Category does not exist\n");
+            return;
+        }
+        Optional<Ticket> ticket = view.getTicketController().create(category.get().getId(), cost, List.of());
         if (ticket.isEmpty()) {
             view.output.print("! Failed to create ticket\n");
             return;
