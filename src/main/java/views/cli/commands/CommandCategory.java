@@ -35,6 +35,13 @@ public class CommandCategory extends Command {
 
     @Override
     public void execute() {
-
+        assert view != null;
+        if (args.length == 1) {
+            view.output.print(incorrectNumberOfArguments(2, args.length));
+            return;
+        }
+        switch (args[1]) {
+            default -> view.output.print("! Command not found, try consulting {help category}\n");
+        }
     }
 }
