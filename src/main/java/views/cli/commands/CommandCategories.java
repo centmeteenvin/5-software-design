@@ -18,12 +18,16 @@ public class CommandCategories extends Command {
 
     @Override
     public String shortDescription() {
-        return null;
+        return "Displays all the stored categories";
     }
 
     @Override
     public String description() {
-        return null;
+        return """
+                % Displays all the stored categories.
+                % The following format is used:
+                %   {id} -> {name}
+                """;
     }
 
     @Override
