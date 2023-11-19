@@ -31,6 +31,12 @@ public class CommandCategory extends Command {
                 %
                 % create {name}:
                 %   creates a new category with the given name.
+                %
+                % get {id}:
+                %   Fetches a person from the database and shows the following data:
+                %    - id
+                %    - name
+                %    - associated tickets.
                 """;
     }
 
@@ -47,7 +53,8 @@ public class CommandCategory extends Command {
             return;
         }
         switch (args[1]) {
-            case "create" -> executeCreate();
+            case "create"   -> executeCreate();
+            case "get"      -> executeGet();
             default -> view.output.print("! Command not found, try consulting {help category}\n");
         }
     }
@@ -64,5 +71,9 @@ public class CommandCategory extends Command {
             return;
         }
         view.output.print("%% Successfully created category %s with id %s\n".formatted(category.get().getName(), category.get().getId()));
+    }
+
+    public void executeGet() {
+
     }
 }

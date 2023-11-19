@@ -41,6 +41,13 @@ class CommandCategoryTest extends CommandTest {
         command.execute();
 
         verify(command, times(1)).executeCreate();
+
+        args = new String[]{CommandCategory.commandString, "get"};
+        command = spy(new CommandCategory(args, view));
+
+        command.execute();
+
+        verify(command, times(1)).executeGet();
     }
 
     @Test
