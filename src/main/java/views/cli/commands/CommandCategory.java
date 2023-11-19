@@ -1,6 +1,9 @@
 package views.cli.commands;
 
+import models.TicketCategory;
 import views.cli.ViewCommandLine;
+
+import java.util.Optional;
 
 public class CommandCategory extends Command {
     public static final String commandString = "category";
@@ -33,7 +36,7 @@ public class CommandCategory extends Command {
 
     @Override
     public String getCommandString() {
-        return null;
+        return CommandCategory.commandString;
     }
 
     @Override
@@ -50,6 +53,16 @@ public class CommandCategory extends Command {
     }
 
     public void executeCreate() {
-
+        assert view != null;
+        if (args.length != 3) {
+            view.output.print(incorrectNumberOfArguments(3, args.length));
+            return;
+        }
+        Optional<TicketCategory> category = view.getTicketCategoryController().create(args[2]);
+        if (category.isEmpty()) {
+            view.output.print("! Failed to create category\n");
+            return;
+        }
+        view.output.print("%% Successfully created category %s with id %s\n".formatted(category.get().getName(), category.get().getId()));
     }
 }
