@@ -7,6 +7,7 @@ import views.cli.ViewCommandLine;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class CommandTicket extends Command{
@@ -34,6 +35,13 @@ public class CommandTicket extends Command{
                 %
                 % create {cost} {category id}:
                 %   Creates a ticket with the given cost in the given category.
+                %
+                % get {id}:
+                %   Fetches the ticket with the given id and returns the following data:
+                %    - id
+                %    - cost
+                %    - category
+                %    - distribution
                 """;
     }
 
@@ -45,7 +53,8 @@ public class CommandTicket extends Command{
             return;
         }
         switch (args[1]) {
-            case "create" -> executeCreate();
+            case "create"   -> executeCreate();
+            case "get"      -> executeGet();
             default -> view.output.print("! Command not found, consider consulting {help ticket}\n");
         }
     }
@@ -83,7 +92,43 @@ public class CommandTicket extends Command{
         view.output.print("%% Successfully created ticket with cost %s EUR and id %s\n".formatted(format.format(cost), ticket.get().getId()));
     }
 
+    public void executeGet() {
+        assert view != null;
+        if (args.length != 3) {
+            view.output.print(incorrectNumberOfArguments(3, args.length));
+            return;
+        }
+        Optional<Ticket> ticket = view.getTicketDatabase().getById(Long.valueOf(args[2]));
+        if (ticket.isEmpty()) {
+            view.output.print("! Ticket does not exist\n");
+            return;
+        }
+        view.output.print(ticketRepresentation(ticket.get()));
+    }
 
+    public String ticketRepresentation(Ticket ticket) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        DecimalFormat format = new DecimalFormat("0.00", symbols);
+        String id = ticket.getId().toString();
+        String cost = format.format(ticket.getCost());
+        String category = ticket.getTicketCategoryId().toString();
+        StringBuilder distribution = new StringBuilder();
+        if (!ticket.getDistribution().isEmpty()) {
+            for (Map.Entry<Long, Double> entry : ticket.getDistribution().entrySet()) {
+                distribution.append("%   ").append(entry.getKey()).append(" -> ").append(format.format(entry.getValue())).append(" EUR\n");
+            }
+            distribution.delete(distribution.length()-1, distribution.length());
+        }
+        else distribution.append("%");
+        return """
+                %% id: %s
+                %% cost: %s EUR
+                %% category: %s
+                %% distribution:
+                %s
+                """.formatted(id, cost, category, distribution);
+    }
 
     @Override
     public String getCommandString() {

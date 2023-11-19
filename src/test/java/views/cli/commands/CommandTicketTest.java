@@ -43,6 +43,13 @@ class CommandTicketTest extends CommandTest {
         commandTicket.execute();
 
         verify(commandTicket, times(1)).executeCreate();
+
+        args = new String[]{CommandTicket.commandString, "get"};
+        commandTicket = spy(new CommandTicket(args, view));
+
+        commandTicket.execute();
+
+        verify(commandTicket, times(1)).executeGet();
     }
 
     @Test
@@ -110,6 +117,56 @@ class CommandTicketTest extends CommandTest {
         verify(output, times(1)).print("% Successfully created ticket with cost 100.50 EUR and id 1\n");
         verify(ticketController, times(2)).create(1L, 100.5, List.of());
 
+    }
+
+    @Test
+    void executeGet() {
+        //noinspection unchecked
+        Database<Ticket> db = (Database<Ticket>) mock(Database.class);
+        Output output = mock(Output.class);
+        ViewCommandLine view = new ViewCommandLine(null, db, null,
+                null, null, null,
+                null, output);
+        String[] args = new String[]{CommandTicket.commandString, "get"};
+        CommandTicket command = new CommandTicket(args, view);
+        doNothing().when(output).print(anyString());
+
+        command.executeGet();
+
+        verify(output, times(1)).print(Command.incorrectNumberOfArguments(3, 2));
+
+        args = new String[]{CommandTicket.commandString, "get", "2"};
+        command = spy(new CommandTicket(args, view));
+        doReturn(Optional.empty()).when(db).getById(2L);
+
+        command.executeGet();
+
+        verify(output, times(1)).print("! Ticket does not exist\n");
+        verify(db, times(1)).getById(2L);
+
+        Ticket ticket = new Ticket(2L, 100, 3L);
+        doReturn(Optional.of(ticket)).when(db).getById(2L);
+
+        command.executeGet();
+
+        verify(command, times(1)).ticketRepresentation(ticket);
+    }
+
+    @Test
+    void ticketPresentation() {
+        Ticket ticket = new Ticket(1L, 100.00, 2L);
+        ticket.getDistribution().put(3L, 120.00);
+        ticket.getDistribution().put(4L, 0.5);
+        CommandTicket command = new CommandTicket();
+        String expected = """
+                % id: 1
+                % cost: 100.00 EUR
+                % category: 2
+                % distribution:
+                %   3 -> 120.00 EUR
+                %   4 -> 0.50 EUR
+                """;
+        assertEquals(expected, command.ticketRepresentation(ticket));
     }
 
     @Override
