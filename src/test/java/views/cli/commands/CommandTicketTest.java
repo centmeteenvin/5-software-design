@@ -43,6 +43,13 @@ class CommandTicketTest extends CommandTest {
         commandTicket.execute();
 
         verify(commandTicket, times(1)).executeCreate();
+
+        args = new String[]{CommandTicket.commandString, "get"};
+        commandTicket = spy(new CommandTicket(args, view));
+
+        commandTicket.execute();
+
+        verify(commandTicket, times(1)).executeGet();
     }
 
     @Test

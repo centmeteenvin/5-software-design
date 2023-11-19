@@ -34,6 +34,13 @@ public class CommandTicket extends Command{
                 %
                 % create {cost} {category id}:
                 %   Creates a ticket with the given cost in the given category.
+                %
+                % get {id}:
+                %   Fetches the ticket with the given id and returns the following data:
+                %    - id
+                %    - cost
+                %    - category
+                %    - distribution
                 """;
     }
 
@@ -45,7 +52,8 @@ public class CommandTicket extends Command{
             return;
         }
         switch (args[1]) {
-            case "create" -> executeCreate();
+            case "create"   -> executeCreate();
+            case "get"      -> executeGet();
             default -> view.output.print("! Command not found, consider consulting {help ticket}\n");
         }
     }
@@ -83,7 +91,9 @@ public class CommandTicket extends Command{
         view.output.print("%% Successfully created ticket with cost %s EUR and id %s\n".formatted(format.format(cost), ticket.get().getId()));
     }
 
+    public void executeGet() {
 
+    }
 
     @Override
     public String getCommandString() {
