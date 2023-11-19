@@ -18,12 +18,14 @@ public class CommandCategory extends Command {
 
     @Override
     public String shortDescription() {
-        return null;
+        return "Main entrypoint for all ticket category related commands";
     }
 
     @Override
     public String description() {
-        return null;
+        return """
+                % Main entrypoint for ticket category related commands
+                """;
     }
 
     @Override
