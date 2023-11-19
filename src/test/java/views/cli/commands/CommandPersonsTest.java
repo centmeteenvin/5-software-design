@@ -12,7 +12,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class CommandPersonsTest {
+class CommandPersonsTest extends CommandTest {
 
     @Test
     void execute() {
@@ -27,7 +27,7 @@ class CommandPersonsTest {
         Command command = (new CommandPersons(args, view));
 
         doNothing().when(output).print(anyString());
-        List<Person> people = List.of(new Person(1L, "foo", 0), new Person(2L, "bar", 0));
+        List<Person> people = List.of(new Person(1L, "foo"), new Person(2L, "bar"));
         doReturn(people).when(database).getAll();
 
         command.execute();
@@ -41,5 +41,10 @@ class CommandPersonsTest {
 
         verify(output, times(1)).print("% 1 -> foo\n");
         verify(output, times(1)).print("% 2 -> bar\n");
+    }
+
+    @Override
+    public Command getCommand() {
+        return new CommandPersons();
     }
 }

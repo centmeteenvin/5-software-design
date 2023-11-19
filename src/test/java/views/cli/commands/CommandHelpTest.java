@@ -8,10 +8,11 @@ import views.cli.io.Output;
 import java.util.Objects;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class CommandHelpTest {
+class CommandHelpTest extends CommandTest {
 
     @Test
     void allShortDescription() {
@@ -77,6 +78,19 @@ class CommandHelpTest {
 
         verify(command, never()).allShortDescription(any());
         verify(command, times(1)).specificDescription(command);
+    }
+
+    @Test
+    void parse() {
+        CommandHelp command = new CommandHelp();
+        Optional<Command> result = command.parse(new String[]{CommandHelp.commandString, CommandPerson.commandString});
+        assertTrue(result.isPresent());
+        assertTrue(result.get() instanceof CommandPerson);
+    }
+
+    @Override
+    public Command getCommand() {
+        return new CommandHelp();
     }
 
     private static class CommandHelpEmpty extends CommandHelp {

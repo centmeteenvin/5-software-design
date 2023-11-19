@@ -2,8 +2,6 @@ package views.cli.commands;
 
 import lombok.SneakyThrows;
 import views.cli.ViewCommandLine;
-import views.cli.io.Input;
-import views.cli.io.Output;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -13,6 +11,7 @@ import java.util.Optional;
 
 public enum Commands {
     HELP(CommandHelp.commandString, CommandHelp.class),
+    PERSON(CommandPerson.commandString, CommandPerson.class),
     PERSONS(CommandPersons.commandString, CommandPersons.class)
     ;
 

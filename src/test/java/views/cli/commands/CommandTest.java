@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CommandTest {
+abstract class CommandTest {
 
     @Test
     void incorrectNumberOfArguments() {
@@ -14,4 +14,11 @@ class CommandTest {
                 """;
         assertEquals(Command.incorrectNumberOfArguments(3, 1), expected);
     }
+
+    @Test
+    void testDescriptions() {
+        assertFalse(getCommand().description().isEmpty());
+    }
+
+    public abstract Command getCommand();
 }
