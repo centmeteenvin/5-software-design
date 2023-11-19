@@ -30,6 +30,13 @@ class CommandCategoryTest extends CommandTest {
         command.execute();
 
         verify(output, times(1)).print("! Command not found, try consulting {help category}\n");
+
+        args = new String[]{CommandCategory.commandString, "create"};
+        command = spy(new CommandCategory(args, view));
+
+        command.execute();
+
+        verify(command, times(1)).executeCreate();
     }
 
     @Override

@@ -41,7 +41,12 @@ public class CommandCategory extends Command {
             return;
         }
         switch (args[1]) {
+            case "create" -> executeCreate();
             default -> view.output.print("! Command not found, try consulting {help category}\n");
         }
+    }
+
+    public void executeCreate() {
+
     }
 }
