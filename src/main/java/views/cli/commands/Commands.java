@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public enum Commands {
+    CATEGORIES(CommandCategories.commandString, CommandCategories.class),
     HELP(CommandHelp.commandString, CommandHelp.class),
     PERSON(CommandPerson.commandString, CommandPerson.class),
     PERSONS(CommandPersons.commandString, CommandPersons.class),
