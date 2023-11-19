@@ -58,7 +58,7 @@ class CommandPersonTest extends CommandTest {
         Output output = mock(Output.class);
         //noinspection unchecked
         PersonController personController =  mock(PersonController.class);
-        Person person = new Person(1L, "foo", 0);
+        Person person = new Person(1L, "foo");
         ViewCommandLine view = new ViewCommandLine(
                 null, null, null,
                 personController, null, null,
@@ -85,6 +85,26 @@ class CommandPersonTest extends CommandTest {
 
         verify(personController, times(2)).create("foo");
         verify(output, times(1)).print("% Successfully created person with name \"foo\" with id: 1\n");
+    }
+
+    @Test
+    void personRepresentation() {
+        Person person = new Person(1L, "foo");
+        CommandPerson command = new CommandPerson();
+        person.getDebts().put(1L, 100D);
+        person.getDebts().put(2L, -1000D);
+        person.getTicketsId().add(1L);
+        person.getTicketsId().add(2L);
+        String expected = """
+                % id: 1
+                % name: foo
+                % ticketIds: [ 1, 2 ]
+                % debts:
+                %   I owe 1 100.00 EUR
+                %   2 owes me 1000.00 EUR
+                % total debt: -900.00 EUR
+                """;
+        assertEquals(expected, command.personRepresentation(person));
     }
 
     @Override

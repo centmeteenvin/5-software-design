@@ -4,6 +4,9 @@ import controllers.PersonController;
 import models.Person;
 import views.cli.ViewCommandLine;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Map;
 import java.util.Optional;
 
 public class CommandPerson extends Command{
@@ -77,4 +80,41 @@ public class CommandPerson extends Command{
     public void executeGet() {
 
     }
+
+    public String personRepresentation(Person person) {
+        String id = person.getId().toString();
+        String name = person.getName();
+        StringBuilder ticketIds = new StringBuilder("[ ");
+        for (Long ticketId : person.getTicketsId()) {
+            ticketIds.append(ticketId).append(", ");
+        }
+        ticketIds.delete(ticketIds.length() - 2, ticketIds.length() - 1);
+        ticketIds.append("]");
+
+        double totalDebt = 0;
+        StringBuilder debts = new StringBuilder();
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        DecimalFormat format = new DecimalFormat("0.00", symbols);
+        for (Map.Entry<Long, Double> debt : person.getDebts().entrySet()) {
+            debts.append("%   ");
+            if (debt.getValue() < 0) {
+                debts.append(debt.getKey()).append(" owes me ").append(format.format(-debt.getValue())).append(" EUR\n");
+            }
+            else {
+                debts.append("I owe ").append(debt.getKey()).append(" ").append(format.format(debt.getValue())).append(" EUR\n");
+            }
+            totalDebt += debt.getValue();
+        }
+        debts.delete(debts.length() - 1, debts.length());
+        return """
+                %% id: %s
+                %% name: %s
+                %% ticketIds: %s
+                %% debts:
+                %s
+                %% total debt: %s EUR
+                """.formatted(id, name, ticketIds, debts, format.format(totalDebt));
+    }
+
 }

@@ -27,7 +27,7 @@ class CommandPersonsTest extends CommandTest {
         Command command = (new CommandPersons(args, view));
 
         doNothing().when(output).print(anyString());
-        List<Person> people = List.of(new Person(1L, "foo", 0), new Person(2L, "bar", 0));
+        List<Person> people = List.of(new Person(1L, "foo"), new Person(2L, "bar"));
         doReturn(people).when(database).getAll();
 
         command.execute();
