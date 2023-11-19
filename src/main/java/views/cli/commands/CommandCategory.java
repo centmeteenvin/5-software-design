@@ -76,4 +76,22 @@ public class CommandCategory extends Command {
     public void executeGet() {
 
     }
+
+    public String categoryPresentation(TicketCategory category) {
+        String id = category.getId().toString();
+        String name = category.getName();
+        StringBuilder ticketIds = new StringBuilder("[ ");
+        if (!category.getTicketIds().isEmpty()) {
+            for (Long ticketId : category.getTicketIds()) {
+                ticketIds.append(ticketId).append(", ");
+            }
+            ticketIds.delete(ticketIds.length() - 2, ticketIds.length() - 1);
+        }
+        ticketIds.append("]");
+        return """
+                %% id: %s
+                %% name: %s
+                %% tickets: %s
+                """.formatted(id, name, ticketIds);
+    }
 }

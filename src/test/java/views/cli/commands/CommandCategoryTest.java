@@ -83,6 +83,21 @@ class CommandCategoryTest extends CommandTest {
         verify(controller, times(2)).create("foo");
     }
 
+    @Test
+    void categoryPresentation() {
+        CommandCategory command = spy(new CommandCategory());
+        TicketCategory category = new TicketCategory(1L, "foo");
+        category.getTicketIds().add(2L);
+        category.getTicketIds().add(3L);
+
+        String expected = """
+                % id: 1
+                % name: foo
+                % tickets: [ 2, 3 ]
+                """;
+        assertEquals(expected, command.categoryPresentation(category));
+    }
+
     @Override
     public Command getCommand() {
         return new CommandCategory();
