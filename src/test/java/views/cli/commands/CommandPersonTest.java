@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import views.cli.ViewCommandLine;
 import views.cli.io.Output;
 
+import javax.swing.text.html.Option;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -105,6 +106,51 @@ class CommandPersonTest extends CommandTest {
                 % total debt: -900.00 EUR
                 """;
         assertEquals(expected, command.personRepresentation(person));
+
+        person = new Person(2L, "bar");
+
+        expected = """
+                % id: 2
+                % name: bar
+                % ticketIds: [ ]
+                % debts:
+                %
+                % total debt: 0.00 EUR
+                """;
+        assertEquals(expected, command.personRepresentation(person));
+    }
+
+    @Test
+    void executeGet() {
+        //noinspection unchecked
+        Database<Person> db = (Database<Person>) mock(Database.class);
+        String[] args = new String[]{"person", "get"};
+        Output output = mock(Output.class);
+        ViewCommandLine view = new ViewCommandLine(db, null, null, null,
+                null, null, null, output);
+        CommandPerson command = new CommandPerson(args, view);
+        doNothing().when(output).print(anyString());
+
+        command.executeGet();
+
+        verify(output, times(1)).print(Command.incorrectNumberOfArguments(3, 2));
+
+        args = new String[]{"person", "get", "1"};
+        command = new CommandPerson(args, view);
+        doReturn(Optional.empty()).when(db).getById(1L);
+
+        command.executeGet();
+
+        verify(db, times(1)).getById(1L);
+        verify(output, times(1)).print("! Person with id 1 does not exist\n");
+
+        Person person = new Person(1L, "foo");
+
+        doReturn(Optional.of(person)).when(db).getById(1L);
+
+        command.executeGet();
+
+        verify(output, times(1)).print(command.personRepresentation(person));
     }
 
     @Override

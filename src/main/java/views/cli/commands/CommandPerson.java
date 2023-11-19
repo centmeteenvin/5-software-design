@@ -78,35 +78,51 @@ public class CommandPerson extends Command{
     }
 
     public void executeGet() {
-
+        assert view != null;
+        if (args.length != 3) {
+            view.output.print(incorrectNumberOfArguments(3, args.length));
+            return;
+        }
+        Optional<Person> person = view.getPersonDatabase().getById(Long.valueOf(args[2]));
+        if (person.isEmpty()) {
+            view.output.print("! Person with id %s does not exist\n".formatted(args[2]));
+            return;
+        }
+        view.output.print(personRepresentation(person.get()));
     }
 
     public String personRepresentation(Person person) {
         String id = person.getId().toString();
         String name = person.getName();
         StringBuilder ticketIds = new StringBuilder("[ ");
-        for (Long ticketId : person.getTicketsId()) {
-            ticketIds.append(ticketId).append(", ");
+        if (!person.getTicketsId().isEmpty()) {
+            for (Long ticketId : person.getTicketsId()) {
+                ticketIds.append(ticketId).append(", ");
+            }
+            ticketIds.delete(ticketIds.length() - 2, ticketIds.length() - 1);
         }
-        ticketIds.delete(ticketIds.length() - 2, ticketIds.length() - 1);
         ticketIds.append("]");
 
-        double totalDebt = 0;
-        StringBuilder debts = new StringBuilder();
         DecimalFormatSymbols symbols = new DecimalFormatSymbols();
         symbols.setDecimalSeparator('.');
         DecimalFormat format = new DecimalFormat("0.00", symbols);
-        for (Map.Entry<Long, Double> debt : person.getDebts().entrySet()) {
-            debts.append("%   ");
-            if (debt.getValue() < 0) {
-                debts.append(debt.getKey()).append(" owes me ").append(format.format(-debt.getValue())).append(" EUR\n");
+        double totalDebt = 0;
+        StringBuilder debts = new StringBuilder();
+        if (!person.getDebts().isEmpty()) {
+            for (Map.Entry<Long, Double> debt : person.getDebts().entrySet()) {
+                debts.append("%   ");
+                if (debt.getValue() < 0) {
+                    debts.append(debt.getKey()).append(" owes me ").append(format.format(-debt.getValue())).append(" EUR\n");
+                }
+                else {
+                    debts.append("I owe ").append(debt.getKey()).append(" ").append(format.format(debt.getValue())).append(" EUR\n");
+                }
+                totalDebt += debt.getValue();
             }
-            else {
-                debts.append("I owe ").append(debt.getKey()).append(" ").append(format.format(debt.getValue())).append(" EUR\n");
-            }
-            totalDebt += debt.getValue();
+            debts.delete(debts.length() - 1, debts.length());
         }
-        debts.delete(debts.length() - 1, debts.length());
+        else debts.append("%");
+
         return """
                 %% id: %s
                 %% name: %s
