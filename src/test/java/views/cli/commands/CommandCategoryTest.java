@@ -1,6 +1,7 @@
 package views.cli.commands;
 
 import controllers.TicketCategoryController;
+import database.Database;
 import models.TicketCategory;
 import org.junit.jupiter.api.Test;
 import views.cli.ViewCommandLine;
@@ -96,6 +97,38 @@ class CommandCategoryTest extends CommandTest {
                 % tickets: [ 2, 3 ]
                 """;
         assertEquals(expected, command.categoryPresentation(category));
+    }
+
+    @Test
+    void executeGet() {
+        Output output = mock(Output.class);
+        //noinspection unchecked
+        Database<TicketCategory> db = (Database<TicketCategory>) mock(Database.class);
+        ViewCommandLine view = new ViewCommandLine(null, null, db,
+                null, null, null,
+                null, output);
+        String[] args = new String[]{CommandCategory.commandString, "get"};
+        CommandCategory command = new CommandCategory(args, view);
+        doNothing().when(output).print(anyString());
+
+        command.executeGet();
+
+        verify(output, times(1)).print(Command.incorrectNumberOfArguments(3, 2));
+
+        args = new String[]{CommandCategory.commandString, "get", "1"};
+        command = spy(new CommandCategory(args, view));
+        doReturn(Optional.empty()).when(db).getById(1L);
+
+        command.executeGet();
+
+        verify(db, times(1)).getById(1L);
+        verify(output, times(1)).print("! Category not found\n");
+
+        TicketCategory category = new TicketCategory(1L, "foo");
+        doReturn(Optional.of(category)).when(db).getById(1L);
+
+        command.execute();
+        verify(command, times(1)).categoryPresentation(category);
     }
 
     @Override

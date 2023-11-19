@@ -74,7 +74,17 @@ public class CommandCategory extends Command {
     }
 
     public void executeGet() {
-
+        assert view != null;
+        if (args.length != 3) {
+            view.output.print(incorrectNumberOfArguments(3, args.length));
+            return;
+        }
+        Optional<TicketCategory> category = view.getTicketCategoryDatabase().getById(Long.valueOf(args[2]));
+        if (category.isEmpty()) {
+            view.output.print("! Category not found\n");
+            return;
+        }
+        view.output.print(categoryPresentation(category.get()));
     }
 
     public String categoryPresentation(TicketCategory category) {
