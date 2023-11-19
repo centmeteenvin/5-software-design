@@ -7,6 +7,7 @@ import views.cli.ViewCommandLine;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class CommandTicket extends Command{
@@ -93,6 +94,30 @@ public class CommandTicket extends Command{
 
     public void executeGet() {
 
+    }
+
+    public String ticketRepresentation(Ticket ticket) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        DecimalFormat format = new DecimalFormat("0.00", symbols);
+        String id = ticket.getId().toString();
+        String cost = format.format(ticket.getCost());
+        String category = ticket.getTicketCategoryId().toString();
+        StringBuilder distribution = new StringBuilder();
+        if (!ticket.getDistribution().isEmpty()) {
+            for (Map.Entry<Long, Double> entry : ticket.getDistribution().entrySet()) {
+                distribution.append("%   ").append(entry.getKey()).append(" -> ").append(format.format(entry.getValue())).append(" EUR\n");
+            }
+            distribution.delete(distribution.length()-1, distribution.length());
+        }
+        else distribution.append("%");
+        return """
+                %% id: %s
+                %% cost: %s EUR
+                %% category: %s
+                %% distribution:
+                %s
+                """.formatted(id, cost, category, distribution);
     }
 
     @Override

@@ -119,6 +119,23 @@ class CommandTicketTest extends CommandTest {
 
     }
 
+    @Test
+    void ticketPresentation() {
+        Ticket ticket = new Ticket(1L, 100.00, 2L);
+        ticket.getDistribution().put(3L, 120.00);
+        ticket.getDistribution().put(4L, 0.5);
+        CommandTicket command = new CommandTicket();
+        String expected = """
+                % id: 1
+                % cost: 100.00 EUR
+                % category: 2
+                % distribution:
+                %   3 -> 120.00 EUR
+                %   4 -> 0.50 EUR
+                """;
+        assertEquals(expected, command.ticketRepresentation(ticket));
+    }
+
     @Override
     public Command getCommand() {
         return new CommandTicket();
