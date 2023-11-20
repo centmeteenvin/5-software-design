@@ -175,4 +175,19 @@ public class TicketControllerImplementation extends TicketController {
             ticketDatabase.update(ticket.get());
         }
     }
+
+    @Override
+    public void calculateAll() {
+        List<Person> persons = personDatabase.getAll();
+        for (Person person : persons){
+            Long id = person.getId();
+            personController.resetDebt(id);
+        }
+
+        List<Ticket> tickets = ticketDatabase.getAll();
+        for (Ticket ticket : tickets) {
+            Long id = ticket.getId();
+            calculate(id);
+        }
+    }
 }

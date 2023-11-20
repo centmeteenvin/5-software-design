@@ -6,6 +6,7 @@ import models.Ticket;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class PersonControllerImplementation extends PersonController {
@@ -113,5 +114,13 @@ public class PersonControllerImplementation extends PersonController {
             person.get().getDebts().put(otherId, previousDebt + difference);
         }
         personDatabase.update(person.get());
+    }
+
+    @Override
+    public void resetDebt(Long id) {
+        Optional<Person> person = personDatabase.getById(id);
+        if (person.isEmpty()) return;
+
+        person.get().getDebts().clear();
     }
 }

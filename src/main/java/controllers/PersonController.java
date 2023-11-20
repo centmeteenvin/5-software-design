@@ -53,4 +53,5 @@ public abstract class PersonController {
      */
     public abstract void modifyDebt(Long id, Long otherPersonId, double difference);
 
+    public abstract void resetDebt(Long id);
 }

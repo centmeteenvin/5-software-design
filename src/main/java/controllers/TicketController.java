@@ -68,6 +68,8 @@ public abstract class TicketController {
      */
     public abstract void setPayer(Long id, Long payerId);
 
+    public abstract void calculateAll();
+
     public final void setPersonController(PersonController personController) {
         this.personController = personController;
     }
