@@ -151,8 +151,8 @@ public class TicketControllerImplementation extends TicketController {
                 // Check if the debtHolder still exists
                 Optional<Person> person = personDatabase.getById(debtHolder);
                 if (person.isEmpty()) return;
-
-                double difference = distribution.get(person);
+                
+                double difference = distribution.get(person.get().getId());
                 personController.modifyDebt(payer.get().getId(), debtHolder, difference);
                 personController.modifyDebt(debtHolder, payer.get().getId(), -difference);
             }

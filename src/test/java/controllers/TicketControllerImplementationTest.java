@@ -256,7 +256,7 @@ class TicketControllerImplementationTest {
 
         assertTrue(testTicket.getDistribution().isEmpty());
 
-        doReturn(Optional.of(testTicket)).when(mockTicketDatabase).getById(any());
+        doReturn(Optional.of(testTicket)).when(mockTicketDatabase).getById(1L);
         controller.calculate(1L);
 
         verify(mockTicketDatabase, times(++timesTicketDatabase)).getById(any());
@@ -291,6 +291,7 @@ class TicketControllerImplementationTest {
         verify(mockPersonController, never()).removeTicket(any(), any());
 
         testTicket.setPayerId(3L);
+
         assertEquals(testTicket.getPayerId(),3L);
 
         controller.calculate(1L);
@@ -322,10 +323,10 @@ class TicketControllerImplementationTest {
         verify(mockTicketDatabase, times(++timesTicketDatabase)).getById(any());
         verify(mockPersonDatabase, times(3)).getById(3L);
         verify(mockPersonDatabase, times(2)).getById(1L);
-        verify(mockPersonDatabase, times(2)).getById(2L);
-        verify(mockPersonController, times(1)).modifyDebt(3L, 1L, 20);
-        verify(mockPersonController, times(1)).modifyDebt(3L, 2L, 20);
-        verify(mockPersonController, times(2)).modifyDebt(any(), 3L, -20);
+        verify(mockPersonDatabase, times(1)).getById(2L);
+        verify(mockPersonController, times(1)).modifyDebt(3L, 1L, 50);
+        verify(mockPersonController, times(1)).modifyDebt(3L, 2L, 50);
+        verify(mockPersonController, times(2)).modifyDebt(any(Long.class), 3L, -50);
     }
     @Test
     void setPayer() {
