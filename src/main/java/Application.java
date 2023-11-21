@@ -36,6 +36,6 @@ public class Application {
     }
 
     public void run() {
-        //TODO
+        view.run();
     }
 }
