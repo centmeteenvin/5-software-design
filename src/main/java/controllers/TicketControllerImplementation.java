@@ -152,7 +152,7 @@ public class TicketControllerImplementation extends TicketController {
                 Optional<Person> person = personDatabase.getById(debtHolder);
                 if (person.isEmpty()) return;
 
-                double difference = distribution.get(person);
+                double difference = distribution.get(person.get().getId());
                 personController.modifyDebt(payer.get().getId(), debtHolder, difference);
                 personController.modifyDebt(debtHolder, payer.get().getId(), -difference);
             }
@@ -173,6 +173,21 @@ public class TicketControllerImplementation extends TicketController {
         if (payerId == null || person.isPresent()) {
             ticket.get().setPayerId(payerId);
             ticketDatabase.update(ticket.get());
+        }
+    }
+
+    @Override
+    public void calculateAll() {
+        List<Person> persons = personDatabase.getAll();
+        for (Person person : persons){
+            Long id = person.getId();
+            personController.resetDebt(id);
+        }
+
+        List<Ticket> tickets = ticketDatabase.getAll();
+        for (Ticket ticket : tickets) {
+            Long id = ticket.getId();
+            calculate(id);
         }
     }
 }

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.swing.text.html.Option;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +36,7 @@ class TicketControllerImplementationTest {
         mockPersonController = mock(PersonController.class);
         mockTicketCategoryController = mock(TicketCategoryController.class);
 
-        controller = new TicketControllerImplementation(mockTicketDatabase, mockPersonDatabase, mockTicketCategoryDatabase);
+        controller = spy(new TicketControllerImplementation(mockTicketDatabase, mockPersonDatabase, mockTicketCategoryDatabase));
         controller.setTicketCategoryController(mockTicketCategoryController);
         controller.setPersonController(mockPersonController);
     }
@@ -256,7 +257,7 @@ class TicketControllerImplementationTest {
 
         assertTrue(testTicket.getDistribution().isEmpty());
 
-        doReturn(Optional.of(testTicket)).when(mockTicketDatabase).getById(any());
+        doReturn(Optional.of(testTicket)).when(mockTicketDatabase).getById(1L);
         controller.calculate(1L);
 
         verify(mockTicketDatabase, times(++timesTicketDatabase)).getById(any());
@@ -291,6 +292,7 @@ class TicketControllerImplementationTest {
         verify(mockPersonController, never()).removeTicket(any(), any());
 
         testTicket.setPayerId(3L);
+
         assertEquals(testTicket.getPayerId(),3L);
 
         controller.calculate(1L);
@@ -322,10 +324,10 @@ class TicketControllerImplementationTest {
         verify(mockTicketDatabase, times(++timesTicketDatabase)).getById(any());
         verify(mockPersonDatabase, times(3)).getById(3L);
         verify(mockPersonDatabase, times(2)).getById(1L);
-        verify(mockPersonDatabase, times(2)).getById(2L);
-        verify(mockPersonController, times(1)).modifyDebt(3L, 1L, 20);
-        verify(mockPersonController, times(1)).modifyDebt(3L, 2L, 20);
-        verify(mockPersonController, times(2)).modifyDebt(any(), 3L, -20);
+        verify(mockPersonDatabase, times(1)).getById(2L);
+        verify(mockPersonController, times(1)).modifyDebt(3L, 1L, 50.);
+        verify(mockPersonController, times(1)).modifyDebt(3L, 2L, 50.);
+        verify(mockPersonController, times(2)).modifyDebt(any(Long.class), eq(3L), eq(-50.));
     }
     @Test
     void setPayer() {
@@ -365,4 +367,44 @@ class TicketControllerImplementationTest {
         verify(mockTicketDatabase, times(2)).update(any());
         assertNull(testTicket.getPayerId());
     }
+
+    @Test
+    void calculateAll(){
+        doReturn(new ArrayList<Person>(){}).when(mockPersonDatabase).getAll();
+        doReturn(new ArrayList<Ticket>(){}).when(mockTicketDatabase).getAll();
+        doNothing().when(mockPersonController).resetDebt(any());
+
+        controller.calculateAll();
+
+        verify(mockPersonDatabase, times(1)).getAll();
+        verify(mockTicketDatabase, times(1)).getAll();
+
+
+        Person testPerson1 = new Person(1L,"foo");
+        Person testPerson2 = new Person(2L, "bar");
+        Person testPerson3 = new Person(3L, "baz");
+
+        Ticket testTicket1 = new Ticket(1L,0,1L);
+        Ticket testTicket2 = new Ticket(2L,0,1L);
+        Ticket testTicket3 = new Ticket(3L,0,1L);
+
+        doReturn(new ArrayList<Person>() {{add(testPerson1); add(testPerson2); add(testPerson3);}}).when(mockPersonDatabase).getAll();
+
+        controller.calculateAll();
+
+        verify(mockPersonDatabase, times(2)).getAll();
+        verify(mockTicketDatabase, times(2)).getAll();
+        verify(mockPersonController, times(3)).resetDebt(any(Long.class));
+        verify(controller, never()).calculate(any(Long.class));
+
+        doReturn(new ArrayList<Ticket>() {{add(testTicket1); add(testTicket2); add(testTicket3);}}).when(mockTicketDatabase).getAll();
+
+        controller.calculateAll();
+
+        verify(mockPersonDatabase, times(3)).getAll();
+        verify(mockTicketDatabase, times(3)).getAll();
+        verify(mockPersonController, times(6)).resetDebt(any(Long.class));
+        verify(controller, times(3)).calculate(any(Long.class));
+    }
+
 }
