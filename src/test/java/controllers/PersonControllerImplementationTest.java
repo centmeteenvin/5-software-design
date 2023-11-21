@@ -200,4 +200,26 @@ public class PersonControllerImplementationTest {
         controller.modifyDebt(1L, 2L, -50);
         assertEquals(testPerson1.getDebts().get(2L),50);
     }
+
+    @Test
+    void resetDebt() {
+        doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
+
+        controller.resetDebt(1L);
+
+        verify(mockPersonDatabase, times(1)).getById(any());
+
+        Person testPerson = new Person(1L,"foo");
+        testPerson.getDebts().put(1L,100.);
+        testPerson.getDebts().put(2L,-50.);
+
+        doReturn(Optional.of(testPerson)).when(mockPersonDatabase).getById(any());
+
+        assertFalse(testPerson.getDebts().isEmpty());
+
+        controller.resetDebt(1L);
+
+        assertTrue(testPerson.getDebts().isEmpty());
+        verify(mockPersonDatabase, times(2)).getById(any());
+    }
 }
