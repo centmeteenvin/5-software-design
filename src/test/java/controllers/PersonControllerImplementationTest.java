@@ -136,28 +136,28 @@ public class PersonControllerImplementationTest {
         controller.delete(1L);
 
         verify(mockPersonDatabase, times(2)).deleteById(any());
-        verify(mockTicketController, times(2)).removePerson(any(),any());
+        verify(mockTicketController, times(2)).removePerson(any(), any());
         assertTrue(testPerson.getTicketsId().isEmpty());
     }
 
     @Test
-    void rename(){
+    void rename() {
         doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
         doReturn(Optional.empty()).when(mockPersonDatabase).update(any());
 
-        Person testPerson = spy(new Person(1L,"foo"));
+        Person testPerson = spy(new Person(1L, "foo"));
 
-        controller.rename(1L,"faa");
+        controller.rename(1L, "faa");
 
-        assertEquals(testPerson.getName(),"foo");
+        assertEquals(testPerson.getName(), "foo");
         verify(mockPersonDatabase, times(1)).getById(any());
         verify(mockPersonDatabase, never()).update(any());
 
         doReturn(Optional.of(testPerson)).when(mockPersonDatabase).getById(any());
 
-        controller.rename(1L,"faa");
+        controller.rename(1L, "faa");
 
-        assertEquals(testPerson.getName(),"faa");
+        assertEquals(testPerson.getName(), "faa");
         verify(mockPersonDatabase, times(2)).getById(any());
         verify(mockPersonDatabase, times(1)).update(any());
     }
@@ -167,10 +167,10 @@ public class PersonControllerImplementationTest {
         doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
         doReturn(Optional.empty()).when(mockPersonDatabase).update(any());
 
-        Person testPerson1 = new Person(1L,"foo");
-        Person testPerson2 = new Person(2L,"bar");
+        Person testPerson1 = new Person(1L, "foo");
+        Person testPerson2 = new Person(2L, "bar");
 
-        controller.modifyDebt(1L,2L, 100);
+        controller.modifyDebt(1L, 2L, 100);
 
         assertTrue(testPerson1.getDebts().isEmpty());
         assertTrue(testPerson2.getDebts().isEmpty());
@@ -179,7 +179,7 @@ public class PersonControllerImplementationTest {
 
         doReturn(Optional.of(testPerson1)).when(mockPersonDatabase).getById(1L);
 
-        controller.modifyDebt(1L,2L, 100);
+        controller.modifyDebt(1L, 2L, 100);
 
         assertTrue(testPerson1.getDebts().isEmpty());
         assertTrue(testPerson2.getDebts().isEmpty());
@@ -188,7 +188,7 @@ public class PersonControllerImplementationTest {
 
         doReturn(Optional.of(testPerson2)).when(mockPersonDatabase).getById(2L);
 
-        controller.modifyDebt(1L,2L, 100);
+        controller.modifyDebt(1L, 2L, 100);
 
         assertFalse(testPerson1.getDebts().isEmpty());
         assertTrue(testPerson1.getDebts().containsKey(2L));
@@ -198,7 +198,7 @@ public class PersonControllerImplementationTest {
         verify(mockPersonDatabase, times(1)).update(any());
 
         controller.modifyDebt(1L, 2L, -50);
-        assertEquals(testPerson1.getDebts().get(2L),50);
+        assertEquals(testPerson1.getDebts().get(2L), 50);
     }
 
     @Test
@@ -209,9 +209,9 @@ public class PersonControllerImplementationTest {
 
         verify(mockPersonDatabase, times(1)).getById(any());
 
-        Person testPerson = new Person(1L,"foo");
-        testPerson.getDebts().put(1L,100.);
-        testPerson.getDebts().put(2L,-50.);
+        Person testPerson = new Person(1L, "foo");
+        testPerson.getDebts().put(1L, 100.);
+        testPerson.getDebts().put(2L, -50.);
 
         doReturn(Optional.of(testPerson)).when(mockPersonDatabase).getById(any());
 
@@ -221,5 +221,56 @@ public class PersonControllerImplementationTest {
 
         assertTrue(testPerson.getDebts().isEmpty());
         verify(mockPersonDatabase, times(2)).getById(any());
+    }
+
+    @Test
+    void pay() {
+        doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
+        doReturn(Optional.empty()).when(mockTicketController).create(any(Long.class),any(Double.class),any());
+
+        Optional<Ticket> receivedTicket;
+
+        receivedTicket = controller.pay(1L,2L,100.);
+
+        assertTrue(receivedTicket.isEmpty());
+
+        verify(mockPersonDatabase, times(1)).getById(1L);
+        verify(mockPersonDatabase, never()).getById(2L);
+        verify(mockTicketController, never()).create(any(Long.class),any(Double.class),any());
+
+        Person payingPerson = new Person(1L,"foo");
+        doReturn(Optional.of(payingPerson)).when(mockPersonDatabase).getById(1L);
+
+        receivedTicket = controller.pay(1L,2L,100.);
+
+        assertTrue(receivedTicket.isEmpty());
+
+        verify(mockPersonDatabase, times(2)).getById(1L);
+        verify(mockPersonDatabase, times(1)).getById(2L);
+        verify(mockTicketController, never()).create(any(Long.class),any(Double.class),any());
+
+        Person receivingPerson = new Person(2L,"bar");
+        doReturn(Optional.of(receivingPerson)).when(mockPersonDatabase).getById(2L);
+
+        receivedTicket = controller.pay(1L,2L,100.);
+
+        assertTrue(receivedTicket.isEmpty());
+
+        verify(mockPersonDatabase, times(3)).getById(1L);
+        verify(mockPersonDatabase, times(2)).getById(2L);
+        verify(mockTicketController, times(1)).create(any(Long.class),any(Double.class),any());
+
+        Ticket testTicket = new Ticket(1L, 100.,0L);
+        doReturn(Optional.of(testTicket)).when(mockTicketController).create(any(Long.class),any(Double.class),any());
+
+        receivedTicket = controller.pay(1L,2L,100);
+
+        assertTrue(receivedTicket.isPresent());
+        assertEquals(receivedTicket.get().getPayerId(),payingPerson.getId());
+        assertEquals(receivedTicket.get().getDistribution().get(2L),100.);
+
+        verify(mockPersonDatabase, times(4)).getById(1L);
+        verify(mockPersonDatabase, times(3)).getById(2L);
+        verify(mockTicketController, times(2)).create(any(Long.class),any(Double.class),any());
     }
 }

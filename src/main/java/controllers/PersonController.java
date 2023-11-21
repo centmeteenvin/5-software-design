@@ -53,5 +53,12 @@ public abstract class PersonController {
      */
     public abstract void modifyDebt(Long id, Long otherPersonId, double difference);
 
+    /**
+     * Resets a persons debt
+     * @param id The id of the person's debt we want to reset
+     */
     public abstract void resetDebt(Long id);
+
+    public abstract Optional<Ticket> pay(Long id, Long receivingPersonId,double payedAmount);
+
 }

@@ -4,10 +4,7 @@ import database.Database;
 import models.Person;
 import models.Ticket;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class PersonControllerImplementation extends PersonController {
 
@@ -17,6 +14,7 @@ public class PersonControllerImplementation extends PersonController {
 
     /**
      * Creates the person and puts it in the database.
+     *
      * @param name
      * @return
      */
@@ -73,7 +71,7 @@ public class PersonControllerImplementation extends PersonController {
         Optional<Person> person = personDatabase.getById(id);
         if (person.isPresent()) {
             Iterator<Long> it = person.get().getTicketsId().iterator();
-            while (it.hasNext()){
+            while (it.hasNext()) {
                 long ticketId = it.next();
                 ticketController.removePerson(id, ticketId);
                 it.remove();
@@ -99,28 +97,63 @@ public class PersonControllerImplementation extends PersonController {
 
     /**
      * Adds the difference to the person's debt.
+     *
      * @param difference the difference that is ADDED to the current person's debt.
      */
     @Override
-    public void modifyDebt(Long id, Long otherId,double difference) {
+    public void modifyDebt(Long id, Long otherId, double difference) {
         Optional<Person> person = personDatabase.getById(id);
         Optional<Person> subject = personDatabase.getById(otherId);
         if (person.isEmpty() || subject.isEmpty()) return;
         if (!person.get().getDebts().containsKey(otherId)) {
             person.get().getDebts().put(otherId, difference);
-        }
-        else {
+        } else {
             double previousDebt = person.get().getDebts().get(otherId);
             person.get().getDebts().put(otherId, previousDebt + difference);
         }
         personDatabase.update(person.get());
     }
 
+    /**
+     * Resets the debts map for a given personId.
+     *
+     * @param id
+     */
     @Override
     public void resetDebt(Long id) {
         Optional<Person> person = personDatabase.getById(id);
         if (person.isEmpty()) return;
 
         person.get().getDebts().clear();
+    }
+
+    /**
+     * Makes a ticket that resembles the payerPerson paying to a receivingPerson.
+     *
+     * <p>
+     * This is done by making an "inverted" ticket:
+     * The person who receives will have a debt to the person that pays
+     * This will counteract the current debt of the payer to the receiver
+     * </p>
+     *
+     * @param payerId
+     * @param receivingPersonId
+     * @param payedAmount
+     * @return
+     */
+    @Override
+    public Optional<Ticket> pay(Long payerId, Long receivingPersonId, double payedAmount) {
+        Optional<Person> payer = personDatabase.getById(payerId);
+        if (payer.isEmpty()) return Optional.empty();
+
+        Optional<Person> receiver = personDatabase.getById(receivingPersonId);
+        if (receiver.isEmpty()) return Optional.empty();
+
+        Optional<Ticket> ticket = ticketController.create(0L, payedAmount, null);
+        if (ticket.isEmpty()) return ticket;
+
+        ticket.get().setPayerId(payerId);
+        ticket.get().getDistribution().put(receivingPersonId, payedAmount);
+        return ticket;
     }
 }
