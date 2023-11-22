@@ -142,10 +142,10 @@ public class TicketControllerImplementation extends TicketController {
 
      */
     @Override
-    public void calculate(Long id) {
+    public void calculate(Long id) throws PersonNotFoundException, TicketNotFoundException {
         // Check the ticket is in the database
         Optional<Ticket> ticket = ticketDatabase.getById(id);
-        if (ticket.isEmpty()) return;
+        if (ticket.isEmpty()) throw new TicketNotFoundException(id);
 
         // Check that the total payed by everyone in the group is equal to the total cost of the ticket
         Map<Long, Double> distribution = ticket.get().getDistribution();
@@ -156,12 +156,12 @@ public class TicketControllerImplementation extends TicketController {
         if (ticket.get().getPayerId() != null) {
             // Check if the payer still exists
             payer = personDatabase.getById(ticket.get().getPayerId());
-            if (payer.isEmpty()) return;
+            if (payer.isEmpty()) throw new PersonNotFoundException(ticket.get().getPayerId());
 
             for (Long debtHolder : distribution.keySet()) {
                 // Check if the debtHolder still exists
                 Optional<Person> person = personDatabase.getById(debtHolder);
-                if (person.isEmpty()) return;
+                if (person.isEmpty()) continue;
 
                 double difference = distribution.get(person.get().getId());
                 personController.modifyDebt(payer.get().getId(), debtHolder, difference);

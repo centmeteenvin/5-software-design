@@ -63,7 +63,7 @@ public abstract class TicketController {
      * Updates {@link Person#getDebt()} for every person in the ticket via {@link PersonController#modifyDebt(Long, double)}.
      * @param id
      */
-    public abstract void calculate(Long id);
+    public abstract void calculate(Long id) throws PersonNotFoundException, TicketNotFoundException;
 
     /**
      * Sets the payer to a certain id

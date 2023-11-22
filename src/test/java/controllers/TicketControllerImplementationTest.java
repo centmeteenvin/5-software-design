@@ -250,29 +250,27 @@ class TicketControllerImplementationTest {
     }
 
     @Test
-    void calculate() {
+    void calculate() throws PersonNotFoundException, TicketNotFoundException {
         int timesTicketDatabase = 0;
         doReturn(Optional.empty()).when(mockTicketDatabase).getById(any());
         doNothing().when(mockTicketDatabase).deleteById(any());
         doNothing().when(mockPersonController).modifyDebt(any(Long.class),any(Long.class), any(Double.class));
 
-        controller.calculate(1L);
+        assertThrows(TicketNotFoundException.class, () -> controller.calculate(1L));
 
         verify(mockTicketDatabase, times(++timesTicketDatabase)).getById(any());
         verify(mockPersonDatabase, never()).getById(any());
         verify(mockPersonController, never()).removeTicket(any(), any());
 
         Ticket testTicket = new Ticket(1L,100,1L);
-
-        assertTrue(testTicket.getDistribution().isEmpty());
-
         doReturn(Optional.of(testTicket)).when(mockTicketDatabase).getById(1L);
+
         controller.calculate(1L);
 
+        assertTrue(testTicket.getDistribution().isEmpty());
         verify(mockTicketDatabase, times(++timesTicketDatabase)).getById(any());
         verify(mockPersonDatabase, never()).getById(any());
         verify(mockPersonController, never()).removeTicket(any(), any());
-
 
         testTicket.getDistribution().put(1L,20.);
         testTicket.getDistribution().put(2L,20.);
@@ -304,7 +302,7 @@ class TicketControllerImplementationTest {
 
         assertEquals(testTicket.getPayerId(),3L);
 
-        controller.calculate(1L);
+        assertThrows(PersonNotFoundException.class , () -> controller.calculate(1L));
 
         verify(mockTicketDatabase, times(++timesTicketDatabase)).getById(any());
         verify(mockPersonDatabase, times(1)).getById(3L);
@@ -312,7 +310,7 @@ class TicketControllerImplementationTest {
 
         doReturn(Optional.of(testPerson3)).when(mockPersonDatabase).getById(3L);
 
-        controller.calculate(1L);
+        assertThrows(PersonNotFoundException.class , () -> controller.calculate(1L));
 
         verify(mockTicketDatabase, times(++timesTicketDatabase)).getById(any());
         verify(mockPersonDatabase, times(2)).getById(3L);
@@ -322,7 +320,6 @@ class TicketControllerImplementationTest {
         doReturn(Optional.of(testPerson1)).when(mockPersonDatabase).getById(1L);
         doReturn(Optional.of(testPerson2)).when(mockPersonDatabase).getById(2L);
         doNothing().when(mockPersonController).modifyDebt(anyLong(),anyLong(),anyDouble());
-
 
         assertTrue(testPerson1.getDebts().isEmpty());
         assertTrue(testPerson2.getDebts().isEmpty());
