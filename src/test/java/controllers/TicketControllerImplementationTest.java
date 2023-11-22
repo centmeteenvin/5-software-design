@@ -110,34 +110,36 @@ class TicketControllerImplementationTest {
     }
 
     @Test
-    void removePerson() {
+    void removePerson() throws PersonNotFoundException, TicketNotFoundException {
         doReturn(Optional.empty()).when(mockTicketDatabase).update(any());
         doNothing().when(mockPersonController).removeTicket(any(), any());
         doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
         doReturn(Optional.empty()).when(mockTicketDatabase).getById(any());
 
+        assertThrows(TicketNotFoundException.class, () -> controller.removePerson(1L, 1L));
 
-        controller.removePerson(1L, 1L);
-        Person person = new Person(1L, "bar");
         Ticket ticket = new Ticket(1L, 100, 1L);
-
         doReturn(Optional.of(ticket)).when(mockTicketDatabase).getById(any());
 
-        controller.addPerson(1L, 1L);
+        assertThrows(PersonNotFoundException.class, () -> controller.removePerson(1L, 1L));
+
         verify(mockTicketDatabase, never()).update(any());
 
         ticket.getDistribution().put(1L, 0D);
-        controller.removePerson(1L, 1L);
 
-        verify(mockTicketDatabase, times(1)).update(any());
+        assertThrows(PersonNotFoundException.class,() -> controller.removePerson(1L, 1L));
+
+        verify(mockTicketDatabase, never()).update(any());
         verify(mockPersonController, never()).removeTicket(any(), any());
 
+        Person person = new Person(1L, "bar");
         doReturn(Optional.of(person)).when(mockPersonDatabase).getById(any());
         ticket.getDistribution().put(1L, 0D);
 
         controller.removePerson(1L, 1L);
+
         assertTrue(ticket.getDistribution().isEmpty());
-        verify(mockTicketDatabase, times(2)).update(any());
+        verify(mockTicketDatabase, times(1)).update(any());
         verify(mockPersonController, times(1)).removeTicket(any(), any());
     }
 

@@ -69,14 +69,14 @@ public class TicketControllerImplementation extends TicketController {
      * Removes a person from the ticket. SHOULD call {@link PersonController#removeTicket(Long, Long)}
      */
     @Override
-    public void removePerson(Long id, Long personId) {
+    public void removePerson(Long id, Long personId) throws PersonNotFoundException, TicketNotFoundException {
         Optional<Ticket> ticket = ticketDatabase.getById(id);
-        if (ticket.isEmpty()) return;
+        if (ticket.isEmpty()) throw new TicketNotFoundException(id);
         if (!ticket.get().getDistribution().containsKey(personId)) return;
         ticket.get().getDistribution().remove(personId);
         ticketDatabase.update(ticket.get());
         Optional<Person> person = personDatabase.getById(personId);
-        if (person.isEmpty()) return;
+        if (person.isEmpty()) throw new PersonNotFoundException(id);
         personController.removeTicket(personId, id);
     }
 

@@ -37,7 +37,7 @@ public abstract class TicketController {
     /**
      * Removes a person from the ticket. SHOULD call {@link PersonController#removeTicket(Long, Long)}
      */
-    public abstract void removePerson(Long id, Long personId);
+    public abstract void removePerson(Long id, Long personId) throws PersonNotFoundException, TicketNotFoundException;
 
     /**
      * Changes the current category. SHOULD call {@link TicketCategoryController#removeTicket(Long, Long)} and {@link TicketCategoryController#addTicket(Long, Long)}
