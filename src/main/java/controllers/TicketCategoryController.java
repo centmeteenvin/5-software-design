@@ -1,6 +1,8 @@
 package controllers;
 
 import database.Database;
+import exceptions.notFoundExceptions.CategoryNotFoundException;
+import exceptions.notFoundExceptions.TicketNotFoundException;
 import models.Ticket;
 import models.TicketCategory;
 
@@ -24,7 +26,7 @@ public abstract class TicketCategoryController {
     /**
      * adds a ticket to the current category.
      */
-    public abstract void addTicket(Long id, Long ticketId);
+    public abstract void addTicket(Long id, Long ticketId) throws CategoryNotFoundException, TicketNotFoundException;
 
     /**
      * removes a ticket from the current category. SHOULD call {@link TicketController#changeCategory(Long, Long)}.

@@ -1,6 +1,8 @@
 package controllers;
 
 import database.Database;
+import exceptions.notFoundExceptions.CategoryNotFoundException;
+import exceptions.notFoundExceptions.TicketNotFoundException;
 import models.Ticket;
 import models.TicketCategory;
 
@@ -15,18 +17,16 @@ public class TicketCategoryControllerImplementation extends TicketCategoryContro
     @Override
     public Optional<TicketCategory> create(String name) {
         long id = System.nanoTime();
-        Optional<TicketCategory> ticketCategory = ticketCategoryDatabase.create(new TicketCategory(id, name));
-
-        return ticketCategory;
+        return ticketCategoryDatabase.create(new TicketCategory(id, name));
     }
 
     @Override
-    public void addTicket(Long id, Long ticketId) {
+    public void addTicket(Long id, Long ticketId) throws CategoryNotFoundException, TicketNotFoundException {
         Optional<TicketCategory> category = ticketCategoryDatabase.getById(id);
-        if (category.isEmpty()) return;
+        if (category.isEmpty()) throw new CategoryNotFoundException(id);
 
         Optional<Ticket> ticket = ticketDatabase.getById(ticketId);
-        if (ticket.isEmpty()) return;
+        if (ticket.isEmpty()) throw new TicketNotFoundException(ticketId);
 
         category.get().getTicketIds().add(ticketId);
         ticketCategoryDatabase.update(category.get());
