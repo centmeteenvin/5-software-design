@@ -11,7 +11,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -220,7 +219,7 @@ class TicketControllerImplementationTest {
     }
 
     @Test
-    void delete() throws PersonNotFoundException, TicketNotFoundException {
+    void delete() throws PersonNotFoundException, TicketNotFoundException, CategoryNotFoundException {
         doReturn(Optional.empty()).when(mockTicketDatabase).getById(any());
         doNothing().when(mockTicketDatabase).deleteById(any());
         doNothing().when(mockPersonController).removeTicket(any(), any());

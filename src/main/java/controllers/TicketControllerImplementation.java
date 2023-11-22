@@ -38,7 +38,15 @@ public class TicketControllerImplementation extends TicketController {
 
         Optional<Ticket> ticket = ticketDatabase.create(new Ticket(System.nanoTime(), totalCost, categoryId));
         if (ticket.isEmpty()) return Optional.empty();
-        ticketCategoryController.addTicket(categoryId, ticket.get().getId());
+
+        if (categoryId != null) {
+            try {
+                ticketCategoryController.addTicket(categoryId, ticket.get().getId());
+            } catch (TicketNotFoundException e) {
+                //pass, This is impossible.
+            }
+        }
+
         for (Long personId : personsId) {
             try {
                 personController.addTicket(personId, ticket.get().getId());
@@ -129,7 +137,11 @@ public class TicketControllerImplementation extends TicketController {
         Optional<Ticket> ticket = ticketDatabase.getById(id);
         if (ticket.isEmpty()) throw new TicketNotFoundException(id);
         ticketDatabase.deleteById(id);
-        ticketCategoryController.removeTicket(ticket.get().getTicketCategoryId(), id);
+        try {
+            ticketCategoryController.removeTicket(ticket.get().getTicketCategoryId(), id);
+        } catch (CategoryNotFoundException e) {
+            //pass if the category does not exist, it is not a big problem to this function.
+        }
         for (Long personId : ticket.get().getDistribution().keySet()) {
             try {
                 personController.removeTicket(personId, id);
