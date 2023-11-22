@@ -21,9 +21,7 @@ public class PersonControllerImplementation extends PersonController {
     @Override
     public Optional<Person> create(String name) {
         long id = System.nanoTime();
-
         Optional<Person> person = personDatabase.create(new Person(id, name));
-
         return person;
 
     }
