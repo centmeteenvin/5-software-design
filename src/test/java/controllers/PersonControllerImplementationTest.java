@@ -164,14 +164,14 @@ public class PersonControllerImplementationTest {
     }
 
     @Test
-    void modifyDebt() {
+    void modifyDebt() throws PersonNotFoundException {
         doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
         doReturn(Optional.empty()).when(mockPersonDatabase).update(any());
 
         Person testPerson1 = new Person(1L, "foo");
         Person testPerson2 = new Person(2L, "bar");
 
-        controller.modifyDebt(1L, 2L, 100);
+        assertThrows(PersonNotFoundException.class, () -> controller.modifyDebt(1L, 2L, 100));
 
         assertTrue(testPerson1.getDebts().isEmpty());
         assertTrue(testPerson2.getDebts().isEmpty());
@@ -180,7 +180,7 @@ public class PersonControllerImplementationTest {
 
         doReturn(Optional.of(testPerson1)).when(mockPersonDatabase).getById(1L);
 
-        controller.modifyDebt(1L, 2L, 100);
+        assertThrows(PersonNotFoundException.class, () -> controller.modifyDebt(1L, 2L, 100));
 
         assertTrue(testPerson1.getDebts().isEmpty());
         assertTrue(testPerson2.getDebts().isEmpty());

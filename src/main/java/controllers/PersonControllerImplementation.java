@@ -98,10 +98,11 @@ public class PersonControllerImplementation extends PersonController {
      * @param difference the difference that is ADDED to the current person's debt.
      */
     @Override
-    public void modifyDebt(Long id, Long otherId, double difference) {
+    public void modifyDebt(Long id, Long otherId, double difference) throws PersonNotFoundException {
         Optional<Person> person = personDatabase.getById(id);
         Optional<Person> subject = personDatabase.getById(otherId);
-        if (person.isEmpty() || subject.isEmpty()) return;
+        if (person.isEmpty()) throw new PersonNotFoundException(id);
+        if (subject.isEmpty()) throw new PersonNotFoundException(otherId);
         if (!person.get().getDebts().containsKey(otherId)) {
             person.get().getDebts().put(otherId, difference);
         } else {
