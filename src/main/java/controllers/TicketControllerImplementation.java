@@ -101,9 +101,9 @@ public class TicketControllerImplementation extends TicketController {
      * Changes the current cost of the ticket. CONSIDER calling  {@link #calculate(Long)}.
      */
     @Override
-    public void changeCost(Long id, double newTotalCost) {
+    public void changeCost(Long id, double newTotalCost) throws TicketNotFoundException {
         Optional<Ticket> ticket = ticketDatabase.getById(id);
-        if (ticket.isEmpty()) return;
+        if (ticket.isEmpty()) throw new TicketNotFoundException(id);
         ticket.get().setCost(newTotalCost);
         ticketDatabase.update(ticket.get());
     }

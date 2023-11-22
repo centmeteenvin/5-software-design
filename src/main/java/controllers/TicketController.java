@@ -47,7 +47,7 @@ public abstract class TicketController {
     /**
      * Changes the current cost of the ticket. CONSIDER calling  {@link #calculate(Long)}.
      */
-    public abstract void changeCost(Long id, double newTotalCost);
+    public abstract void changeCost(Long id, double newTotalCost) throws TicketNotFoundException;
 
     /**
      * Updated the weight of a certain person. Consider calling  {@link #calculate(Long)}.

@@ -180,14 +180,15 @@ class TicketControllerImplementationTest {
     }
 
     @Test
-    void changeCost() {
+    void changeCost() throws TicketNotFoundException {
         doReturn(Optional.empty()).when(mockTicketDatabase).getById(any());
         doReturn(Optional.empty()).when(mockTicketDatabase).update(any());
-        Ticket ticket = new Ticket(1L, 100, 1L);
-        controller.changeCost(1L, 200);
+
+        assertThrows(TicketNotFoundException.class ,() -> controller.changeCost(1L, 200));
 
         verify(mockTicketDatabase, never()).update(any());
 
+        Ticket ticket = new Ticket(1L, 100, 1L);
         doReturn(Optional.of(ticket)).when(mockTicketDatabase).getById(any());
 
         controller.changeCost(1L, 200);
