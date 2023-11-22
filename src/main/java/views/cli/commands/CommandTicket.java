@@ -1,5 +1,8 @@
 package views.cli.commands;
 
+import exceptions.notFoundExceptions.CategoryNotFoundException;
+import exceptions.notFoundExceptions.PersonNotFoundException;
+import exceptions.notFoundExceptions.TicketNotFoundException;
 import models.Ticket;
 import models.TicketCategory;
 import views.cli.ViewCommandLine;
@@ -83,12 +86,17 @@ public class CommandTicket extends Command{
             view.output.print("! %s EUR is not a valid cost\n".formatted(format.format(cost)));
             return;
         }
-        Optional<TicketCategory> category = view.getTicketCategoryDatabase().getById(Long.valueOf(args[3]));
-        if (category.isEmpty()) {
+
+        Optional<Ticket> ticket = null;
+        try {
+            ticket = view.getTicketController().create(Long.valueOf(args[3]), cost, List.of());
+        } catch (CategoryNotFoundException e) {
             view.output.print("! Category does not exist\n");
             return;
+        } catch (PersonNotFoundException e) {
+            view.output.print("! Received PersonNotFoundException, this should not occur\n");
+            return;
         }
-        Optional<Ticket> ticket = view.getTicketController().create(category.get().getId(), cost, List.of());
         if (ticket.isEmpty()) {
             view.output.print("! Failed to create ticket\n");
             return;
@@ -116,15 +124,14 @@ public class CommandTicket extends Command{
             view.output.print(incorrectNumberOfArguments(4, args.length));
             return;
         }
-        if(view.getTicketDatabase().getById(Long.valueOf(args[2])).isEmpty()) {
+        try {
+            view.getTicketController().addPerson(Long.valueOf(args[2]), Long.valueOf(args[3]));
+        } catch (TicketNotFoundException e) {
             view.output.print("! Ticket does not exist\n");
             return;
-        }
-        if (view.getPersonDatabase().getById(Long.valueOf(args[3])).isEmpty()) {
+        } catch (PersonNotFoundException e) {
             view.output.print("! Person does not exist\n");
-            return;
-        }
-        view.getTicketController().addPerson(Long.valueOf(args[2]), Long.valueOf(args[3]));
+            return;        }
         view.output.print("%% Successfully added person %s to ticket %s\n".formatted(args[3], args[2]));
     }
 

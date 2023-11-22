@@ -2,6 +2,9 @@ package views.cli.commands;
 
 import controllers.TicketController;
 import database.Database;
+import exceptions.notFoundExceptions.CategoryNotFoundException;
+import exceptions.notFoundExceptions.PersonNotFoundException;
+import exceptions.notFoundExceptions.TicketNotFoundException;
 import models.Person;
 import models.Ticket;
 import models.TicketCategory;
@@ -61,7 +64,7 @@ class CommandTicketTest extends CommandTest {
     }
 
     @Test
-    void executeCreate() {
+    void executeCreate() throws PersonNotFoundException, CategoryNotFoundException {
         TicketController ticketController = mock(TicketController.class);
         Output output = mock(Output.class);
         //noinspection unchecked
@@ -100,11 +103,15 @@ class CommandTicketTest extends CommandTest {
 
         args = new String[]{CommandTicket.commandString, "create", "100.5", "1"};
         command = new CommandTicket(args, view);
-        doReturn(Optional.empty()).when(categoryDb).getById(1L);
+        doThrow(CategoryNotFoundException.class).when(ticketController.create(any(), any(), any()));
 
         command.executeCreate();
 
         verify(output, times(1)).print("! Category does not exist\n");
+
+        doThrow(PersonNotFoundException.class).when(ticketController.create(any(), any(), any()));
+
+        verify(output, times(1)).print("! Received PersonNotFoundException, this should not occur\n");
 
         args = new String[]{CommandTicket.commandString, "create", "100.5", "1"};
         command = new CommandTicket(args, view);
@@ -161,14 +168,10 @@ class CommandTicketTest extends CommandTest {
     }
 
     @Test
-    void executeAdd() {
-        //noinspection unchecked
-        Database<Ticket> ticketDatabase = (Database<Ticket>) mock(Database.class);
-        //noinspection unchecked
-        Database<Person> personDatabase = (Database<Person>) mock(Database.class);
+    void executeAdd() throws TicketNotFoundException, PersonNotFoundException {
         TicketController ticketController = mock(TicketController.class);
         Output output = mock(Output.class);
-        ViewCommandLine view = new ViewCommandLine(personDatabase, ticketDatabase, null,
+        ViewCommandLine view = new ViewCommandLine(null, null, null,
                 null, ticketController, null,
                 null, output);
         String[] args = new String[]{CommandTicket.commandString, "add"};
@@ -188,22 +191,19 @@ class CommandTicketTest extends CommandTest {
 
         args = new String[]{CommandTicket.commandString, "add", "1", "2"};
         command = new CommandTicket(args, view);
-        doReturn(Optional.empty()).when(ticketDatabase).getById(1L);
+        doThrow(TicketNotFoundException.class).when(ticketController).addPerson(any(), any());
 
         command.executeAdd();
 
         verify(output, times(1)).print("! Ticket does not exist\n");
 
-        Ticket ticket = new Ticket(1L, 100, 3L);
-        doReturn(Optional.of(ticket)).when(ticketDatabase).getById(1L);
-        doReturn(Optional.empty()).when(personDatabase).getById(2L);
+        doThrow(PersonNotFoundException.class).when(ticketController).addPerson(any(), any());
 
         command.executeAdd();
 
         verify(output, times(1)).print("! Person does not exist\n");
 
         Person person = new Person(2L, "foo");
-        doReturn(Optional.of(person)).when(personDatabase).getById(2L);
         doNothing().when(ticketController).addPerson(1L, 2L);
 
         command.executeAdd();
