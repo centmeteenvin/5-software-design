@@ -41,7 +41,7 @@ public abstract class TicketCategoryController {
     /**
      * Deletes the category. SHOULD call {@link TicketController#changeCategory(Long, Long)}.
      */
-    public abstract void delete(Long id);
+    public abstract void delete(Long id) throws CategoryNotFoundException;
 
     public final void setTicketController(TicketController ticketController) {
         this.ticketController = ticketController;

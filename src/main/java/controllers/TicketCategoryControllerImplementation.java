@@ -56,16 +56,19 @@ public class TicketCategoryControllerImplementation extends TicketCategoryContro
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Long id) throws CategoryNotFoundException {
         Optional<TicketCategory> category = ticketCategoryDatabase.getById(id);
-        if (category.isPresent()) {
-            Iterator<Long> it = category.get().getTicketIds().iterator();
-            while (it.hasNext()) {
-                long ticketId = it.next();
+        if (category.isEmpty()) throw new CategoryNotFoundException(id);
+        Iterator<Long> it = category.get().getTicketIds().iterator();
+        while (it.hasNext()) {
+            long ticketId = it.next();
+            try {
                 ticketController.changeCategory(ticketId, null);
-                it.remove();
+            } catch (TicketNotFoundException e) {
+                //pass, if a ticket is not found, it need not be deleted another time.
             }
-            ticketCategoryDatabase.deleteById(id);
+            it.remove();
         }
+        ticketCategoryDatabase.deleteById(id);
     }
 }

@@ -161,12 +161,12 @@ public class TicketCategoryControllerImplementationTest {
     }
 
     @Test
-    void delete() {
+    void delete() throws TicketNotFoundException, CategoryNotFoundException {
         doReturn(Optional.empty()).when(mockTicketCategoryDatabase).getById(any());
         doNothing().when(mockTicketController).changeCategory(any(),any());
         doNothing().when(mockTicketCategoryDatabase).deleteById(any());
 
-        controller.delete(1L);
+        assertThrows(CategoryNotFoundException.class, () -> controller.delete(1L));
 
         verify(mockTicketCategoryDatabase,times(1)).getById(any());
         verify(mockTicketController, never()).changeCategory(any(),any());
