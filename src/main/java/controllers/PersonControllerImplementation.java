@@ -51,13 +51,12 @@ public class PersonControllerImplementation extends PersonController {
      * @param ticketId
      */
     @Override
-    public void removeTicket(Long id, Long ticketId) {
+    public void removeTicket(Long id, Long ticketId) throws PersonNotFoundException {
         Optional<Person> person = personDatabase.getById(id);
-        if (person.isPresent()) {
-            List<Long> ticketIds = person.get().getTicketsId();
-            ticketIds.remove(ticketId);
-            personDatabase.update(person.get());
-        }
+        if (person.isEmpty()) throw new PersonNotFoundException(id);
+        List<Long> ticketIds = person.get().getTicketsId();
+        ticketIds.remove(ticketId);
+        personDatabase.update(person.get());
     }
 
     /**

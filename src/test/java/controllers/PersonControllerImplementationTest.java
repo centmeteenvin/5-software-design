@@ -58,7 +58,7 @@ public class PersonControllerImplementationTest {
     }
 
     @Test
-    void addTicket() {
+    void addTicket() throws TicketNotFoundException, PersonNotFoundException {
         doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
         doReturn(Optional.empty()).when(mockTicketDatabase).getById(any());
 
@@ -90,7 +90,7 @@ public class PersonControllerImplementationTest {
         Person testPerson = new Person(1L, "foo");
         testPerson.getTicketsId().add(1L);
 
-        controller.removeTicket(testPerson.getId(), 1L);
+        assertThrows(PersonNotFoundException.class ,() -> controller.removeTicket(testPerson.getId(), 1L));
 
         assertEquals(testPerson.getTicketsId().get(0), 1L);
         verify(mockPersonDatabase, never()).update(any());

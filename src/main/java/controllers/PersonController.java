@@ -35,7 +35,7 @@ public abstract class PersonController {
     /**
      * Removes a ticket from the {@link Person#getTicketsId()}. Should NOT call {@link TicketController#removePerson(Long, Long)}.
      */
-    public abstract void removeTicket(Long id, Long ticketId);
+    public abstract void removeTicket(Long id, Long ticketId) throws PersonNotFoundException;
 
     /**
      * Removes the current person from the database. SHOULD call {@link TicketController#addPerson(Long, Long)}
