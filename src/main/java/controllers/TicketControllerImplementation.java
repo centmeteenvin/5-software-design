@@ -177,14 +177,15 @@ public class TicketControllerImplementation extends TicketController {
      * @param payerId
      */
     @Override
-    public void setPayer(Long id, Long payerId) {
+    public void setPayer(Long id, Long payerId) throws PersonNotFoundException {
         Optional<Ticket> ticket = ticketDatabase.getById(id);
         if (ticket.isEmpty()) return;
-        Optional<Person> person = personDatabase.getById(payerId);
-        if (payerId == null || person.isPresent()) {
-            ticket.get().setPayerId(payerId);
-            ticketDatabase.update(ticket.get());
+        if (payerId != null) {
+            Optional<Person> person = personDatabase.getById(payerId);
+            if (person.isEmpty()) throw new PersonNotFoundException(payerId);
         }
+        ticket.get().setPayerId(payerId);
+        ticketDatabase.update(ticket.get());
     }
 
     @Override

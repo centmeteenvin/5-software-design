@@ -336,14 +336,13 @@ class TicketControllerImplementationTest {
         verify(mockPersonController, times(2)).modifyDebt(any(Long.class), eq(3L), eq(-50.));
     }
     @Test
-    void setPayer() {
+    void setPayer() throws PersonNotFoundException {
         doReturn(Optional.empty()).when(mockTicketDatabase).getById(any());
         doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
         doReturn(Optional.empty()).when(mockTicketDatabase).update(any());
-
         Ticket testTicket = new Ticket(1L, 0, 1L);
 
-        controller.setPayer(1L,1L);
+        assertThrows(TicketNotFoundException.class, () -> controller.setPayer(1L,1L));
 
         verify(mockTicketDatabase, times(1)).getById(any());
         verify(mockPersonDatabase, never()).getById(any());
@@ -351,7 +350,8 @@ class TicketControllerImplementationTest {
         assertNull(testTicket.getPayerId());
 
         doReturn(Optional.of(testTicket)).when(mockTicketDatabase).getById(any());
-        controller.setPayer(1L,1L);
+
+        assertThrows(PersonNotFoundException.class, () -> controller.setPayer(1L,1L));
 
         verify(mockTicketDatabase, times(2)).getById(any());
         verify(mockPersonDatabase, times(1)).getById(any());
@@ -362,12 +362,14 @@ class TicketControllerImplementationTest {
         doReturn(Optional.of(testPerson)).when(mockPersonDatabase).getById(any());
 
         controller.setPayer(1L,1L);
+
         verify(mockTicketDatabase, times(3)).getById(any());
         verify(mockPersonDatabase, times(2)).getById(any());
         verify(mockTicketDatabase, times(1)).update(any());
         assertEquals(testTicket.getPayerId(), 1L);
 
         controller.setPayer(1L,null);
+
         verify(mockTicketDatabase, times(4)).getById(any());
         verify(mockPersonDatabase, times(3)).getById(any());
         verify(mockTicketDatabase, times(2)).update(any());
