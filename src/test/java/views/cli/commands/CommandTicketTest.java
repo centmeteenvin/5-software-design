@@ -203,7 +203,7 @@ class CommandTicketTest extends CommandTest {
         command.executeAdd();
 
         verify(output, times(1)).print("! Person does not exist\n");
-        
+
         doNothing().when(ticketController).addPerson(1L, 2L);
 
         command.executeAdd();

@@ -69,7 +69,7 @@ public abstract class TicketController {
      * Sets the payer to a certain id
      * @param id
      */
-    public abstract void setPayer(Long id, Long payerId) throws PersonNotFoundException;
+    public abstract void setPayer(Long id, Long payerId) throws PersonNotFoundException, TicketNotFoundException;
 
     public abstract void calculateAll();
 

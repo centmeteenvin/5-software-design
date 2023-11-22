@@ -25,7 +25,7 @@ public class TicketControllerImplementation extends TicketController {
      */
     @Override
     public Optional<Ticket> create(Long categoryId, double totalCost, List<Long> personsId) throws CategoryNotFoundException, PersonNotFoundException {
-        if (categoryId == null) {
+        if (categoryId != null) {
             Optional<TicketCategory> category = ticketCategoryDatabase.getById(categoryId);
             if (category.isEmpty()) throw new CategoryNotFoundException(categoryId);
         }
@@ -82,8 +82,10 @@ public class TicketControllerImplementation extends TicketController {
         Optional<Ticket> ticket = ticketDatabase.getById(id);
         if (ticket.isEmpty()) throw new TicketNotFoundException(id);
         if (!ticket.get().getDistribution().containsKey(personId)) return;
+
         ticket.get().getDistribution().remove(personId);
         ticketDatabase.update(ticket.get());
+
         Optional<Person> person = personDatabase.getById(personId);
         if (person.isEmpty()) throw new PersonNotFoundException(id);
         personController.removeTicket(personId, id);
@@ -190,9 +192,9 @@ public class TicketControllerImplementation extends TicketController {
      * @param payerId
      */
     @Override
-    public void setPayer(Long id, Long payerId) throws PersonNotFoundException {
+    public void setPayer(Long id, Long payerId) throws PersonNotFoundException, TicketNotFoundException {
         Optional<Ticket> ticket = ticketDatabase.getById(id);
-        if (ticket.isEmpty()) return;
+        if (ticket.isEmpty()) throw new TicketNotFoundException(id);
         if (payerId != null) {
             Optional<Person> person = personDatabase.getById(payerId);
             if (person.isEmpty()) throw new PersonNotFoundException(payerId);
