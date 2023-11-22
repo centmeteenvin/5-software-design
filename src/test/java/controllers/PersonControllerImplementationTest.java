@@ -115,7 +115,7 @@ public class PersonControllerImplementationTest {
         Person testPerson = spy(new Person(1L, "foo"));
 
         // Do nothing (Check)
-        controller.delete(1L);
+        assertThrows(PersonNotFoundException.class , () ->controller.delete(1L));
 
         verify(mockPersonDatabase, never()).deleteById(any());
         verify(mockTicketController, never()).removePerson(any(), any());

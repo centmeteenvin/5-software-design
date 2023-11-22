@@ -66,17 +66,16 @@ public class PersonControllerImplementation extends PersonController {
      * @param id
      */
     @Override
-    public void delete(Long id) {
+    public void delete(Long id) throws PersonNotFoundException {
         Optional<Person> person = personDatabase.getById(id);
-        if (person.isPresent()) {
-            Iterator<Long> it = person.get().getTicketsId().iterator();
-            while (it.hasNext()) {
-                long ticketId = it.next();
-                ticketController.removePerson(id, ticketId);
-                it.remove();
-            }
-            personDatabase.deleteById(id);
+        if (person.isEmpty()) throw new PersonNotFoundException(id);
+        Iterator<Long> it = person.get().getTicketsId().iterator();
+        while (it.hasNext()) {
+            long ticketId = it.next();
+            ticketController.removePerson(id, ticketId);
+            it.remove();
         }
+        personDatabase.deleteById(id);
     }
 
     /**

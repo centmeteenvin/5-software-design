@@ -40,7 +40,7 @@ public abstract class PersonController {
     /**
      * Removes the current person from the database. SHOULD call {@link TicketController#addPerson(Long, Long)}
      */
-    public abstract void delete(Long id);
+    public abstract void delete(Long id) throws PersonNotFoundException;
 
     /**
      * Rename the current person.
