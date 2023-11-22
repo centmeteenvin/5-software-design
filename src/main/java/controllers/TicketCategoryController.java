@@ -31,12 +31,12 @@ public abstract class TicketCategoryController {
     /**
      * removes a ticket from the current category. SHOULD call {@link TicketController#changeCategory(Long, Long)}.
      */
-    public abstract void removeTicket(Long id, Long ticketId);
+    public abstract void removeTicket(Long id, Long ticketId) throws CategoryNotFoundException, TicketNotFoundException;
 
     /**
      * renames the current ticket name.
      */
-    public abstract void rename(Long id, String newName);
+    public abstract void rename(Long id, String newName) throws CategoryNotFoundException;
 
     /**
      * Deletes the category. SHOULD call {@link TicketController#changeCategory(Long, Long)}.

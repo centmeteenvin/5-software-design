@@ -33,12 +33,12 @@ public class TicketCategoryControllerImplementation extends TicketCategoryContro
     }
 
     @Override
-    public void removeTicket(Long id, Long ticketId) {
+    public void removeTicket(Long id, Long ticketId) throws CategoryNotFoundException, TicketNotFoundException {
         Optional<TicketCategory> category = ticketCategoryDatabase.getById(id);
-        if (category.isEmpty()) return;
+        if (category.isEmpty()) throw new CategoryNotFoundException(id);
 
         Optional<Ticket> ticket = ticketDatabase.getById(ticketId);
-        if (ticket.isEmpty()) return;
+        if (ticket.isEmpty()) throw new TicketNotFoundException(ticketId);
 
         if (!category.get().getTicketIds().contains(ticketId)) return;
 
@@ -48,12 +48,11 @@ public class TicketCategoryControllerImplementation extends TicketCategoryContro
     }
 
     @Override
-    public void rename(Long id, String newName) {
+    public void rename(Long id, String newName) throws CategoryNotFoundException {
         Optional<TicketCategory> category = ticketCategoryDatabase.getById(id);
-        if (category.isPresent()) {
-            category.get().setName(newName);
-            ticketCategoryDatabase.update(category.get());
-        }
+        if (category.isEmpty()) throw new CategoryNotFoundException(id);
+        category.get().setName(newName);
+        ticketCategoryDatabase.update(category.get());
     }
 
     @Override
