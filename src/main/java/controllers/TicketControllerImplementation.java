@@ -53,11 +53,11 @@ public class TicketControllerImplementation extends TicketController {
      * Adds a person to the ticket. SHOULD call {@link PersonController#addTicket(Long, Long)}.
      */
     @Override
-    public void addPerson(Long id, Long personId) {
+    public void addPerson(Long id, Long personId) throws TicketNotFoundException, PersonNotFoundException {
         Optional<Ticket> ticket = ticketDatabase.getById(id);
-        if (ticket.isEmpty()) return;
+        if (ticket.isEmpty()) throw new TicketNotFoundException(id);
         Optional<Person> person = personDatabase.getById(personId);
-        if (person.isEmpty()) return;
+        if (person.isEmpty()) throw new PersonNotFoundException(personId);
         if (ticket.get().getDistribution().containsKey(personId)) return;
         Map<Long, Double> distribution = ticket.get().getDistribution();
         distribution.put(personId, 0D);

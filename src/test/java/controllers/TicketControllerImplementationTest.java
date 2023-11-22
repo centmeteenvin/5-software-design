@@ -79,23 +79,23 @@ class TicketControllerImplementationTest {
     }
 
     @Test
-    void addPerson() {
+    void addPerson() throws TicketNotFoundException, PersonNotFoundException {
         doReturn(Optional.empty()).when(mockTicketDatabase).update(any());
         doNothing().when(mockPersonController).addTicket(any(), any());
         doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
         doReturn(Optional.empty()).when(mockTicketDatabase).getById(any());
 
+        assertThrows(TicketNotFoundException.class, () -> controller.addPerson(1L, 1L));
 
-        controller.addPerson(1L, 1L);
         Person person = new Person(2L, "bar");
-        Ticket ticket = new Ticket(3L, 100, 1L);
-
         doReturn(Optional.of(person)).when(mockPersonDatabase).getById(any());
-        controller.addPerson(1L, 1L);
+
+        assertThrows(TicketNotFoundException.class, () -> controller.addPerson(1L, 1L));
 
         verify(mockTicketDatabase, never()).update(any());
         verify(mockPersonController, never()).addTicket(any(), any());
 
+        Ticket ticket = new Ticket(3L, 100, 1L);
         doReturn(Optional.of(ticket)).when(mockTicketDatabase).getById(any());
 
         controller.addPerson(1L, 1L);
