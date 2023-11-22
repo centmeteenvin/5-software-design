@@ -225,15 +225,14 @@ public class PersonControllerImplementationTest {
     }
 
     @Test
-    void pay() {
+    void pay() throws PersonNotFoundException {
         doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
         doReturn(Optional.empty()).when(mockTicketController).create(any(Long.class),any(Double.class),any());
 
         Optional<Ticket> receivedTicket;
 
-        receivedTicket = controller.pay(1L,2L,100.);
+        assertThrows(PersonNotFoundException.class, () -> controller.pay(1L,2L,100.));
 
-        assertTrue(receivedTicket.isEmpty());
 
         verify(mockPersonDatabase, times(1)).getById(1L);
         verify(mockPersonDatabase, never()).getById(2L);
@@ -242,9 +241,8 @@ public class PersonControllerImplementationTest {
         Person payingPerson = new Person(1L,"foo");
         doReturn(Optional.of(payingPerson)).when(mockPersonDatabase).getById(1L);
 
-        receivedTicket = controller.pay(1L,2L,100.);
+        assertThrows(PersonNotFoundException.class, () -> controller.pay(1L,2L,100.));
 
-        assertTrue(receivedTicket.isEmpty());
 
         verify(mockPersonDatabase, times(2)).getById(1L);
         verify(mockPersonDatabase, times(1)).getById(2L);

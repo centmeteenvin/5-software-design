@@ -140,12 +140,12 @@ public class PersonControllerImplementation extends PersonController {
      * @return
      */
     @Override
-    public Optional<Ticket> pay(Long payerId, Long receivingPersonId, double payedAmount) {
+    public Optional<Ticket> pay(Long payerId, Long receivingPersonId, double payedAmount) throws PersonNotFoundException {
         Optional<Person> payer = personDatabase.getById(payerId);
-        if (payer.isEmpty()) return Optional.empty();
+        if (payer.isEmpty()) throw new PersonNotFoundException(payerId);
 
         Optional<Person> receiver = personDatabase.getById(receivingPersonId);
-        if (receiver.isEmpty()) return Optional.empty();
+        if (receiver.isEmpty()) throw new PersonNotFoundException(receivingPersonId);
 
         Optional<Ticket> ticket = ticketController.create(0L, payedAmount, null);
         if (ticket.isEmpty()) return ticket;

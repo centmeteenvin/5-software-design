@@ -61,6 +61,6 @@ public abstract class PersonController {
      */
     public abstract void resetDebt(Long id) throws PersonNotFoundException;
 
-    public abstract Optional<Ticket> pay(Long id, Long receivingPersonId,double payedAmount);
+    public abstract Optional<Ticket> pay(Long id, Long receivingPersonId,double payedAmount) throws PersonNotFoundException;
 
 }
