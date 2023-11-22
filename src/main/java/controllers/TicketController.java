@@ -52,7 +52,7 @@ public abstract class TicketController {
     /**
      * Updated the weight of a certain person. Consider calling  {@link #calculate(Long)}.
      */
-    public abstract void changeWeight(Long id, Long personId, double newWeight);
+    public abstract void changeWeight(Long id, Long personId, double newWeight) throws TicketNotFoundException;
 
     /**
      * Deletes the Ticket. SHOULD call {@link PersonController#removeTicket(Long, Long)} AND {@link TicketCategoryController#removeTicket(Long, Long)}.

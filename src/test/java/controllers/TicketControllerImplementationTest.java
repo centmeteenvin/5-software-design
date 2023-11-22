@@ -198,12 +198,13 @@ class TicketControllerImplementationTest {
     }
 
     @Test
-    void changeWeight() {
+    void changeWeight() throws TicketNotFoundException {
         doReturn(Optional.empty()).when(mockTicketDatabase).getById(any());
         doReturn(Optional.empty()).when(mockTicketDatabase).update(any());
-        Ticket ticket = new Ticket(1L, 100, 1L);
-        controller.changeWeight(1L, 1L, 100);
 
+        assertThrows(TicketNotFoundException.class, () -> controller.changeWeight(1L, 1L, 100));
+
+        Ticket ticket = new Ticket(1L, 100, 1L);
         doReturn(Optional.of(ticket)).when(mockTicketDatabase).getById(any());
 
         controller.changeWeight(1L, 1L, 100);

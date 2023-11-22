@@ -112,9 +112,9 @@ public class TicketControllerImplementation extends TicketController {
      * Updated the weight of a certain person. Consider calling  {@link #calculate(Long)}.
      */
     @Override
-    public void changeWeight(Long id, Long personId, double newWeight) {
+    public void changeWeight(Long id, Long personId, double newWeight) throws TicketNotFoundException {
         Optional<Ticket> ticket = ticketDatabase.getById(id);
-        if (ticket.isEmpty()) return;
+        if (ticket.isEmpty()) throw new TicketNotFoundException(id);
         if (!ticket.get().getDistribution().containsKey(personId)) return;
         ticket.get().getDistribution().put(personId, newWeight);
         ticketDatabase.update(ticket.get());
