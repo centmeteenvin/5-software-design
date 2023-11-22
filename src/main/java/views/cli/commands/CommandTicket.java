@@ -87,7 +87,7 @@ public class CommandTicket extends Command{
             return;
         }
 
-        Optional<Ticket> ticket = null;
+        Optional<Ticket> ticket;
         try {
             ticket = view.getTicketController().create(Long.valueOf(args[3]), cost, List.of());
         } catch (CategoryNotFoundException e) {
