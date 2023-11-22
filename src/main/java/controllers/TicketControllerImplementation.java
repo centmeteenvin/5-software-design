@@ -84,11 +84,11 @@ public class TicketControllerImplementation extends TicketController {
      * Changes the current category.
      */
     @Override
-    public void changeCategory(Long id, Long newCategoryId) {
+    public void changeCategory(Long id, Long newCategoryId) throws CategoryNotFoundException, TicketNotFoundException {
         Optional<Ticket> ticket = ticketDatabase.getById(id);
-        if (ticket.isEmpty()) return;
+        if (ticket.isEmpty()) throw new TicketNotFoundException(id);
         Optional<TicketCategory> newCategory = ticketCategoryDatabase.getById(newCategoryId);
-        if (newCategory.isEmpty()) return;
+        if (newCategory.isEmpty()) throw new CategoryNotFoundException(newCategoryId);
         if (Objects.equals(ticket.get().getTicketCategoryId(), newCategoryId)) return;
         Long oldTicketCategoryId = ticket.get().getTicketCategoryId();
         ticket.get().setTicketCategoryId(newCategoryId);

@@ -42,7 +42,7 @@ public abstract class TicketController {
     /**
      * Changes the current category. SHOULD call {@link TicketCategoryController#removeTicket(Long, Long)} and {@link TicketCategoryController#addTicket(Long, Long)}
      */
-    public abstract void changeCategory(Long id, Long newCategoryId);
+    public abstract void changeCategory(Long id, Long newCategoryId) throws CategoryNotFoundException, TicketNotFoundException;
 
     /**
      * Changes the current cost of the ticket. CONSIDER calling  {@link #calculate(Long)}.

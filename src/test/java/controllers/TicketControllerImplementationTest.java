@@ -144,7 +144,7 @@ class TicketControllerImplementationTest {
     }
 
     @Test
-    void changeCategory() {
+    void changeCategory() throws TicketNotFoundException, CategoryNotFoundException {
         doReturn(Optional.empty()).when(mockTicketDatabase).getById(any());
         doReturn(Optional.empty()).when(mockTicketDatabase).update(any());
         doReturn(Optional.empty()).when(mockTicketCategoryDatabase).getById(any());
@@ -155,11 +155,11 @@ class TicketControllerImplementationTest {
         TicketCategory category2 = new TicketCategory(2L, "bar");
         Ticket ticket = new Ticket(1L, 100, 1L);
 
-        controller.changeCategory(1L, 2L);
+        assertThrows(TicketNotFoundException.class, () ->controller.changeCategory(1L, 2L));
 
         doReturn(Optional.of(ticket)).when(mockTicketDatabase).getById(any());
 
-        controller.changeCategory(1L, 2L);
+        assertThrows(CategoryNotFoundException.class, () ->controller.changeCategory(1L, 2L));
 
         doReturn(Optional.of(category1)).when(mockTicketCategoryDatabase).getById(1L);
 
