@@ -1,6 +1,7 @@
 package controllers;
 
 import database.Database;
+import exceptions.notFoundExceptions.CategoryNotFoundException;
 import exceptions.notFoundExceptions.PersonNotFoundException;
 import exceptions.notFoundExceptions.TicketNotFoundException;
 import models.Person;
@@ -72,7 +73,11 @@ public class PersonControllerImplementation extends PersonController {
         Iterator<Long> it = person.get().getTicketsId().iterator();
         while (it.hasNext()) {
             long ticketId = it.next();
-            ticketController.removePerson(id, ticketId);
+            try {
+                ticketController.removePerson(id, ticketId);
+            } catch (TicketNotFoundException e) {
+                // pass if a ticket does not exist, we don't need to update its list.
+            }
             it.remove();
         }
         personDatabase.deleteById(id);
@@ -147,7 +152,12 @@ public class PersonControllerImplementation extends PersonController {
         Optional<Person> receiver = personDatabase.getById(receivingPersonId);
         if (receiver.isEmpty()) throw new PersonNotFoundException(receivingPersonId);
 
-        Optional<Ticket> ticket = ticketController.create(0L, payedAmount, null);
+        Optional<Ticket> ticket = null;
+        try {
+            ticket = ticketController.create(null, payedAmount, null);
+        } catch (CategoryNotFoundException e) {
+            //pass
+        }
         if (ticket.isEmpty()) return ticket;
 
         ticket.get().setPayerId(payerId);

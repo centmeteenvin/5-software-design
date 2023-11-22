@@ -1,6 +1,7 @@
 package controllers;
 
 import database.Database;
+import exceptions.notFoundExceptions.CategoryNotFoundException;
 import exceptions.notFoundExceptions.PersonNotFoundException;
 import exceptions.notFoundExceptions.TicketNotFoundException;
 import models.Person;
@@ -107,7 +108,7 @@ public class PersonControllerImplementationTest {
     }
 
     @Test
-    void Delete() throws PersonNotFoundException {
+    void Delete() throws PersonNotFoundException, TicketNotFoundException {
         doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
         doNothing().when(mockPersonDatabase).deleteById(any());
         doNothing().when(mockTicketController).removePerson(any(), any());
@@ -225,7 +226,7 @@ public class PersonControllerImplementationTest {
     }
 
     @Test
-    void pay() throws PersonNotFoundException {
+    void pay() throws PersonNotFoundException, CategoryNotFoundException {
         doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
         doReturn(Optional.empty()).when(mockTicketController).create(any(Long.class),any(Double.class),any());
 

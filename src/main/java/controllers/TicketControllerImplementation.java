@@ -25,9 +25,10 @@ public class TicketControllerImplementation extends TicketController {
      */
     @Override
     public Optional<Ticket> create(Long categoryId, double totalCost, List<Long> personsId) throws CategoryNotFoundException, PersonNotFoundException {
-        Optional<TicketCategory> category = ticketCategoryDatabase.getById(categoryId);
-        if (category.isEmpty()) throw new CategoryNotFoundException(categoryId);
-
+        if (categoryId == null) {
+            Optional<TicketCategory> category = ticketCategoryDatabase.getById(categoryId);
+            if (category.isEmpty()) throw new CategoryNotFoundException(categoryId);
+        }
         List<Person> people = new ArrayList<>();
         for (Long personId : personsId) {
             Optional<Person> person = personDatabase.getById(personId);
