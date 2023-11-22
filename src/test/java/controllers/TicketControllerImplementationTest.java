@@ -220,19 +220,19 @@ class TicketControllerImplementationTest {
     }
 
     @Test
-    void delete() {
+    void delete() throws PersonNotFoundException, TicketNotFoundException {
         doReturn(Optional.empty()).when(mockTicketDatabase).getById(any());
         doNothing().when(mockTicketDatabase).deleteById(any());
         doNothing().when(mockPersonController).removeTicket(any(), any());
         doNothing().when(mockTicketCategoryController).removeTicket(any(), any());
-        Ticket ticket = new Ticket(1L, 100, 1L);
 
-        controller.delete(1L);
+        assertThrows(TicketNotFoundException.class, () -> controller.delete(1L));
 
         verify(mockTicketDatabase, never()).deleteById(any());
         verify(mockPersonController, never()).removeTicket(any(), any());
         verify(mockTicketCategoryController, never()).removeTicket(any(), any());
 
+        Ticket ticket = new Ticket(1L, 100, 1L);
         doReturn(Optional.of(ticket)).when(mockTicketDatabase).getById(any());
 
         controller.delete(1L);

@@ -57,7 +57,7 @@ public abstract class TicketController {
     /**
      * Deletes the Ticket. SHOULD call {@link PersonController#removeTicket(Long, Long)} AND {@link TicketCategoryController#removeTicket(Long, Long)}.
      */
-    public abstract void delete(Long id);
+    public abstract void delete(Long id) throws TicketNotFoundException;
 
     /**
      * Updates {@link Person#getDebt()} for every person in the ticket via {@link PersonController#modifyDebt(Long, double)}.
