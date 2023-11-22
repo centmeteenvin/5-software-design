@@ -1,6 +1,8 @@
 package controllers;
 
 import database.Database;
+import exceptions.notFoundExceptions.PersonNotFoundException;
+import exceptions.notFoundExceptions.TicketNotFoundException;
 import models.Person;
 import models.Ticket;
 
@@ -33,13 +35,13 @@ public class PersonControllerImplementation extends PersonController {
      * @param ticketId
      */
     @Override
-    public void addTicket(Long id, Long ticketId) {
+    public void addTicket(Long id, Long ticketId) throws PersonNotFoundException, TicketNotFoundException {
         Optional<Person> person = personDatabase.getById(id);
+        if (person.isEmpty()) throw new PersonNotFoundException(id);
         Optional<Ticket> ticket = ticketDatabase.getById(ticketId);
-        if (person.isPresent() && ticket.isPresent()) {
-            person.get().getTicketsId().add(ticketId);
-            personDatabase.update(person.get());
-        }
+        if (ticket.isEmpty()) throw new TicketNotFoundException(ticketId);
+        person.get().getTicketsId().add(ticketId);
+        personDatabase.update(person.get());
     }
 
     /**

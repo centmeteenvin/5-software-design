@@ -1,6 +1,8 @@
 package controllers;
 
 import database.Database;
+import exceptions.notFoundExceptions.PersonNotFoundException;
+import exceptions.notFoundExceptions.TicketNotFoundException;
 import models.Person;
 import models.Ticket;
 import models.TicketCategory;
@@ -62,14 +64,13 @@ public class PersonControllerImplementationTest {
 
         Person testPerson = new Person(1L, "foo");
         Ticket testTicket = new Ticket(2L, 100, 1L);
-        controller.addTicket(testPerson.getId(), 2L);
+        assertThrows(PersonNotFoundException.class , () -> controller.addTicket(testPerson.getId(), 2L));
 
-        assertTrue(testPerson.getTicketsId().isEmpty());
+
 
         doReturn(Optional.of(testPerson)).when(mockPersonDatabase).getById(any());
-        controller.addTicket(testPerson.getId(), 2L);
+        assertThrows(TicketNotFoundException.class , () -> controller.addTicket(testPerson.getId(), 2L));
 
-        assertTrue(testPerson.getTicketsId().isEmpty());
 
         doReturn(Optional.of(testTicket)).when(mockTicketDatabase).getById(any());
         controller.addTicket(testPerson.getId(), 2L);

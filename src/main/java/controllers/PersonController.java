@@ -1,6 +1,8 @@
 package controllers;
 
 import database.Database;
+import exceptions.notFoundExceptions.PersonNotFoundException;
+import exceptions.notFoundExceptions.TicketNotFoundException;
 import models.Person;
 import models.Ticket;
 
@@ -28,7 +30,7 @@ public abstract class PersonController {
     /**
      * Adds a ticket to {@link Person#getTicketsId()}. Should NOT call {@link TicketController#addPerson(Long, Long)}.
      */
-    public abstract void addTicket(Long id, Long ticketId);
+    public abstract void addTicket(Long id, Long ticketId) throws PersonNotFoundException, TicketNotFoundException;
 
     /**
      * Removes a ticket from the {@link Person#getTicketsId()}. Should NOT call {@link TicketController#removePerson(Long, Long)}.
