@@ -45,7 +45,7 @@ public abstract class PersonController {
     /**
      * Rename the current person.
      */
-    public abstract void rename(Long id, String newName);
+    public abstract void rename(Long id, String newName) throws PersonNotFoundException;
 
     /**
      * Modifies the person's debt.

@@ -85,12 +85,11 @@ public class PersonControllerImplementation extends PersonController {
      * @param newName
      */
     @Override
-    public void rename(Long id, String newName) {
+    public void rename(Long id, String newName) throws PersonNotFoundException {
         Optional<Person> person = personDatabase.getById(id);
-        if (person.isPresent()) {
-            person.get().setName(newName);
-            personDatabase.update(person.get());
-        }
+        if (person.isEmpty()) throw new PersonNotFoundException(id);
+        person.get().setName(newName);
+        personDatabase.update(person.get());
     }
 
     /**

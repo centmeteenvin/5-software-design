@@ -83,7 +83,7 @@ public class PersonControllerImplementationTest {
     }
 
     @Test
-    void removeTicket() {
+    void removeTicket() throws PersonNotFoundException {
         doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
         doReturn(Optional.empty()).when(mockPersonDatabase).update(any());
 
@@ -107,7 +107,7 @@ public class PersonControllerImplementationTest {
     }
 
     @Test
-    void Delete() {
+    void Delete() throws PersonNotFoundException {
         doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
         doNothing().when(mockPersonDatabase).deleteById(any());
         doNothing().when(mockTicketController).removePerson(any(), any());
@@ -142,13 +142,13 @@ public class PersonControllerImplementationTest {
     }
 
     @Test
-    void rename() {
+    void rename() throws PersonNotFoundException {
         doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
         doReturn(Optional.empty()).when(mockPersonDatabase).update(any());
 
         Person testPerson = spy(new Person(1L, "foo"));
 
-        controller.rename(1L, "faa");
+        assertThrows(PersonNotFoundException.class,() -> controller.rename(1L, "faa"));
 
         assertEquals(testPerson.getName(), "foo");
         verify(mockPersonDatabase, times(1)).getById(any());
