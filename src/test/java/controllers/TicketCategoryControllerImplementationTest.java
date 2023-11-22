@@ -1,6 +1,8 @@
 package controllers;
 
 import database.Database;
+import exceptions.notFoundExceptions.CategoryNotFoundException;
+import exceptions.notFoundExceptions.TicketNotFoundException;
 import models.Person;
 import models.Ticket;
 import models.TicketCategory;
@@ -10,8 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -56,23 +57,22 @@ public class TicketCategoryControllerImplementationTest {
     }
 
     @Test
-    void addTicket() {
+    void addTicket() throws TicketNotFoundException, CategoryNotFoundException {
         doReturn(Optional.empty()).when(mockTicketCategoryDatabase).getById(any());
         doReturn(Optional.empty()).when(mockTicketDatabase).getById(any());
         doReturn(Optional.empty()).when(mockTicketCategoryDatabase).update(any());
 
-        controller.addTicket(1L, 1L);
+        assertThrows(CategoryNotFoundException.class,() -> controller.addTicket(1L, 1L));
 
         verify(mockTicketCategoryDatabase, times(1)).getById(any());
         verify(mockTicketDatabase, never()).getById(any());
         verify(mockTicketCategoryDatabase, never()).update(any());
 
         TicketCategory testTicketCategory = spy(new TicketCategory(1L, "foo"));
-
         doReturn(Optional.of(testTicketCategory)).when(mockTicketCategoryDatabase).getById(any());
         doReturn(Optional.empty()).when(mockTicketDatabase).getById(any());
 
-        controller.addTicket(1L, 1L);
+        assertThrows(TicketNotFoundException.class,() -> controller.addTicket(1L, 1L));
 
         verify(mockTicketCategoryDatabase, times(2)).getById(any());
         verify(mockTicketDatabase, times(1)).getById(any());
@@ -80,7 +80,6 @@ public class TicketCategoryControllerImplementationTest {
         assertTrue(testTicketCategory.getTicketIds().isEmpty());
 
         Ticket testTicket = new Ticket(1L, 0, 0L);
-
         doReturn(Optional.of(testTicketCategory)).when(mockTicketCategoryDatabase).getById(any());
         doReturn(Optional.of(testTicket)).when(mockTicketDatabase).getById(any());
 
@@ -95,12 +94,12 @@ public class TicketCategoryControllerImplementationTest {
     }
 
     @Test
-    void removeTicket() {
+    void removeTicket() throws TicketNotFoundException, CategoryNotFoundException {
         doReturn(Optional.empty()).when(mockTicketCategoryDatabase).getById(any());
         doReturn(Optional.empty()).when(mockTicketDatabase).getById(any());
         doReturn(Optional.empty()).when(mockTicketCategoryDatabase).update(any());
 
-        controller.removeTicket(1L, 1L);
+        assertThrows(CategoryNotFoundException.class,() -> controller.removeTicket(1L, 1L));
 
         verify(mockTicketCategoryDatabase, times(1)).getById(any());
         verify(mockTicketDatabase, never()).getById(any());
@@ -108,11 +107,10 @@ public class TicketCategoryControllerImplementationTest {
 
         TicketCategory testTicketCategory = spy(new TicketCategory(1L, "foo"));
         testTicketCategory.getTicketIds().add(1L);
-
         doReturn(Optional.of(testTicketCategory)).when(mockTicketCategoryDatabase).getById(any());
         doReturn(Optional.empty()).when(mockTicketDatabase).getById(any());
 
-        controller.removeTicket(1L, 1L);
+        assertThrows(TicketNotFoundException.class,() -> controller.removeTicket(1L, 1L));
 
         verify(mockTicketCategoryDatabase, times(2)).getById(any());
         verify(mockTicketDatabase, times(1)).getById(any());
@@ -120,7 +118,6 @@ public class TicketCategoryControllerImplementationTest {
         assertEquals(testTicketCategory.getTicketIds().size(), 1);
 
         Ticket testTicket = new Ticket(1L, 0, 1L);
-
         doReturn(Optional.of(testTicketCategory)).when(mockTicketCategoryDatabase).getById(any());
         doReturn(Optional.of(testTicket)).when(mockTicketDatabase).getById(any());
 
@@ -142,13 +139,13 @@ public class TicketCategoryControllerImplementationTest {
     }
 
     @Test
-    void rename() {
+    void rename() throws CategoryNotFoundException {
         doReturn(Optional.empty()).when(mockTicketCategoryDatabase).getById(any());
         doReturn(Optional.empty()).when(mockTicketCategoryDatabase).update(any());
 
         TicketCategory testCategory = spy(new TicketCategory(1L, "foo"));
 
-        controller.rename(1L, "faa");
+        assertThrows(CategoryNotFoundException.class, () -> controller.rename(1L, "faa"));
 
         assertEquals(testCategory.getName(), "foo");
         verify(mockTicketCategoryDatabase, times(1)).getById(any());
@@ -164,12 +161,12 @@ public class TicketCategoryControllerImplementationTest {
     }
 
     @Test
-    void delete() {
+    void delete() throws TicketNotFoundException, CategoryNotFoundException {
         doReturn(Optional.empty()).when(mockTicketCategoryDatabase).getById(any());
         doNothing().when(mockTicketController).changeCategory(any(),any());
         doNothing().when(mockTicketCategoryDatabase).deleteById(any());
 
-        controller.delete(1L);
+        assertThrows(CategoryNotFoundException.class, () -> controller.delete(1L));
 
         verify(mockTicketCategoryDatabase,times(1)).getById(any());
         verify(mockTicketController, never()).changeCategory(any(),any());

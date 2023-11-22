@@ -1,6 +1,9 @@
 package controllers;
 
 import database.Database;
+import exceptions.notFoundExceptions.CategoryNotFoundException;
+import exceptions.notFoundExceptions.PersonNotFoundException;
+import exceptions.notFoundExceptions.TicketNotFoundException;
 import models.Person;
 import models.Ticket;
 import models.TicketCategory;
@@ -24,49 +27,49 @@ public abstract class TicketController {
     /**
      * Creates a new ticket and stores it in the db. If the categoryId does not exist or any of the personIds do not exist. it will return empty.
      */
-    public abstract Optional<Ticket> create(Long categoryId, double totalCost, List<Long> personsId);
+    public abstract Optional<Ticket> create(Long categoryId, double totalCost, List<Long> personsId) throws CategoryNotFoundException, PersonNotFoundException;
 
     /**
      * Adds a person to the ticket. SHOULD call {@link PersonController#addTicket(Long, Long)}.
      */
-    public abstract void addPerson(Long id, Long personId);
+    public abstract void addPerson(Long id, Long personId) throws TicketNotFoundException, PersonNotFoundException;
 
     /**
      * Removes a person from the ticket. SHOULD call {@link PersonController#removeTicket(Long, Long)}
      */
-    public abstract void removePerson(Long id, Long personId);
+    public abstract void removePerson(Long id, Long personId) throws PersonNotFoundException, TicketNotFoundException;
 
     /**
      * Changes the current category. SHOULD call {@link TicketCategoryController#removeTicket(Long, Long)} and {@link TicketCategoryController#addTicket(Long, Long)}
      */
-    public abstract void changeCategory(Long id, Long newCategoryId);
+    public abstract void changeCategory(Long id, Long newCategoryId) throws CategoryNotFoundException, TicketNotFoundException;
 
     /**
      * Changes the current cost of the ticket. CONSIDER calling  {@link #calculate(Long)}.
      */
-    public abstract void changeCost(Long id, double newTotalCost);
+    public abstract void changeCost(Long id, double newTotalCost) throws TicketNotFoundException;
 
     /**
      * Updated the weight of a certain person. Consider calling  {@link #calculate(Long)}.
      */
-    public abstract void changeWeight(Long id, Long personId, double newWeight);
+    public abstract void changeWeight(Long id, Long personId, double newWeight) throws TicketNotFoundException;
 
     /**
      * Deletes the Ticket. SHOULD call {@link PersonController#removeTicket(Long, Long)} AND {@link TicketCategoryController#removeTicket(Long, Long)}.
      */
-    public abstract void delete(Long id);
+    public abstract void delete(Long id) throws TicketNotFoundException;
 
     /**
      * Updates {@link Person#getDebt()} for every person in the ticket via {@link PersonController#modifyDebt(Long, double)}.
      * @param id
      */
-    public abstract void calculate(Long id);
+    public abstract void calculate(Long id) throws PersonNotFoundException, TicketNotFoundException;
 
     /**
      * Sets the payer to a certain id
      * @param id
      */
-    public abstract void setPayer(Long id, Long payerId);
+    public abstract void setPayer(Long id, Long payerId) throws PersonNotFoundException, TicketNotFoundException;
 
     public abstract void calculateAll();
 
