@@ -203,10 +203,10 @@ public class PersonControllerImplementationTest {
     }
 
     @Test
-    void resetDebt() {
+    void resetDebt() throws PersonNotFoundException {
         doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
 
-        controller.resetDebt(1L);
+        assertThrows(PersonNotFoundException.class, () -> controller.resetDebt(1L));
 
         verify(mockPersonDatabase, times(1)).getById(any());
 

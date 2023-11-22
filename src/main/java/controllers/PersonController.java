@@ -59,7 +59,7 @@ public abstract class PersonController {
      * Resets a persons debt
      * @param id The id of the person's debt we want to reset
      */
-    public abstract void resetDebt(Long id);
+    public abstract void resetDebt(Long id) throws PersonNotFoundException;
 
     public abstract Optional<Ticket> pay(Long id, Long receivingPersonId,double payedAmount);
 

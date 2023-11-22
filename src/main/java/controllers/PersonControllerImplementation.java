@@ -118,9 +118,9 @@ public class PersonControllerImplementation extends PersonController {
      * @param id
      */
     @Override
-    public void resetDebt(Long id) {
+    public void resetDebt(Long id) throws PersonNotFoundException {
         Optional<Person> person = personDatabase.getById(id);
-        if (person.isEmpty()) return;
+        if (person.isEmpty()) throw new PersonNotFoundException(id);
 
         person.get().getDebts().clear();
     }
