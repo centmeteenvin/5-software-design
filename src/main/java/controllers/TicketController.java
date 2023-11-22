@@ -1,6 +1,8 @@
 package controllers;
 
 import database.Database;
+import exceptions.notFoundExceptions.CategoryNotFoundException;
+import exceptions.notFoundExceptions.PersonNotFoundException;
 import models.Person;
 import models.Ticket;
 import models.TicketCategory;
@@ -24,7 +26,7 @@ public abstract class TicketController {
     /**
      * Creates a new ticket and stores it in the db. If the categoryId does not exist or any of the personIds do not exist. it will return empty.
      */
-    public abstract Optional<Ticket> create(Long categoryId, double totalCost, List<Long> personsId);
+    public abstract Optional<Ticket> create(Long categoryId, double totalCost, List<Long> personsId) throws CategoryNotFoundException, PersonNotFoundException;
 
     /**
      * Adds a person to the ticket. SHOULD call {@link PersonController#addTicket(Long, Long)}.

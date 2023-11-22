@@ -1,6 +1,9 @@
 package controllers;
 
 import database.Database;
+import exceptions.notFoundExceptions.CategoryNotFoundException;
+import exceptions.notFoundExceptions.PersonNotFoundException;
+import exceptions.notFoundExceptions.TicketNotFoundException;
 import models.Person;
 import models.Ticket;
 import models.TicketCategory;
@@ -46,26 +49,28 @@ class TicketControllerImplementationTest {
     }
 
     @Test
-    void create() {
+    void create() throws TicketNotFoundException, PersonNotFoundException, CategoryNotFoundException {
         doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
         doReturn(Optional.empty()).when(mockTicketCategoryDatabase).getById(any());
         doNothing().when(mockPersonController).addTicket(any(), any());
         doNothing().when(mockTicketCategoryController).addTicket(any(), any());
 
-        Optional<Ticket> receivedTicket  = controller.create(1L, 100, List.of(2L));
-        assertTrue(receivedTicket.isEmpty());
+        Optional<Ticket> receivedTicket;
+        assertThrows(CategoryNotFoundException.class, () -> controller.create(1L, 100, List.of(2L)));
 
         TicketCategory category = new TicketCategory(1L, "foo");
         doReturn(Optional.of(category)).when(mockTicketCategoryDatabase).getById(1L);
-        receivedTicket = controller.create(1L, 100, List.of(2L));
-        assertTrue(receivedTicket.isEmpty());
+
+        assertThrows(PersonNotFoundException.class, () -> controller.create(1L, 100, List.of(2L)));
 
         Person person = new Person(2L, "bar");
         Ticket ticket = new Ticket(3L, 100, 1L);
         ticket.getDistribution().put(1L, 100D);
         doReturn(Optional.of(person)).when(mockPersonDatabase).getById(2L);
         doReturn(Optional.of(ticket)).when(mockTicketDatabase).create(any());
+
         receivedTicket = controller.create(1L, 100, List.of(2L));
+
         assertTrue(receivedTicket.isPresent());
         assertEquals(receivedTicket.get(), ticket);
         verify(mockPersonController, times(1)).addTicket(any(), any());

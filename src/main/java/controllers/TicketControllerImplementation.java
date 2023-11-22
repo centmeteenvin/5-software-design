@@ -1,6 +1,9 @@
 package controllers;
 
 import database.Database;
+import exceptions.notFoundExceptions.CategoryNotFoundException;
+import exceptions.notFoundExceptions.PersonNotFoundException;
+import exceptions.notFoundExceptions.TicketNotFoundException;
 import models.Person;
 import models.Ticket;
 import models.TicketCategory;
@@ -21,14 +24,14 @@ public class TicketControllerImplementation extends TicketController {
      * Creates a new ticket and stores it in the db.
      */
     @Override
-    public Optional<Ticket> create(Long categoryId, double totalCost, List<Long> personsId) {
+    public Optional<Ticket> create(Long categoryId, double totalCost, List<Long> personsId) throws CategoryNotFoundException, PersonNotFoundException {
         Optional<TicketCategory> category = ticketCategoryDatabase.getById(categoryId);
-        if (category.isEmpty()) return Optional.empty();
+        if (category.isEmpty()) throw new CategoryNotFoundException(categoryId);
 
         List<Person> people = new ArrayList<>();
         for (Long personId : personsId) {
             Optional<Person> person = personDatabase.getById(personId);
-            if (person.isEmpty()) return Optional.empty();
+            if (person.isEmpty()) throw new PersonNotFoundException(personId);
             people.add(person.get());
         }
 
@@ -36,7 +39,11 @@ public class TicketControllerImplementation extends TicketController {
         if (ticket.isEmpty()) return Optional.empty();
         ticketCategoryController.addTicket(categoryId, ticket.get().getId());
         for (Long personId : personsId) {
-            personController.addTicket(personId, ticket.get().getId());
+            try {
+                personController.addTicket(personId, ticket.get().getId());
+            } catch (TicketNotFoundException e) {
+                //pass, Exception is impossible in this case because the ticket is certain to be in the db.
+            }
             ticket.get().getDistribution().put(personId, totalCost / personsId.size());
         }
         return ticket;
