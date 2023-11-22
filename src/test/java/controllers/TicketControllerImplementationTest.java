@@ -377,7 +377,7 @@ class TicketControllerImplementationTest {
     }
 
     @Test
-    void calculateAll(){
+    void calculateAll() throws PersonNotFoundException {
         doReturn(new ArrayList<Person>(){}).when(mockPersonDatabase).getAll();
         doReturn(new ArrayList<Ticket>(){}).when(mockTicketDatabase).getAll();
         doNothing().when(mockPersonController).resetDebt(any());

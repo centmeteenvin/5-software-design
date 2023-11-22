@@ -193,13 +193,22 @@ public class TicketControllerImplementation extends TicketController {
         List<Person> persons = personDatabase.getAll();
         for (Person person : persons){
             Long id = person.getId();
-            personController.resetDebt(id);
+            try {
+                personController.resetDebt(id);
+            } catch (PersonNotFoundException e) {
+                //pass, if the person does not exist it is not that bad that we don't reset their debts to zero
+            }
         }
 
         List<Ticket> tickets = ticketDatabase.getAll();
         for (Ticket ticket : tickets) {
             Long id = ticket.getId();
-            calculate(id);
+            try {
+                calculate(id);
+            } catch (PersonNotFoundException | TicketNotFoundException e) {
+                // pass, we just continue to loop for tickets that throw errors
+                continue;
+            }
         }
     }
 }
