@@ -1,5 +1,6 @@
 package views.gui.components;
 
+import views.gui.components.panels.HomePanel;
 import views.gui.components.panels.SamplePanel;
 
 import javax.swing.*;
@@ -11,6 +12,6 @@ public class ViewFrame extends JFrame {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
         this.setSize(new Dimension(screenSize.width-100, screenSize.height-50));
-        this.add(new SamplePanel(1));
+        this.add(new HomePanel());
     }
 }
