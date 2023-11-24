@@ -3,11 +3,13 @@ import controllers.TicketCategoryController;
 import controllers.TicketController;
 import database.Database;
 import factories.ApplicationFactory;
+import lombok.Getter;
 import models.Person;
 import models.Ticket;
 import models.TicketCategory;
 import views.View;
 
+@Getter
 public class Application {
 
     private final Database<Person> personDatabase;
