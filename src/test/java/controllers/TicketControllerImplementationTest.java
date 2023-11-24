@@ -329,9 +329,9 @@ class TicketControllerImplementationTest {
         verify(mockPersonDatabase, times(3)).getById(3L);
         verify(mockPersonDatabase, times(2)).getById(1L);
         verify(mockPersonDatabase, times(2)).getById(2L);
-        verify(mockPersonController, times(1)).modifyDebt(3L, 1L, 50.);
-        verify(mockPersonController, times(1)).modifyDebt(3L, 2L, 50.);
-        verify(mockPersonController, times(2)).modifyDebt(any(Long.class), eq(3L), eq(-50.));
+        verify(mockPersonController, times(1)).modifyDebt(3L, 1L, -50.);
+        verify(mockPersonController, times(1)).modifyDebt(3L, 2L, -50.);
+        verify(mockPersonController, times(2)).modifyDebt(any(Long.class), eq(3L), eq(50.));
     }
     @Test
     void setPayer() throws PersonNotFoundException, TicketNotFoundException {

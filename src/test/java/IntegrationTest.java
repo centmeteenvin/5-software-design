@@ -85,6 +85,29 @@ public class IntegrationTest {
         ticketOptional = ticketDb.getById(ticket.getId());
         assertTrue(ticketOptional.isPresent());
         assertEquals(ticket, ticketOptional.get());
+
+        //Set the payer
+        assertDoesNotThrow(() -> ticketController.setPayer(ticket.getId(), person.getId()));
+        assertEquals(person.getId(), ticket.getPayerId());
+
+        //Create and add a second person
+        Optional<Person> person2Optional = personController.create("baz");
+        assertTrue(person2Optional.isPresent());
+        Person person2 = person2Optional.get();
+        assertDoesNotThrow(() -> ticketController.addPerson(ticket.getId(), person2.getId()));
+        assertTrue(person2.getTicketsId().contains(ticket.getId()));
+        assertTrue(ticket.getDistribution().containsKey(person2.getId()));
+
+        //Set the weights of both people
+        assertDoesNotThrow(() -> ticketController.changeWeight(ticket.getId(), person.getId(), 100));
+        assertDoesNotThrow(() -> ticketController.changeWeight(ticket.getId(), person2.getId(), .5));
+        assertEquals(100, ticket.getDistribution().get(person.getId()));
+        assertEquals(.5, ticket.getDistribution().get(person2.getId()));
+
+        //Calculate The tickets
+        assertDoesNotThrow(() -> ticketController.calculateAll());
+        assertEquals(-0.5, person.getDebts().get(person2.getId()));
+        assertEquals(0.5, person2.getDebts().get(person.getId()));
     }
 }
 

@@ -179,8 +179,8 @@ public class TicketControllerImplementation extends TicketController {
                 if (person.isEmpty()) continue;
 
                 double difference = distribution.get(person.get().getId());
-                personController.modifyDebt(payer.get().getId(), debtHolder, difference);
-                personController.modifyDebt(debtHolder, payer.get().getId(), -difference);
+                personController.modifyDebt(payer.get().getId(), debtHolder, -difference);
+                personController.modifyDebt(debtHolder, payer.get().getId(), difference);
             }
         }
     }
