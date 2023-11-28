@@ -70,16 +70,15 @@ public class PersonControllerImplementation extends PersonController {
     public void delete(Long id) throws PersonNotFoundException {
         Optional<Person> person = personDatabase.getById(id);
         if (person.isEmpty()) throw new PersonNotFoundException(id);
-        Iterator<Long> it = person.get().getTicketsId().iterator();
-        while (it.hasNext()) {
-            long ticketId = it.next();
+        List<Long> personTicketIdsCopy = List.copyOf(person.get().getTicketsId());
+        for (Long ticketId : personTicketIdsCopy) {
             try {
                 ticketController.removePerson(ticketId, id);
             } catch (TicketNotFoundException e) {
                 // pass if a ticket does not exist, we don't need to update its list.
             }
-            it.remove();
         }
+        person.get().getTicketsId().clear();
         personDatabase.deleteById(id);
     }
 
