@@ -74,7 +74,7 @@ public class PersonControllerImplementation extends PersonController {
         while (it.hasNext()) {
             long ticketId = it.next();
             try {
-                ticketController.removePerson(id, ticketId);
+                ticketController.removePerson(ticketId, id);
             } catch (TicketNotFoundException e) {
                 // pass if a ticket does not exist, we don't need to update its list.
             }
@@ -162,6 +162,7 @@ public class PersonControllerImplementation extends PersonController {
 
         ticket.get().setPayerId(payerId);
         ticket.get().getDistribution().put(receivingPersonId, payedAmount);
+        ticket.get().getDistribution().put(payerId, 0.);
         return ticket;
     }
 }

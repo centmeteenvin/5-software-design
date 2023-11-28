@@ -138,7 +138,9 @@ public class PersonControllerImplementationTest {
         controller.delete(1L);
 
         verify(mockPersonDatabase, times(2)).deleteById(any());
-        verify(mockTicketController, times(2)).removePerson(any(), any());
+        verify(mockTicketController, times(1)).removePerson(1L, 1L);
+        verify(mockTicketController, times(1)).removePerson(2L, 1L);
+
         assertTrue(testPerson.getTicketsId().isEmpty());
     }
 
@@ -226,7 +228,7 @@ public class PersonControllerImplementationTest {
     }
 
     @Test
-    void pay() throws PersonNotFoundException, CategoryNotFoundException {
+    void pay() throws PersonNotFoundException, CategoryNotFoundException, TicketNotFoundException {
         doReturn(Optional.empty()).when(mockPersonDatabase).getById(any());
         doReturn(Optional.empty()).when(mockTicketController).create(any(Long.class),any(Double.class),any());
 
@@ -269,6 +271,7 @@ public class PersonControllerImplementationTest {
         assertTrue(receivedTicket.isPresent());
         assertEquals(receivedTicket.get().getPayerId(),payingPerson.getId());
         assertEquals(receivedTicket.get().getDistribution().get(2L),100.);
+        assertEquals(receivedTicket.get().getDistribution().get(1L),0.);
 
         verify(mockPersonDatabase, times(4)).getById(1L);
         verify(mockPersonDatabase, times(3)).getById(2L);

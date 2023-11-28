@@ -136,6 +136,13 @@ public class IntegrationTest {
         assertDoesNotThrow(() -> ticketController.calculateAll());
         assertEquals(0, person.getDebts().get(person3.getId()));
         assertEquals( 0, person3.getDebts().get(person.getId()));
+
+        //Remove person3, No tickets should be valid
+        assertDoesNotThrow(() -> personController.delete(person3.getId()));
+        assertDoesNotThrow(() -> ticketController.calculateAll());
+        assertEquals(0., person.getDebts().values().stream().reduce(0., Double::sum));
+        assertEquals(0., person2.getDebts().values().stream().reduce(0., Double::sum));
+        assertEquals(2, ticket.getDistribution().size());
     }
 }
 
