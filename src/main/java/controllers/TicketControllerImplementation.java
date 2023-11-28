@@ -98,14 +98,20 @@ public class TicketControllerImplementation extends TicketController {
     public void changeCategory(Long id, Long newCategoryId) throws CategoryNotFoundException, TicketNotFoundException {
         Optional<Ticket> ticket = ticketDatabase.getById(id);
         if (ticket.isEmpty()) throw new TicketNotFoundException(id);
-        Optional<TicketCategory> newCategory = ticketCategoryDatabase.getById(newCategoryId);
-        if (newCategory.isEmpty()) throw new CategoryNotFoundException(newCategoryId);
+        // We omit checking if the category exists when the id is null
+        if (newCategoryId != null) {
+            Optional<TicketCategory> newCategory = ticketCategoryDatabase.getById(newCategoryId);
+            if (newCategory.isEmpty()) throw new CategoryNotFoundException(newCategoryId);
+        }
         if (Objects.equals(ticket.get().getTicketCategoryId(), newCategoryId)) return;
         Long oldTicketCategoryId = ticket.get().getTicketCategoryId();
         ticket.get().setTicketCategoryId(newCategoryId);
         ticketDatabase.update(ticket.get());
         ticketCategoryController.removeTicket(oldTicketCategoryId, id);
-        ticketCategoryController.addTicket(newCategoryId, id);
+        if (newCategoryId != null) {
+            ticketCategoryController.addTicket(newCategoryId, id);
+        }
+
     }
 
     /**

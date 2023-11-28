@@ -156,7 +156,7 @@ class TicketControllerImplementationTest {
 
         assertThrows(TicketNotFoundException.class, () ->controller.changeCategory(1L, 2L));
 
-        doReturn(Optional.of(ticket)).when(mockTicketDatabase).getById(any());
+        doReturn(Optional.of(ticket)).when(mockTicketDatabase).getById(1L);
 
         assertThrows(CategoryNotFoundException.class, () ->controller.changeCategory(1L, 2L));
 
@@ -175,6 +175,12 @@ class TicketControllerImplementationTest {
         verify(mockTicketDatabase, times(1)).update(any());
         verify(mockTicketCategoryController, times(1)).addTicket(any(), any());
         verify(mockTicketCategoryController, times(1)).removeTicket(any(), any());
+
+
+        // Test that we omit category exists check when category id is null
+        doThrow(NullPointerException.class).when(mockTicketDatabase).getById(null);
+        doThrow(CategoryNotFoundException.class).when(mockTicketCategoryController).addTicket(null, 1L);
+        assertDoesNotThrow(() -> controller.changeCategory(1L, null));
     }
 
     @Test

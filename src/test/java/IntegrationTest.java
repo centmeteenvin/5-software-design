@@ -143,6 +143,46 @@ public class IntegrationTest {
         assertEquals(0., person.getDebts().values().stream().reduce(0., Double::sum));
         assertEquals(0., person2.getDebts().values().stream().reduce(0., Double::sum));
         assertEquals(2, ticket.getDistribution().size());
+
+        //Adjust weights of ticket to make it valid again
+        assertDoesNotThrow(() -> ticketController.changeWeight(ticket.getId(), person.getId(), 100));
+        assertDoesNotThrow(() -> ticketController.calculateAll());
+        assertEquals(-0.5, person.getDebts().get(person2.getId()));
+        assertEquals(0.5, person2.getDebts().get(person.getId()));
+
+        //Change the cost of the ticket.
+        assertDoesNotThrow(() -> ticketController.changeCost(ticket.getId(), 125));
+        assertEquals(125, ticket.getCost());
+
+        //Create a new category and update the ticket to it.
+        Optional<TicketCategory> category2Optional = categoryController.create("var");
+        assertTrue(category2Optional.isPresent());
+        TicketCategory category2 = category2Optional.get();
+
+        assertDoesNotThrow(() -> ticketController.changeCategory(ticket.getId(), category2.getId()));
+        assertEquals(category2.getId(), ticket.getTicketCategoryId());
+        assertTrue(category.getTicketIds().isEmpty());
+        assertTrue(category2.getTicketIds().contains(ticket.getId()));
+
+        //Delete the second category
+        assertDoesNotThrow(() -> categoryController.delete(category2.getId()));
+        assertTrue(categoryDb.getById(category2.getId()).isEmpty());
+        assertNull(ticket.getTicketCategoryId());
+
+        //Change the name of the category
+        assertDoesNotThrow(() -> categoryController.rename(category.getId(), "laz"));
+        assertEquals("laz", category.getName());
+
+        //Change the name of the person
+        assertDoesNotThrow(() -> personController.rename(person.getId(), "FOO"));
+        assertEquals("FOO", person.getName());
+
+        //Delete the ticket
+        assertDoesNotThrow(() -> ticketController.delete(ticket.getId()));
+        assertEquals(1, person.getTicketsId().size());
+        assertEquals(0, person2.getTicketsId().size());
+        assertTrue(category.getTicketIds().isEmpty());
+
     }
 }
 
