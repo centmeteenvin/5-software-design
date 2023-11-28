@@ -7,6 +7,7 @@ import models.Ticket;
 import models.TicketCategory;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 public class TicketCategoryControllerImplementation extends TicketCategoryController {
@@ -59,15 +60,13 @@ public class TicketCategoryControllerImplementation extends TicketCategoryContro
     public void delete(Long id) throws CategoryNotFoundException {
         Optional<TicketCategory> category = ticketCategoryDatabase.getById(id);
         if (category.isEmpty()) throw new CategoryNotFoundException(id);
-        Iterator<Long> it = category.get().getTicketIds().iterator();
-        while (it.hasNext()) {
-            long ticketId = it.next();
+        List<Long> ticketIds = List.copyOf(category.get().getTicketIds());
+        for (Long ticketId : ticketIds) {
             try {
                 ticketController.changeCategory(ticketId, null);
             } catch (TicketNotFoundException e) {
                 //pass, if a ticket is not found, it need not be deleted another time.
             }
-            it.remove();
         }
         ticketCategoryDatabase.deleteById(id);
     }
