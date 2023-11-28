@@ -154,7 +154,7 @@ public class PersonControllerImplementation extends PersonController {
 
         Optional<Ticket> ticket = null;
         try {
-            ticket = ticketController.create(null, payedAmount, null);
+            ticket = ticketController.create(null, payedAmount, List.of(payerId, receivingPersonId));
         } catch (CategoryNotFoundException e) {
             //pass
         }

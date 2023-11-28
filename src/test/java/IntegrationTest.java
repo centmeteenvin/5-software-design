@@ -108,6 +108,34 @@ public class IntegrationTest {
         assertDoesNotThrow(() -> ticketController.calculateAll());
         assertEquals(-0.5, person.getDebts().get(person2.getId()));
         assertEquals(0.5, person2.getDebts().get(person.getId()));
+
+        //Update the weights so that they don't add to the total cost anymore,
+        assertDoesNotThrow(() -> ticketController.changeWeight(ticket.getId(), person.getId(), 25));
+
+        //calculate again, weights should all be 0
+        assertDoesNotThrow(() -> ticketController.calculateAll());
+        assertEquals(0., person.getDebts().values().stream().reduce(0., Double::sum));
+        assertEquals(0., person2.getDebts().values().stream().reduce(0., Double::sum));
+
+        //Create a third person, add it to the list, set its weight to 75 and calculate
+        Optional<Person> person3Optional = personController.create("baz");
+        assertTrue(person3Optional.isPresent());
+        Person person3 = person3Optional.get();
+
+        assertDoesNotThrow(() -> ticketController.addPerson(ticket.getId(), person3.getId()));
+        assertEquals(3, ticket.getDistribution().size());
+        assertTrue(ticket.getDistribution().containsKey(person3.getId()));
+
+        assertDoesNotThrow(() -> ticketController.changeWeight(ticket.getId(), person3.getId(), 75));
+        assertDoesNotThrow(() -> ticketController.calculateAll());
+        assertEquals(-75, person.getDebts().get(person3.getId()));
+        assertEquals( 75, person3.getDebts().get(person.getId()));
+
+        //person 3 pays of person
+        assertDoesNotThrow(() -> personController.pay(person3.getId(), person.getId(), 75));
+        assertDoesNotThrow(() -> ticketController.calculateAll());
+        assertEquals(0, person.getDebts().get(person3.getId()));
+        assertEquals( 0, person3.getDebts().get(person.getId()));
     }
 }
 

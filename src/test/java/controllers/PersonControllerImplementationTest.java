@@ -260,6 +260,7 @@ public class PersonControllerImplementationTest {
         verify(mockPersonDatabase, times(2)).getById(2L);
         verify(mockTicketController, times(1)).create(any(),any(Double.class),any());
 
+
         Ticket testTicket = new Ticket(1L, 100.,0L);
         doReturn(Optional.of(testTicket)).when(mockTicketController).create(any(),any(Double.class),any());
 
@@ -272,5 +273,6 @@ public class PersonControllerImplementationTest {
         verify(mockPersonDatabase, times(4)).getById(1L);
         verify(mockPersonDatabase, times(3)).getById(2L);
         verify(mockTicketController, times(2)).create(any(),any(Double.class),any());
+        verify(mockTicketController, never()).create(any(),any(Double.class), isNull());
     }
 }
