@@ -12,13 +12,13 @@ import models.TicketCategory;
 @Getter
 public abstract class View {
 
-    private final Database<Person> personDatabase;
-    private final Database<Ticket> ticketDatabase;
-    private final Database<TicketCategory> ticketCategoryDatabase;
+    protected final Database<Person> personDatabase;
+    protected final Database<Ticket> ticketDatabase;
+    protected final Database<TicketCategory> ticketCategoryDatabase;
 
-    private final PersonController personController;
-    private final TicketController ticketController;
-    private final TicketCategoryController ticketCategoryController;
+    protected final PersonController personController;
+    protected final TicketController ticketController;
+    protected final TicketCategoryController ticketCategoryController;
 
 
     public View(Database<Person> personDatabase, Database<Ticket> ticketDatabase, Database<TicketCategory> ticketCategoryDatabase, PersonController personController, TicketController ticketController, TicketCategoryController ticketCategoryController) {

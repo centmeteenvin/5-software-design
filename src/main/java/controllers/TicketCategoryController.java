@@ -3,11 +3,12 @@ package controllers;
 import database.Database;
 import exceptions.notFoundExceptions.CategoryNotFoundException;
 import exceptions.notFoundExceptions.TicketNotFoundException;
+import lombok.Getter;
 import models.Ticket;
 import models.TicketCategory;
 
 import java.util.Optional;
-
+@Getter
 public abstract class TicketCategoryController {
     protected final Database<TicketCategory> ticketCategoryDatabase;
     protected final Database<Ticket> ticketDatabase;

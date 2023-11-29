@@ -3,11 +3,13 @@ package controllers;
 import database.Database;
 import exceptions.notFoundExceptions.PersonNotFoundException;
 import exceptions.notFoundExceptions.TicketNotFoundException;
+import lombok.Getter;
 import models.Person;
 import models.Ticket;
 
 import java.util.Optional;
 
+@Getter
 public abstract class PersonController {
     protected final Database<Person> personDatabase;
     protected final Database<Ticket> ticketDatabase;

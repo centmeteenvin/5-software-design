@@ -4,6 +4,7 @@ import database.Database;
 import exceptions.notFoundExceptions.CategoryNotFoundException;
 import exceptions.notFoundExceptions.PersonNotFoundException;
 import exceptions.notFoundExceptions.TicketNotFoundException;
+import lombok.Getter;
 import models.Person;
 import models.Ticket;
 import models.TicketCategory;
@@ -11,6 +12,7 @@ import models.TicketCategory;
 import java.util.List;
 import java.util.Optional;
 
+@Getter
 public abstract class TicketController {
     protected final Database<Ticket> ticketDatabase;
     protected final Database<Person> personDatabase;
