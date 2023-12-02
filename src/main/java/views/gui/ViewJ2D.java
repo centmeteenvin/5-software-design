@@ -9,7 +9,6 @@ import models.Ticket;
 import models.TicketCategory;
 import views.View;
 import views.gui.components.ViewFrame;
-import views.gui.styles.Style;
 
 import javax.swing.*;
 
