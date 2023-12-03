@@ -12,6 +12,9 @@ public class StyleBlueWhite implements Style{
     // Buttons
     private Color buttonForegroundColor = new Color(0,45,179);
     private Color buttonBackgroundColor = Color.WHITE;
+    // List
+    private Color listForegroundColor = new Color(0,45,179);
+    private Color listBackgroundColor = Color.WHITE;
 
     // Fonts
     private Font titleFont = addFont("OpenSans-Bold", 122);

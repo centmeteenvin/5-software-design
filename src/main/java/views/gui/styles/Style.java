@@ -12,6 +12,9 @@ public interface Style {
     Color getButtonForegroundColor();
     Color getButtonBackgroundColor();
 
+    Color getListForegroundColor();
+    Color getListBackgroundColor();
+
     Font getTitleFont();
     Font getSubtitleFont();
     Font getBoldSubtitleFont();

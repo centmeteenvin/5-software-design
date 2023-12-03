@@ -8,6 +8,8 @@ import views.gui.styles.Style;
 import javax.swing.*;
 import java.awt.*;
 
+import static java.lang.Math.floor;
+
 public class PersonPanel extends JPanel {
     JPanel layoutPanel;
     Style style;
@@ -65,7 +67,7 @@ public class PersonPanel extends JPanel {
         leftPanel.add(userLabel);
 
         // Add buffer
-        leftPanel.add(Box.createVerticalStrut(30));
+        leftPanel.add(Box.createVerticalStrut(screenSize.height/20));
 
         // Add Person button (Box2)
         JButton createPersonButton = new JButton("+ Add User");
@@ -80,14 +82,16 @@ public class PersonPanel extends JPanel {
         leftPanel.add(createPersonButton);
 
         // Add buffer
-        leftPanel.add(Box.createVerticalStrut(30));
+        leftPanel.add(Box.createVerticalStrut(screenSize.height/20));
 
         // Add list
         JList<String> personJList = new JList<>(listModel);
         personJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        personJList.setFixedCellHeight(40);
-        personJList.setFixedCellWidth(screenSize.width/4);
+        personJList.setFixedCellHeight(screenSize.height/20);
+        personJList.setFixedCellWidth(screenSize.width/5);
         personJList.setFont(style.getListFont());
+        personJList.setForeground(style.getListForegroundColor());
+        personJList.setBackground(style.getListBackgroundColor());
         updatePersonList();
         leftPanel.add(personJList);
         return leftPanel;
