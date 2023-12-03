@@ -9,12 +9,13 @@ import java.awt.*;
 public class HomePanel extends JPanel {
     Border testBorder = BorderFactory.createLineBorder(Color.RED, 1);
 
-    public HomePanel() {
+
+    public HomePanel(JPanel layoutPanel) {
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         this.setBackground(Style.getBackgroundColor_primary());
         this.add(createTitleSection());
         this.add(Box.createVerticalStrut(70));
-        this.add(createButtonSection());
+        this.add(createButtonSection(layoutPanel));
 
         //this.setBorder(testBorder);
     }
@@ -39,39 +40,48 @@ public class HomePanel extends JPanel {
         titleSection.add(title);
         titleSection.add(subTitle);
 
-        titleSection.setBorder(testBorder);
+        //titleSection.setBorder(testBorder);
         return titleSection;
     }
 
-    JPanel createButtonSection() {
+    JPanel createButtonSection(JPanel layoutPanel) {
         Font buttonFont = Style.getButtonFont();
-        Dimension buttonSize = new Dimension(450,150);
 
         JPanel buttonSection = new JPanel();
         buttonSection.setLayout(new BoxLayout(buttonSection, BoxLayout.X_AXIS));
         buttonSection.setBackground(null);
-        buttonSection.setSize(1500,500);
 
         JButton userButton = new JButton("Users");
+        // Visual
         userButton.setForeground(Style.getButtonForegroundColor());
         userButton.setFont(buttonFont);
-        userButton.setSize(buttonSize);
-        userButton.setPreferredSize(buttonSize);
         userButton.setBackground(Style.getButtonBackgroundColor());
+        // Function
+        userButton.addActionListener(e -> {
+            //System.out.println("User button pushed");
+            CardLayout layout = (CardLayout) layoutPanel.getLayout();
+            layout.show(layoutPanel, "PersonPanel");
+        });
 
 
         JButton ticketButton = new JButton("Tickets");
+        // Visual
         ticketButton.setForeground(Style.getButtonForegroundColor());
         ticketButton.setFont(buttonFont);
-        ticketButton.setSize(buttonSize);
-        ticketButton.setPreferredSize(buttonSize);
         ticketButton.setBackground(Style.getButtonBackgroundColor());
+        // Function
+        ticketButton.addActionListener(e -> {
+            //System.out.println("Ticket button pushed");
+            CardLayout layout = (CardLayout) layoutPanel.getLayout();
+            layout.show(layoutPanel, "TicketPanel");
+        });
 
+        // Construct panel
         buttonSection.add(userButton);
         buttonSection.add(Box.createHorizontalStrut(50));
         buttonSection.add(ticketButton);
 
-        buttonSection.setBorder(testBorder);
+        //buttonSection.setBorder(testBorder);
         return buttonSection;
     }
 }

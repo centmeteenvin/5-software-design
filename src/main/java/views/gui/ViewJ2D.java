@@ -30,12 +30,11 @@ public class ViewJ2D extends View {
     }
 
     public void setupFrame(){
-
         // Add card layout to the frame
         container = new JPanel();
         CardLayout layout = new CardLayout();
         container.setLayout(layout);
-        container.add(new HomePanel(), "HomePanel");
+        container.add(new HomePanel(container), "HomePanel");
         container.add(new SamplePanel(1), "PersonPanel");
         container.add(new SamplePanel(2), "TicketPanel");
 
