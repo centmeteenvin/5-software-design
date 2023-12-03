@@ -58,6 +58,7 @@ public class HomePanel extends JPanel {
         userButton.setForeground(style.getButtonForegroundColor());
         userButton.setFont(buttonFont);
         userButton.setBackground(style.getButtonBackgroundColor());
+        userButton.setMaximumSize(new Dimension(400,100));
         // Function
         userButton.addActionListener(e -> {
             //System.out.println("User button pushed");
@@ -71,6 +72,7 @@ public class HomePanel extends JPanel {
         ticketButton.setForeground(style.getButtonForegroundColor());
         ticketButton.setFont(buttonFont);
         ticketButton.setBackground(style.getButtonBackgroundColor());
+        ticketButton.setMaximumSize(new Dimension(400,100));
         // Function
         ticketButton.addActionListener(e -> {
             //System.out.println("Ticket button pushed");
