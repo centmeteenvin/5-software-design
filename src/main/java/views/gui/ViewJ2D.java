@@ -12,6 +12,8 @@ import views.gui.components.ViewFrame;
 import views.gui.components.panels.HomePanel;
 import views.gui.components.panels.PersonPanel;
 import views.gui.components.panels.SamplePanel;
+import views.gui.styles.Style;
+import views.gui.styles.StyleBlueWhite;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,12 +34,13 @@ public class ViewJ2D extends View {
 
     public void setupFrame(){
         // Add card layout to the frame
+        Style style = new StyleBlueWhite();
         container = new JPanel();
         CardLayout layout = new CardLayout();
         container.setLayout(layout);
-        container.add(new HomePanel(container), "HomePanel");
-        container.add(new PersonPanel(container), "PersonPanel");
-        container.add(new SamplePanel(2), "TicketPanel");
+        container.add(new HomePanel(container,style), "HomePanel");
+        container.add(new PersonPanel(container,style), "PersonPanel");
+        container.add(new SamplePanel(2,style), "TicketPanel");
 
         layout.show(container,"PersonPanel");
         frame.add(container);

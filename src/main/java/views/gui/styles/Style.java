@@ -14,7 +14,9 @@ public interface Style {
 
     Font getTitleFont();
     Font getSubtitleFont();
+    Font getBoldSubtitleFont();
     Font getButtonFont();
+
 
     default Font addFont(String fontName, float size) {
         try {
