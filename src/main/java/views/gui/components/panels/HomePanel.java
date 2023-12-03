@@ -8,11 +8,13 @@ import java.awt.*;
 
 public class HomePanel extends JPanel {
     Border testBorder = BorderFactory.createLineBorder(Color.RED, 1);
+    Style style;
 
 
-    public HomePanel(JPanel layoutPanel) {
+    public HomePanel(JPanel layoutPanel, Style style) {
+        this.style = style;
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        this.setBackground(Style.getBackgroundColor_primary());
+        this.setBackground(style.getBackgroundColor_primary());
         this.add(createTitleSection());
         this.add(Box.createVerticalStrut(70));
         this.add(createButtonSection(layoutPanel));
@@ -28,13 +30,13 @@ public class HomePanel extends JPanel {
 
         JLabel title = new JLabel("SKMT");
         title.setForeground(Color.WHITE);
-        title.setFont(Style.getTitleFont());
+        title.setFont(style.getTitleFont());
         title.setAlignmentX(CENTER_ALIGNMENT);
 
 
         JLabel subTitle = new JLabel("The Scripk Kiddo's Money Tracker");
         subTitle.setForeground(Color.WHITE);
-        subTitle.setFont(Style.getSubtitleFont());
+        subTitle.setFont(style.getSubtitleFont());
         subTitle.setAlignmentX(CENTER_ALIGNMENT);
 
         titleSection.add(title);
@@ -45,7 +47,7 @@ public class HomePanel extends JPanel {
     }
 
     JPanel createButtonSection(JPanel layoutPanel) {
-        Font buttonFont = Style.getButtonFont();
+        Font buttonFont = style.getButtonFont();
 
         JPanel buttonSection = new JPanel();
         buttonSection.setLayout(new BoxLayout(buttonSection, BoxLayout.X_AXIS));
@@ -53,9 +55,9 @@ public class HomePanel extends JPanel {
 
         JButton userButton = new JButton("Users");
         // Visual
-        userButton.setForeground(Style.getButtonForegroundColor());
+        userButton.setForeground(style.getButtonForegroundColor());
         userButton.setFont(buttonFont);
-        userButton.setBackground(Style.getButtonBackgroundColor());
+        userButton.setBackground(style.getButtonBackgroundColor());
         // Function
         userButton.addActionListener(e -> {
             //System.out.println("User button pushed");
@@ -66,9 +68,9 @@ public class HomePanel extends JPanel {
 
         JButton ticketButton = new JButton("Tickets");
         // Visual
-        ticketButton.setForeground(Style.getButtonForegroundColor());
+        ticketButton.setForeground(style.getButtonForegroundColor());
         ticketButton.setFont(buttonFont);
-        ticketButton.setBackground(Style.getButtonBackgroundColor());
+        ticketButton.setBackground(style.getButtonBackgroundColor());
         // Function
         ticketButton.addActionListener(e -> {
             //System.out.println("Ticket button pushed");
