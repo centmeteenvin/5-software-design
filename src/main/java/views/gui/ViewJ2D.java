@@ -10,6 +10,7 @@ import models.TicketCategory;
 import views.View;
 import views.gui.components.ViewFrame;
 import views.gui.components.panels.HomePanel;
+import views.gui.components.panels.PersonPanel;
 import views.gui.components.panels.SamplePanel;
 
 import javax.swing.*;
@@ -35,10 +36,10 @@ public class ViewJ2D extends View {
         CardLayout layout = new CardLayout();
         container.setLayout(layout);
         container.add(new HomePanel(container), "HomePanel");
-        container.add(new SamplePanel(1), "PersonPanel");
+        container.add(new PersonPanel(container), "PersonPanel");
         container.add(new SamplePanel(2), "TicketPanel");
 
-        layout.show(container,"HomePanel");
+        layout.show(container,"PersonPanel");
         frame.add(container);
         frame.setVisible(true);
     }
