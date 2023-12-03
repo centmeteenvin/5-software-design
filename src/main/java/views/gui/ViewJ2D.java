@@ -33,16 +33,25 @@ public class ViewJ2D extends View {
     }
 
     public void setupFrame(){
-        // Add card layout to the frame
+        // Determine style
         Style style = new StyleBlueWhite();
+
+        // Create container that will hold the different panels
         container = new JPanel();
+
+        // Add card layout to the frame
         CardLayout layout = new CardLayout();
         container.setLayout(layout);
+
+        // Add every panel to the container
         container.add(new HomePanel(container,style), "HomePanel");
-        container.add(new PersonPanel(container,style), "PersonPanel");
+        container.add(new PersonPanel(container,style, getPersonDatabase(), getPersonController()), "PersonPanel");
         container.add(new SamplePanel(2,style), "TicketPanel");
 
+        // Show the homepanel
         layout.show(container,"PersonPanel");
+
+        // Add the container to the frame
         frame.add(container);
         frame.setVisible(true);
     }

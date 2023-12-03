@@ -16,6 +16,7 @@ public interface Style {
     Font getSubtitleFont();
     Font getBoldSubtitleFont();
     Font getButtonFont();
+    Font getListFont();
 
 
     default Font addFont(String fontName, float size) {

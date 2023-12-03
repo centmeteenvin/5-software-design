@@ -1,5 +1,8 @@
 package views.gui.components.panels;
 
+import controllers.PersonController;
+import database.Database;
+import models.Person;
 import views.gui.styles.Style;
 
 import javax.swing.*;
@@ -8,14 +11,24 @@ import java.awt.*;
 public class PersonPanel extends JPanel {
     JPanel layoutPanel;
     Style style;
+    Database<Person> personDatabase;
+    PersonController personController;
+    DefaultListModel<String> listModel;
 
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-    public PersonPanel(JPanel layoutPanel, Style style) {
+    public PersonPanel(JPanel layoutPanel, Style style, Database<Person> personDatabase, PersonController personController) {
         this.layoutPanel = layoutPanel;
         this.style = style;
+        this.personDatabase = personDatabase;
+        this.personController = personController;
+        this.listModel = new DefaultListModel<>();
 
         this.setLayout(new BorderLayout());
+
+        personController.create("Foo");
+        personController.create("Bar");
+        personController.create("Baz");
 
         this.add(createLeftPanel(), BorderLayout.LINE_START);
         this.add(createRightPanel(), BorderLayout.CENTER);
@@ -62,11 +75,29 @@ public class PersonPanel extends JPanel {
         createPersonButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         createPersonButton.addActionListener(e -> {
             System.out.println("Add user");
+            updatePersonList();
         });
         leftPanel.add(createPersonButton);
 
+        // Add buffer
+        leftPanel.add(Box.createVerticalStrut(30));
 
+        // Add list
+        JList<String> personJList = new JList<>(listModel);
+        personJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        personJList.setFixedCellHeight(40);
+        personJList.setFixedCellWidth(screenSize.width/4);
+        personJList.setFont(style.getListFont());
+        updatePersonList();
+        leftPanel.add(personJList);
         return leftPanel;
+    }
+
+    private void updatePersonList() {
+        listModel.clear();
+        for (Person person : personDatabase.getAll()){
+            listModel.addElement(person.getName());
+        }
     }
 
     JPanel createRightPanel() {
