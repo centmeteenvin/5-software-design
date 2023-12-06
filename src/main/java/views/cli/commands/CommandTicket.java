@@ -4,7 +4,6 @@ import exceptions.notFoundExceptions.CategoryNotFoundException;
 import exceptions.notFoundExceptions.PersonNotFoundException;
 import exceptions.notFoundExceptions.TicketNotFoundException;
 import models.Ticket;
-import models.TicketCategory;
 import views.cli.ViewCommandLine;
 
 import java.text.DecimalFormat;
