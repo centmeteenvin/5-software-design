@@ -1,6 +1,9 @@
 package controllers;
 
 import database.Database;
+import exceptions.notFoundExceptions.CategoryNotFoundException;
+import exceptions.notFoundExceptions.PersonNotFoundException;
+import exceptions.notFoundExceptions.TicketNotFoundException;
 import models.Person;
 import models.Ticket;
 
@@ -21,9 +24,7 @@ public class PersonControllerImplementation extends PersonController {
     @Override
     public Optional<Person> create(String name) {
         long id = System.nanoTime();
-
         Optional<Person> person = personDatabase.create(new Person(id, name));
-
         return person;
 
     }
@@ -35,13 +36,13 @@ public class PersonControllerImplementation extends PersonController {
      * @param ticketId
      */
     @Override
-    public void addTicket(Long id, Long ticketId) {
+    public void addTicket(Long id, Long ticketId) throws PersonNotFoundException, TicketNotFoundException {
         Optional<Person> person = personDatabase.getById(id);
+        if (person.isEmpty()) throw new PersonNotFoundException(id);
         Optional<Ticket> ticket = ticketDatabase.getById(ticketId);
-        if (person.isPresent() && ticket.isPresent()) {
-            person.get().getTicketsId().add(ticketId);
-            personDatabase.update(person.get());
-        }
+        if (ticket.isEmpty()) throw new TicketNotFoundException(ticketId);
+        person.get().getTicketsId().add(ticketId);
+        personDatabase.update(person.get());
     }
 
     /**
@@ -51,13 +52,12 @@ public class PersonControllerImplementation extends PersonController {
      * @param ticketId
      */
     @Override
-    public void removeTicket(Long id, Long ticketId) {
+    public void removeTicket(Long id, Long ticketId) throws PersonNotFoundException {
         Optional<Person> person = personDatabase.getById(id);
-        if (person.isPresent()) {
-            List<Long> ticketIds = person.get().getTicketsId();
-            ticketIds.remove(ticketId);
-            personDatabase.update(person.get());
-        }
+        if (person.isEmpty()) throw new PersonNotFoundException(id);
+        List<Long> ticketIds = person.get().getTicketsId();
+        ticketIds.remove(ticketId);
+        personDatabase.update(person.get());
     }
 
     /**
@@ -67,17 +67,19 @@ public class PersonControllerImplementation extends PersonController {
      * @param id
      */
     @Override
-    public void delete(Long id) {
+    public void delete(Long id) throws PersonNotFoundException {
         Optional<Person> person = personDatabase.getById(id);
-        if (person.isPresent()) {
-            Iterator<Long> it = person.get().getTicketsId().iterator();
-            while (it.hasNext()) {
-                long ticketId = it.next();
-                ticketController.removePerson(id, ticketId);
-                it.remove();
+        if (person.isEmpty()) throw new PersonNotFoundException(id);
+        List<Long> personTicketIdsCopy = List.copyOf(person.get().getTicketsId());
+        for (Long ticketId : personTicketIdsCopy) {
+            try {
+                ticketController.removePerson(ticketId, id);
+            } catch (TicketNotFoundException e) {
+                // pass if a ticket does not exist, we don't need to update its list.
             }
-            personDatabase.deleteById(id);
         }
+        person.get().getTicketsId().clear();
+        personDatabase.deleteById(id);
     }
 
     /**
@@ -87,12 +89,11 @@ public class PersonControllerImplementation extends PersonController {
      * @param newName
      */
     @Override
-    public void rename(Long id, String newName) {
+    public void rename(Long id, String newName) throws PersonNotFoundException {
         Optional<Person> person = personDatabase.getById(id);
-        if (person.isPresent()) {
-            person.get().setName(newName);
-            personDatabase.update(person.get());
-        }
+        if (person.isEmpty()) throw new PersonNotFoundException(id);
+        person.get().setName(newName);
+        personDatabase.update(person.get());
     }
 
     /**
@@ -101,10 +102,11 @@ public class PersonControllerImplementation extends PersonController {
      * @param difference the difference that is ADDED to the current person's debt.
      */
     @Override
-    public void modifyDebt(Long id, Long otherId, double difference) {
+    public void modifyDebt(Long id, Long otherId, double difference) throws PersonNotFoundException {
         Optional<Person> person = personDatabase.getById(id);
         Optional<Person> subject = personDatabase.getById(otherId);
-        if (person.isEmpty() || subject.isEmpty()) return;
+        if (person.isEmpty()) throw new PersonNotFoundException(id);
+        if (subject.isEmpty()) throw new PersonNotFoundException(otherId);
         if (!person.get().getDebts().containsKey(otherId)) {
             person.get().getDebts().put(otherId, difference);
         } else {
@@ -120,9 +122,9 @@ public class PersonControllerImplementation extends PersonController {
      * @param id
      */
     @Override
-    public void resetDebt(Long id) {
+    public void resetDebt(Long id) throws PersonNotFoundException {
         Optional<Person> person = personDatabase.getById(id);
-        if (person.isEmpty()) return;
+        if (person.isEmpty()) throw new PersonNotFoundException(id);
 
         person.get().getDebts().clear();
     }
@@ -142,18 +144,24 @@ public class PersonControllerImplementation extends PersonController {
      * @return
      */
     @Override
-    public Optional<Ticket> pay(Long payerId, Long receivingPersonId, double payedAmount) {
+    public Optional<Ticket> pay(Long payerId, Long receivingPersonId, double payedAmount) throws PersonNotFoundException {
         Optional<Person> payer = personDatabase.getById(payerId);
-        if (payer.isEmpty()) return Optional.empty();
+        if (payer.isEmpty()) throw new PersonNotFoundException(payerId);
 
         Optional<Person> receiver = personDatabase.getById(receivingPersonId);
-        if (receiver.isEmpty()) return Optional.empty();
+        if (receiver.isEmpty()) throw new PersonNotFoundException(receivingPersonId);
 
-        Optional<Ticket> ticket = ticketController.create(0L, payedAmount, null);
+        Optional<Ticket> ticket = null;
+        try {
+            ticket = ticketController.create(null, payedAmount, List.of(payerId, receivingPersonId));
+        } catch (CategoryNotFoundException e) {
+            //pass
+        }
         if (ticket.isEmpty()) return ticket;
 
         ticket.get().setPayerId(payerId);
         ticket.get().getDistribution().put(receivingPersonId, payedAmount);
+        ticket.get().getDistribution().put(payerId, 0.);
         return ticket;
     }
 }
