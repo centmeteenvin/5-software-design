@@ -62,6 +62,7 @@ public class CommandTicket extends Command{
             case "create"   -> executeCreate();
             case "get"      -> executeGet();
             case "add"      -> executeAdd();
+            case "set"      -> executeSetWeight();
             default -> view.output.print("! Command not found, consider consulting {help ticket}\n");
         }
     }
@@ -133,6 +134,20 @@ public class CommandTicket extends Command{
             view.output.print("! Person does not exist\n");
             return;        }
         view.output.print("%% Successfully added person %s to ticket %s\n".formatted(args[3], args[2]));
+    }
+
+    public void executeSetWeight() {
+        assert view != null;
+        if (args.length != 5) {
+            view.output.print(incorrectNumberOfArguments(5, args.length));
+            return;
+        }
+        try {
+            view.getTicketController().changeWeight(Long.parseLong(args[2]), Long.parseLong(args[3]), Double.parseDouble(args[4]));
+            view.output.print("% Successfully updated weight");
+        } catch (TicketNotFoundException e) {
+            view.output.print("! Ticket with id %s not found.".formatted(args[2]));
+        }
     }
 
     public String ticketRepresentation(Ticket ticket) {
