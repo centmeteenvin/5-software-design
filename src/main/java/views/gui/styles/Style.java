@@ -6,20 +6,31 @@ import java.io.IOException;
 
 public interface Style {
 
-    Color getBackgroundColor_primary();
-    Color getBackgroundColor_secondary();
+    Color getBackgroundPrimaryColor();
+    Color getBackgroundSecondaryColor();
 
-    Color getButtonForegroundColor();
-    Color getButtonBackgroundColor();
+    Color getButton1ForegroundColor();
+    Color getButton1BackgroundColor();
+    Color getButton2ForegroundColor();
+    Color getButton2BackgroundColor();
 
     Color getListForegroundColor();
     Color getListBackgroundColor();
+
+    Color getLinePrimaryColor();
+    Color getLineSecondaryColor();
+
+    Color getLabel1ForegroundColor();
+    Color getLabel1BackgroundColor();
+    Color getLabel2ForegroundColor();
+    Color getLabel2BackgroundColor();
 
     Font getTitleFont();
     Font getSubtitleFont();
     Font getBoldSubtitleFont();
     Font getButtonFont();
     Font getListFont();
+    Font getTextFont();
 
 
     default Font addFont(String fontName, float size) {

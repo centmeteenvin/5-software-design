@@ -14,7 +14,7 @@ public class HomePanel extends JPanel {
     public HomePanel(JPanel layoutPanel, Style style) {
         this.style = style;
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        this.setBackground(style.getBackgroundColor_primary());
+        this.setBackground(style.getBackgroundPrimaryColor());
         this.add(createTitleSection());
         this.add(Box.createVerticalStrut(70));
         this.add(createButtonSection(layoutPanel));
@@ -55,9 +55,9 @@ public class HomePanel extends JPanel {
 
         JButton userButton = new JButton("Users");
         // Visual
-        userButton.setForeground(style.getButtonForegroundColor());
+        userButton.setForeground(style.getButton1ForegroundColor());
         userButton.setFont(buttonFont);
-        userButton.setBackground(style.getButtonBackgroundColor());
+        userButton.setBackground(style.getButton1BackgroundColor());
         userButton.setMaximumSize(new Dimension(400,100));
         // Function
         userButton.addActionListener(e -> {
@@ -69,9 +69,9 @@ public class HomePanel extends JPanel {
 
         JButton ticketButton = new JButton("Tickets");
         // Visual
-        ticketButton.setForeground(style.getButtonForegroundColor());
+        ticketButton.setForeground(style.getButton1ForegroundColor());
         ticketButton.setFont(buttonFont);
-        ticketButton.setBackground(style.getButtonBackgroundColor());
+        ticketButton.setBackground(style.getButton1BackgroundColor());
         ticketButton.setMaximumSize(new Dimension(400,100));
         // Function
         ticketButton.addActionListener(e -> {

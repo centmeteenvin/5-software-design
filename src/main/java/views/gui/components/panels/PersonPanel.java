@@ -17,6 +17,8 @@ public class PersonPanel extends JPanel {
     DefaultListModel<Person> listModel;
     JList<Person> personJList;
 
+    int horizontalOffset = 10;
+
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     Person personInView;
 
@@ -44,7 +46,7 @@ public class PersonPanel extends JPanel {
         JPanel leftPanel = new JPanel();
         leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
         leftPanel.setPreferredSize(new Dimension(screenSize.width / 4, screenSize.height));
-        leftPanel.setBackground(style.getBackgroundColor_primary());
+        leftPanel.setBackground(style.getBackgroundPrimaryColor());
 
         // Title (box 1)
         JLabel userLabel = new JLabel("Users") {
@@ -57,26 +59,26 @@ public class PersonPanel extends JPanel {
                 int height = getHeight();
 
                 // Draw the bottom line
-                g.setColor(Color.WHITE);
+                g.setColor(style.getLineSecondaryColor());
                 g.drawLine(0, height, width, height);
                 g.drawLine(0, height - 1, width, height - 1);
                 g.drawLine(0, height - 2, width, height - 2);
             }
         };
         userLabel.setMaximumSize(new Dimension(screenSize.width / 4, 100));
-        userLabel.setForeground(Color.WHITE);
+        userLabel.setForeground(style.getLabel1ForegroundColor());
         userLabel.setFont(style.getBoldSubtitleFont());
         userLabel.setHorizontalAlignment(SwingConstants.CENTER);
         userLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         leftPanel.add(userLabel);
 
         // Add buffer
-        leftPanel.add(Box.createVerticalStrut(screenSize.height / 20));
+        leftPanel.add(Box.createVerticalStrut(10));
 
         // Add Person button (Box2)
         JButton createPersonButton = new JButton("+ Add User");
-        createPersonButton.setForeground(style.getButtonForegroundColor());
-        createPersonButton.setBackground(style.getButtonBackgroundColor());
+        createPersonButton.setForeground(style.getButton2ForegroundColor());
+        createPersonButton.setBackground(style.getButton2BackgroundColor());
         createPersonButton.setFont(style.getButtonFont());
         createPersonButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         createPersonButton.addActionListener(e -> {
@@ -104,10 +106,93 @@ public class PersonPanel extends JPanel {
 
     JPanel createRightPanel() throws NullPointerException {
         JPanel rightPanel = new JPanel();
-        rightPanel.setBackground(style.getBackgroundColor_secondary());
+        rightPanel.setBackground(style.getBackgroundSecondaryColor());
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
 
         //personInView = personJList.getSelectedValue();
+        // Add top with name and buttons
+        JPanel topContainer = createTopContainer();
+        rightPanel.add(topContainer);
+
+        // Add username with button to change name
+        JPanel usernameContainer = createUsernameContainer();
+        rightPanel.add(usernameContainer);
+
+        // Add Id
+        JPanel userIdContainer = createUserIdContainer();
+        rightPanel.add(userIdContainer);
+
+        return rightPanel;
+    }
+
+    private JPanel createUsernameContainer() {
+        JPanel usernameContainer = new JPanel();
+        usernameContainer.setLayout(new BoxLayout(usernameContainer, BoxLayout.X_AXIS));
+        usernameContainer.setBackground(style.getBackgroundSecondaryColor());
+        usernameContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
+
+        usernameContainer.add(Box.createHorizontalStrut(horizontalOffset));
+
+        JLabel usernameLabel = new JLabel("Username :");
+        usernameLabel.setMaximumSize(new Dimension(screenSize.width / 7, 100));
+        usernameLabel.setForeground(style.getButton2ForegroundColor());
+        usernameLabel.setFont(style.getTextFont());
+        usernameLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        usernameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        usernameContainer.add(usernameLabel);
+
+        JLabel personInViewLabel = new JLabel("Dummy");
+        personInViewLabel.setMaximumSize(new Dimension(screenSize.width / 6, 100));
+        personInViewLabel.setForeground(style.getButton2ForegroundColor());
+        personInViewLabel.setFont(style.getTextFont());
+        personInViewLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        personInViewLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        usernameContainer.add(personInViewLabel);
+
+        JButton changeNameButton = new JButton("change name");
+        changeNameButton.setForeground(style.getButton2BackgroundColor());
+        changeNameButton.setBackground(style.getButton2ForegroundColor());
+        changeNameButton.setFont(style.getButtonFont());
+        changeNameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        changeNameButton.addActionListener(e -> {
+            System.out.println("Change name");
+        });
+        usernameContainer.add(changeNameButton);
+        return usernameContainer;
+    }
+
+    private JPanel createUserIdContainer() {
+        JPanel userIdContainer = new JPanel();
+        userIdContainer.setLayout(new BoxLayout(userIdContainer, BoxLayout.X_AXIS));
+        userIdContainer.setBackground(style.getBackgroundSecondaryColor());
+        userIdContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
+
+        userIdContainer.add(Box.createHorizontalStrut(horizontalOffset));
+
+        JLabel userIdLabel = new JLabel("Id :");
+        userIdLabel.setMaximumSize(new Dimension(screenSize.width / 7, 100));
+        userIdLabel.setForeground(style.getButton2ForegroundColor());
+        userIdLabel.setFont(style.getTextFont());
+        userIdLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        userIdLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        userIdContainer.add(userIdLabel);
+
+        JLabel personInViewLabel = new JLabel("Dummy");
+        personInViewLabel.setMaximumSize(new Dimension(screenSize.width / 6, 100));
+        personInViewLabel.setForeground(style.getButton2ForegroundColor());
+        personInViewLabel.setFont(style.getTextFont());
+        personInViewLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        personInViewLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        userIdContainer.add(personInViewLabel);
+
+        return userIdContainer;
+    }
+
+    private JPanel createTopContainer() {
         // Create container for top panel
         JPanel topContainer = new JPanel() {
             @Override
@@ -119,20 +204,20 @@ public class PersonPanel extends JPanel {
                 int height = getHeight();
 
                 // Draw the bottom line
-                g.setColor(style.getBackgroundColor_primary());
+                g.setColor(style.getBackgroundPrimaryColor());
                 g.drawLine(0, height, width, height);
                 g.drawLine(0, height - 1, width, height - 1);
                 g.drawLine(0, height - 2, width, height - 2);
             }
         };
-        topContainer.setMaximumSize(new Dimension(3* screenSize.width / 4, 100));
+        topContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 100));
         topContainer.setLayout(new BoxLayout(topContainer, BoxLayout.X_AXIS));
-        topContainer.add(Box.createHorizontalStrut(5));
+        topContainer.add(Box.createHorizontalStrut(horizontalOffset));
 
         // Name of the person in view
-        JLabel personName = new JLabel("  " + "Dummy");
-        personName.setMaximumSize(new Dimension(screenSize.width/2, 100));
-        personName.setForeground(style.getButtonForegroundColor());
+        JLabel personName = new JLabel("Dummy");
+        personName.setMaximumSize(new Dimension(screenSize.width / 2, 100));
+        personName.setForeground(style.getButton2ForegroundColor());
         personName.setFont(style.getBoldSubtitleFont());
         personName.setHorizontalAlignment(SwingConstants.LEFT);
         personName.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -140,8 +225,8 @@ public class PersonPanel extends JPanel {
 
         // Button to homepage
         JButton homepageButton = new JButton("Homepage");
-        homepageButton.setForeground(style.getButtonBackgroundColor());
-        homepageButton.setBackground(style.getButtonForegroundColor());
+        homepageButton.setForeground(style.getButton2BackgroundColor());
+        homepageButton.setBackground(style.getButton2ForegroundColor());
         homepageButton.setFont(style.getButtonFont());
         homepageButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         homepageButton.addActionListener(e -> {
@@ -150,12 +235,12 @@ public class PersonPanel extends JPanel {
         });
         topContainer.add(homepageButton);
 
-        topContainer.add(Box.createHorizontalStrut(5));
+        topContainer.add(Box.createHorizontalStrut(horizontalOffset));
 
         // Button to ticketpage
         JButton ticketpanelButton = new JButton("Ticketpage");
-        ticketpanelButton.setForeground(style.getButtonBackgroundColor());
-        ticketpanelButton.setBackground(style.getButtonForegroundColor());
+        ticketpanelButton.setForeground(style.getButton2BackgroundColor());
+        ticketpanelButton.setBackground(style.getButton2ForegroundColor());
         ticketpanelButton.setFont(style.getButtonFont());
         ticketpanelButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         ticketpanelButton.addActionListener(e -> {
@@ -163,9 +248,7 @@ public class PersonPanel extends JPanel {
             layout.show(layoutPanel, "TicketPanel");
         });
         topContainer.add(ticketpanelButton);
-
-        rightPanel.add(topContainer);
-        return rightPanel;
+        return topContainer;
     }
 
     private void updatePersonList() {

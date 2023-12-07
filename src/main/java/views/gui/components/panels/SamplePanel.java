@@ -13,8 +13,8 @@ public class SamplePanel extends JPanel {
     
     public SamplePanel(int id, Style style) {
         this.style = style;
-        this.setBackground(style.getBackgroundColor_primary());
-        this.setBorder(BorderFactory.createLineBorder(style.getBackgroundColor_secondary(),10));
+        this.setBackground(style.getBackgroundPrimaryColor());
+        this.setBorder(BorderFactory.createLineBorder(style.getBackgroundSecondaryColor(),10));
         this.setLayout(new BorderLayout());
 
         JLabel label = new JLabel("Sample panel " + id);
