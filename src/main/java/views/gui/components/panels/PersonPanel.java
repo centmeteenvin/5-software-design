@@ -7,6 +7,7 @@ import views.gui.styles.Style;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Optional;
 
 import static java.lang.Math.floor;
 
@@ -76,8 +77,7 @@ public class PersonPanel extends JPanel {
         createPersonButton.setFont(style.getButtonFont());
         createPersonButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         createPersonButton.addActionListener(e -> {
-            System.out.println("Add user");
-            updatePersonList();
+            addUser();
         });
         leftPanel.add(createPersonButton);
 
@@ -110,4 +110,22 @@ public class PersonPanel extends JPanel {
         return rightPanel;
     }
 
+    private void addUser() {
+        String name = JOptionPane.showInputDialog(null, "Enter your full name");
+        while (name != null && name.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Invalid input, please enter a correct name");
+            name = JOptionPane.showInputDialog(null, "Enter your full name");
+        }
+        if (name == null) {
+            return;
+        }
+        Optional<Person> optionalPerson = personController.create(name);
+
+        if (optionalPerson.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "An Error occurred creating the person");
+            return;
+        }
+        JOptionPane.showMessageDialog(null, "Successfully created person: %s".formatted(optionalPerson.get().getName()));
+
+    }
 }
