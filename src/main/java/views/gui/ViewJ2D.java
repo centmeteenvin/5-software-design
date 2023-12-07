@@ -54,5 +54,6 @@ public class ViewJ2D extends View {
         // Add the container to the frame
         frame.add(container);
         frame.setVisible(true);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 }
