@@ -12,9 +12,15 @@ public interface Style {
     Color getButtonForegroundColor();
     Color getButtonBackgroundColor();
 
+    Color getListForegroundColor();
+    Color getListBackgroundColor();
+
     Font getTitleFont();
     Font getSubtitleFont();
+    Font getBoldSubtitleFont();
     Font getButtonFont();
+    Font getListFont();
+
 
     default Font addFont(String fontName, float size) {
         try {

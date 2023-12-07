@@ -10,7 +10,10 @@ import models.TicketCategory;
 import views.View;
 import views.gui.components.ViewFrame;
 import views.gui.components.panels.HomePanel;
+import views.gui.components.panels.PersonPanel;
 import views.gui.components.panels.SamplePanel;
+import views.gui.styles.Style;
+import views.gui.styles.StyleBlueWhite;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,15 +33,25 @@ public class ViewJ2D extends View {
     }
 
     public void setupFrame(){
-        // Add card layout to the frame
+        // Determine style
+        Style style = new StyleBlueWhite();
+
+        // Create container that will hold the different panels
         container = new JPanel();
+
+        // Add card layout to the frame
         CardLayout layout = new CardLayout();
         container.setLayout(layout);
-        container.add(new HomePanel(container), "HomePanel");
-        container.add(new SamplePanel(1), "PersonPanel");
-        container.add(new SamplePanel(2), "TicketPanel");
 
-        layout.show(container,"HomePanel");
+        // Add every panel to the container
+        container.add(new HomePanel(container,style), "HomePanel");
+        container.add(new PersonPanel(container,style, getPersonDatabase(), getPersonController()), "PersonPanel");
+        container.add(new SamplePanel(2,style), "TicketPanel");
+
+        // Show the homepanel
+        layout.show(container,"PersonPanel");
+
+        // Add the container to the frame
         frame.add(container);
         frame.setVisible(true);
     }
