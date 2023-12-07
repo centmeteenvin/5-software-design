@@ -12,10 +12,10 @@ public class StyleBlueWhite implements Style{
     private Color backgroundPrimaryColor = primaryColor;
     private Color backgroundSecondaryColor = secondaryColor;
     // Buttons
-    private Color button1ForegroundColor = secondaryColor;
-    private Color button1BackgroundColor = primaryColor;
-    private Color button2ForegroundColor = primaryColor;
-    private Color button2BackgroundColor = secondaryColor;
+    private Color button1ForegroundColor = primaryColor;
+    private Color button1BackgroundColor = secondaryColor;
+    private Color button2ForegroundColor = secondaryColor;
+    private Color button2BackgroundColor = primaryColor;
     // List
     private Color listForegroundColor = primaryColor;
     private Color listBackgroundColor = secondaryColor;
@@ -23,10 +23,10 @@ public class StyleBlueWhite implements Style{
     private Color linePrimaryColor = primaryColor;
     private Color lineSecondaryColor = secondaryColor;
     // Labels
-    private Color label1ForegroundColor = secondaryColor;
-    private Color label1BackgroundColor = primaryColor;
-    private Color label2ForegroundColor = primaryColor;
-    private Color label2BackgroundColor = secondaryColor;
+    private Color label1ForegroundColor = primaryColor;
+    private Color label1BackgroundColor = secondaryColor;
+    private Color label2ForegroundColor = secondaryColor;
+    private Color label2BackgroundColor = primaryColor;
 
     // Fonts
     private Font titleFont = addFont("OpenSans-Bold", 122);

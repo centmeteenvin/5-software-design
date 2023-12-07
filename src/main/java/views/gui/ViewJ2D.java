@@ -49,7 +49,7 @@ public class ViewJ2D extends View {
         container.add(new SamplePanel(2,style), "TicketPanel");
 
         // Show the homepanel
-        layout.show(container,"PersonPanel");
+        layout.show(container,"HomePanel");
 
         // Add the container to the frame
         frame.add(container);

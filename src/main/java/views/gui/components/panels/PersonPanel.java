@@ -66,7 +66,7 @@ public class PersonPanel extends JPanel {
             }
         };
         userLabel.setMaximumSize(new Dimension(screenSize.width / 4, 100));
-        userLabel.setForeground(style.getLabel1ForegroundColor());
+        userLabel.setForeground(style.getLabel2ForegroundColor());
         userLabel.setFont(style.getBoldSubtitleFont());
         userLabel.setHorizontalAlignment(SwingConstants.CENTER);
         userLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -77,8 +77,8 @@ public class PersonPanel extends JPanel {
 
         // Add Person button (Box2)
         JButton createPersonButton = new JButton("+ Add User");
-        createPersonButton.setForeground(style.getButton2ForegroundColor());
-        createPersonButton.setBackground(style.getButton2BackgroundColor());
+        createPersonButton.setForeground(style.getButton1ForegroundColor());
+        createPersonButton.setBackground(style.getButton1BackgroundColor());
         createPersonButton.setFont(style.getButtonFont());
         createPersonButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         createPersonButton.addActionListener(e -> {
@@ -135,7 +135,7 @@ public class PersonPanel extends JPanel {
 
         JLabel usernameLabel = new JLabel("Username :");
         usernameLabel.setMaximumSize(new Dimension(screenSize.width / 7, 100));
-        usernameLabel.setForeground(style.getButton2ForegroundColor());
+        usernameLabel.setForeground(style.getButton1ForegroundColor());
         usernameLabel.setFont(style.getTextFont());
         usernameLabel.setHorizontalAlignment(SwingConstants.LEFT);
         usernameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -144,7 +144,7 @@ public class PersonPanel extends JPanel {
 
         JLabel personInViewLabel = new JLabel("Dummy");
         personInViewLabel.setMaximumSize(new Dimension(screenSize.width / 6, 100));
-        personInViewLabel.setForeground(style.getButton2ForegroundColor());
+        personInViewLabel.setForeground(style.getButton1ForegroundColor());
         personInViewLabel.setFont(style.getTextFont());
         personInViewLabel.setHorizontalAlignment(SwingConstants.LEFT);
         personInViewLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -152,8 +152,8 @@ public class PersonPanel extends JPanel {
         usernameContainer.add(personInViewLabel);
 
         JButton changeNameButton = new JButton("change name");
-        changeNameButton.setForeground(style.getButton2BackgroundColor());
-        changeNameButton.setBackground(style.getButton2ForegroundColor());
+        changeNameButton.setForeground(style.getButton1BackgroundColor());
+        changeNameButton.setBackground(style.getButton1ForegroundColor());
         changeNameButton.setFont(style.getButtonFont());
         changeNameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         changeNameButton.addActionListener(e -> {
@@ -173,7 +173,7 @@ public class PersonPanel extends JPanel {
 
         JLabel userIdLabel = new JLabel("Id :");
         userIdLabel.setMaximumSize(new Dimension(screenSize.width / 7, 100));
-        userIdLabel.setForeground(style.getButton2ForegroundColor());
+        userIdLabel.setForeground(style.getButton1ForegroundColor());
         userIdLabel.setFont(style.getTextFont());
         userIdLabel.setHorizontalAlignment(SwingConstants.LEFT);
         userIdLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -182,7 +182,7 @@ public class PersonPanel extends JPanel {
 
         JLabel personInViewLabel = new JLabel("Dummy");
         personInViewLabel.setMaximumSize(new Dimension(screenSize.width / 6, 100));
-        personInViewLabel.setForeground(style.getButton2ForegroundColor());
+        personInViewLabel.setForeground(style.getButton1ForegroundColor());
         personInViewLabel.setFont(style.getTextFont());
         personInViewLabel.setHorizontalAlignment(SwingConstants.LEFT);
         personInViewLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -217,7 +217,7 @@ public class PersonPanel extends JPanel {
         // Name of the person in view
         JLabel personName = new JLabel("Dummy");
         personName.setMaximumSize(new Dimension(screenSize.width / 2, 100));
-        personName.setForeground(style.getButton2ForegroundColor());
+        personName.setForeground(style.getButton1ForegroundColor());
         personName.setFont(style.getBoldSubtitleFont());
         personName.setHorizontalAlignment(SwingConstants.LEFT);
         personName.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -225,8 +225,8 @@ public class PersonPanel extends JPanel {
 
         // Button to homepage
         JButton homepageButton = new JButton("Homepage");
-        homepageButton.setForeground(style.getButton2BackgroundColor());
-        homepageButton.setBackground(style.getButton2ForegroundColor());
+        homepageButton.setForeground(style.getButton1BackgroundColor());
+        homepageButton.setBackground(style.getButton1ForegroundColor());
         homepageButton.setFont(style.getButtonFont());
         homepageButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         homepageButton.addActionListener(e -> {
@@ -239,8 +239,8 @@ public class PersonPanel extends JPanel {
 
         // Button to ticketpage
         JButton ticketpanelButton = new JButton("Ticketpage");
-        ticketpanelButton.setForeground(style.getButton2BackgroundColor());
-        ticketpanelButton.setBackground(style.getButton2ForegroundColor());
+        ticketpanelButton.setForeground(style.getButton1BackgroundColor());
+        ticketpanelButton.setBackground(style.getButton1ForegroundColor());
         ticketpanelButton.setFont(style.getButtonFont());
         ticketpanelButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         ticketpanelButton.addActionListener(e -> {

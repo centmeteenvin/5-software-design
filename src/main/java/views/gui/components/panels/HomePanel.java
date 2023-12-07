@@ -29,13 +29,13 @@ public class HomePanel extends JPanel {
         titleSection.setBackground(null);
 
         JLabel title = new JLabel("SKMT");
-        title.setForeground(Color.WHITE);
+        title.setForeground(style.getLabel2ForegroundColor());
         title.setFont(style.getTitleFont());
         title.setAlignmentX(CENTER_ALIGNMENT);
 
 
         JLabel subTitle = new JLabel("The Scripk Kiddo's Money Tracker");
-        subTitle.setForeground(Color.WHITE);
+        subTitle.setForeground(style.getLabel2ForegroundColor());
         subTitle.setFont(style.getSubtitleFont());
         subTitle.setAlignmentX(CENTER_ALIGNMENT);
 
