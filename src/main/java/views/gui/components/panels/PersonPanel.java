@@ -3,22 +3,23 @@ package views.gui.components.panels;
 import controllers.PersonController;
 import database.Database;
 import models.Person;
+import views.gui.components.Tuple;
 import views.gui.styles.Style;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.Optional;
 
-import static java.lang.Math.floor;
-
 public class PersonPanel extends JPanel {
     JPanel layoutPanel;
     Style style;
     Database<Person> personDatabase;
     PersonController personController;
-    DefaultListModel<String> listModel;
+    DefaultListModel<Person> listModel;
+    JList<Person> personJList;
 
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    Person personInView;
 
     public PersonPanel(JPanel layoutPanel, Style style, Database<Person> personDatabase, PersonController personController) {
         this.layoutPanel = layoutPanel;
@@ -29,12 +30,15 @@ public class PersonPanel extends JPanel {
 
         this.setLayout(new BorderLayout());
 
-        personController.create("Foo");
-        personController.create("Bar");
-        personController.create("Baz");
-
         this.add(createLeftPanel(), BorderLayout.LINE_START);
         this.add(createRightPanel(), BorderLayout.CENTER);
+
+
+        /*
+        try {
+        } catch (NullPointerException ignore){
+
+        }*/
     }
 
     JPanel createLeftPanel() {
@@ -78,6 +82,7 @@ public class PersonPanel extends JPanel {
         createPersonButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         createPersonButton.addActionListener(e -> {
             addUser();
+            updatePersonList();
         });
         leftPanel.add(createPersonButton);
 
@@ -85,7 +90,8 @@ public class PersonPanel extends JPanel {
         leftPanel.add(Box.createVerticalStrut(screenSize.height/20));
 
         // Add list
-        JList<String> personJList = new JList<>(listModel);
+        personJList = new JList<>(listModel);
+        personJList.setCellRenderer(new PersonListCellRenderer());
         personJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         personJList.setFixedCellHeight(screenSize.height/20);
         personJList.setFixedCellWidth(screenSize.width/5);
@@ -97,17 +103,49 @@ public class PersonPanel extends JPanel {
         return leftPanel;
     }
 
+    JPanel createRightPanel() throws NullPointerException {
+        JPanel rightPanel = new JPanel();
+        rightPanel.setBackground(style.getBackgroundColor_secondary());
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        rightPanel.setBackground(style.getBackgroundColor_secondary());
+
+        //personInView = personJList.getSelectedValue();
+        JPanel topContainer = new JPanel();
+        topContainer.setLayout(new BoxLayout(topContainer, BoxLayout.X_AXIS));
+        topContainer.add(Box.createHorizontalStrut(5));
+
+        JLabel personName = new JLabel("  " + "Dummy"){
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+
+                // Get the width and height of the label
+                int width = getWidth();
+                int height = getHeight();
+
+                // Draw the bottom line
+                g.setColor(style.getBackgroundColor_primary());
+                g.drawLine(0, height, width, height);
+                g.drawLine(0, height - 1, width, height - 1);
+                g.drawLine(0, height - 2, width, height - 2);
+            }
+        };
+        personName.setMaximumSize(new Dimension(screenSize.width, 100));
+        personName.setForeground(style.getButtonForegroundColor());
+        personName.setFont(style.getBoldSubtitleFont());
+        personName.setHorizontalAlignment(SwingConstants.LEFT);
+        personName.setAlignmentX(Component.LEFT_ALIGNMENT);
+        rightPanel.add(personName);
+
+        rightPanel.add(personName);
+        return rightPanel;
+    }
+
     private void updatePersonList() {
         listModel.clear();
         for (Person person : personDatabase.getAll()){
-            listModel.addElement(person.getName());
+            listModel.addElement(person);
         }
-    }
-
-    JPanel createRightPanel() {
-        JPanel rightPanel = new JPanel();
-        rightPanel.setBackground(style.getBackgroundColor_secondary());
-        return rightPanel;
     }
 
     private void addUser() {
@@ -128,4 +166,24 @@ public class PersonPanel extends JPanel {
         JOptionPane.showMessageDialog(null, "Successfully created person: %s".formatted(optionalPerson.get().getName()));
 
     }
+
+    // Private object so that we can pass a Person in to the list, but only show its name and id
+    private class PersonListCellRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                                                      boolean cellHasFocus) {
+            // Call the super method to get the default cell renderer component
+            Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+            // If the value is an instance of Person, display the desired property
+            if (value instanceof Person) {
+                Person person = (Person) value;
+                setText(person.getName() + "   #" + person.getId() ); // Assuming getName() is the desired property
+            }
+
+            return c;
+        }
+    }
+
 }
+
