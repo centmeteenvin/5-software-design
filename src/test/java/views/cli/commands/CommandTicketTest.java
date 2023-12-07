@@ -61,6 +61,13 @@ class CommandTicketTest extends CommandTest {
         commandTicket.execute();
 
         verify(commandTicket, times(1)).executeAdd();
+
+        args = new String[]{CommandTicket.commandString, "set"};
+        commandTicket = spy(new CommandTicket(args, view));
+
+        commandTicket.execute();
+
+        verify(commandTicket, times(1)).executeSetWeight();
     }
 
     @Test
@@ -210,6 +217,54 @@ class CommandTicketTest extends CommandTest {
 
         verify(ticketController, times(3)).addPerson(1L, 2L);
         verify(output, times(1)).print("% Successfully added person 2 to ticket 1\n");
+    }
+
+    @Test
+    void executeSetWeight() throws TicketNotFoundException {
+        TicketController ticketController = mock(TicketController.class);
+        Output output = mock(Output.class);
+        ViewCommandLine view = new ViewCommandLine(null, null, null,
+                null, ticketController, null,
+                null, output);
+        String[] args = new String[]{CommandTicket.commandString, "set"};
+        CommandTicket command = new CommandTicket(args, view);
+        doNothing().when(output).print(anyString());
+
+        command.execute();
+
+        verify(output, times(1)).print(Command.incorrectNumberOfArguments(5, 2));
+
+        args = new String[]{CommandTicket.commandString, "set", "1"};
+        command = new CommandTicket(args, view);
+
+        command.execute();
+
+        verify(output, times(1)).print(Command.incorrectNumberOfArguments(5, 3));
+
+        args = new String[]{CommandTicket.commandString, "set", "1", "2"};
+        command = new CommandTicket(args, view);
+
+        command.execute();
+
+        verify(output, times(1)).print(Command.incorrectNumberOfArguments(5, 4));
+
+        args = new String[]{CommandTicket.commandString, "set", "1", "2", "100"};
+        command = new CommandTicket(args, view);
+        int changeWeightCounter = 0;
+        doThrow(TicketNotFoundException.class).when(ticketController).changeWeight(1L, 2L, 100);
+
+        command.execute();
+
+        verify(output, times(1)).print("! Ticket with id 1 not found.");
+        verify(ticketController, times(++changeWeightCounter)).changeWeight(1L, 2L, 100);
+
+        doNothing().when(ticketController).changeWeight(1L, 2L, 100);
+
+        command.execute();
+
+        verify(output, times(1)).print("% Successfully updated weight");
+        verify(ticketController, times(++changeWeightCounter)).changeWeight(1L, 2L, 100);
+
     }
 
     @Test
