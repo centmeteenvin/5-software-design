@@ -3,7 +3,6 @@ package views.gui.components.panels;
 import controllers.PersonController;
 import database.Database;
 import models.Person;
-import views.gui.components.Tuple;
 import views.gui.styles.Style;
 
 import javax.swing.*;
@@ -72,7 +71,7 @@ public class PersonPanel extends JPanel {
         leftPanel.add(userLabel);
 
         // Add buffer
-        leftPanel.add(Box.createVerticalStrut(screenSize.height/20));
+        leftPanel.add(Box.createVerticalStrut(screenSize.height / 20));
 
         // Add Person button (Box2)
         JButton createPersonButton = new JButton("+ Add User");
@@ -87,14 +86,14 @@ public class PersonPanel extends JPanel {
         leftPanel.add(createPersonButton);
 
         // Add buffer
-        leftPanel.add(Box.createVerticalStrut(screenSize.height/20));
+        leftPanel.add(Box.createVerticalStrut(screenSize.height / 20));
 
         // Add list
         personJList = new JList<>(listModel);
         personJList.setCellRenderer(new PersonListCellRenderer());
         personJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        personJList.setFixedCellHeight(screenSize.height/20);
-        personJList.setFixedCellWidth(screenSize.width/5);
+        personJList.setFixedCellHeight(screenSize.height / 20);
+        personJList.setFixedCellWidth(screenSize.width / 5);
         personJList.setFont(style.getListFont());
         personJList.setForeground(style.getListForegroundColor());
         personJList.setBackground(style.getListBackgroundColor());
@@ -107,14 +106,10 @@ public class PersonPanel extends JPanel {
         JPanel rightPanel = new JPanel();
         rightPanel.setBackground(style.getBackgroundColor_secondary());
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
-        rightPanel.setBackground(style.getBackgroundColor_secondary());
 
         //personInView = personJList.getSelectedValue();
-        JPanel topContainer = new JPanel();
-        topContainer.setLayout(new BoxLayout(topContainer, BoxLayout.X_AXIS));
-        topContainer.add(Box.createHorizontalStrut(5));
-
-        JLabel personName = new JLabel("  " + "Dummy"){
+        // Create container for top panel
+        JPanel topContainer = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -130,20 +125,52 @@ public class PersonPanel extends JPanel {
                 g.drawLine(0, height - 2, width, height - 2);
             }
         };
-        personName.setMaximumSize(new Dimension(screenSize.width, 100));
+        topContainer.setMaximumSize(new Dimension(3* screenSize.width / 4, 100));
+        topContainer.setLayout(new BoxLayout(topContainer, BoxLayout.X_AXIS));
+        topContainer.add(Box.createHorizontalStrut(5));
+
+        // Name of the person in view
+        JLabel personName = new JLabel("  " + "Dummy");
+        personName.setMaximumSize(new Dimension(screenSize.width/2, 100));
         personName.setForeground(style.getButtonForegroundColor());
         personName.setFont(style.getBoldSubtitleFont());
         personName.setHorizontalAlignment(SwingConstants.LEFT);
         personName.setAlignmentX(Component.LEFT_ALIGNMENT);
-        rightPanel.add(personName);
+        topContainer.add(personName);
 
-        rightPanel.add(personName);
+        // Button to homepage
+        JButton homepageButton = new JButton("Homepage");
+        homepageButton.setForeground(style.getButtonBackgroundColor());
+        homepageButton.setBackground(style.getButtonForegroundColor());
+        homepageButton.setFont(style.getButtonFont());
+        homepageButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        homepageButton.addActionListener(e -> {
+            CardLayout layout = (CardLayout) layoutPanel.getLayout();
+            layout.show(layoutPanel, "HomePanel");
+        });
+        topContainer.add(homepageButton);
+
+        topContainer.add(Box.createHorizontalStrut(5));
+
+        // Button to ticketpage
+        JButton ticketpanelButton = new JButton("Ticketpage");
+        ticketpanelButton.setForeground(style.getButtonBackgroundColor());
+        ticketpanelButton.setBackground(style.getButtonForegroundColor());
+        ticketpanelButton.setFont(style.getButtonFont());
+        ticketpanelButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        ticketpanelButton.addActionListener(e -> {
+            CardLayout layout = (CardLayout) layoutPanel.getLayout();
+            layout.show(layoutPanel, "TicketPanel");
+        });
+        topContainer.add(ticketpanelButton);
+
+        rightPanel.add(topContainer);
         return rightPanel;
     }
 
     private void updatePersonList() {
         listModel.clear();
-        for (Person person : personDatabase.getAll()){
+        for (Person person : personDatabase.getAll()) {
             listModel.addElement(person);
         }
     }
@@ -170,15 +197,13 @@ public class PersonPanel extends JPanel {
     // Private object so that we can pass a Person in to the list, but only show its name and id
     private class PersonListCellRenderer extends DefaultListCellRenderer {
         @Override
-        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
-                                                      boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             // Call the super method to get the default cell renderer component
             Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
             // If the value is an instance of Person, display the desired property
-            if (value instanceof Person) {
-                Person person = (Person) value;
-                setText(person.getName() + "   #" + person.getId() ); // Assuming getName() is the desired property
+            if (value instanceof Person person) {
+                setText(person.getName() + "   #" + person.getId()); // Assuming getName() is the desired property
             }
 
             return c;
