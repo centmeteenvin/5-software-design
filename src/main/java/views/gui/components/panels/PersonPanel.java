@@ -6,21 +6,24 @@ import models.Person;
 import views.gui.styles.Style;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.util.Optional;
 
-public class PersonPanel extends JPanel {
+public class PersonPanel extends JPanel implements ListSelectionListener {
     JPanel layoutPanel;
     Style style;
     Database<Person> personDatabase;
     PersonController personController;
     DefaultListModel<Person> listModel;
     JList<Person> personJList;
+    JPanel rightPanel;
+    CardLayout rightPanelLayout;
 
     int horizontalOffset = 10;
 
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    Person personInView;
 
     public PersonPanel(JPanel layoutPanel, Style style, Database<Person> personDatabase, PersonController personController) {
         this.layoutPanel = layoutPanel;
@@ -28,18 +31,17 @@ public class PersonPanel extends JPanel {
         this.personDatabase = personDatabase;
         this.personController = personController;
         this.listModel = new DefaultListModel<>();
+        this.rightPanel = new JPanel();
+        this.rightPanelLayout = new CardLayout();
+
 
         this.setLayout(new BorderLayout());
 
         this.add(createLeftPanel(), BorderLayout.LINE_START);
-        this.add(createRightPanel(), BorderLayout.CENTER);
 
-
-        /*
-        try {
-        } catch (NullPointerException ignore){
-
-        }*/
+        this.rightPanel.setLayout(rightPanelLayout);
+        rightPanel.add(createEmptyRightPanel(),"EmptyPanel");
+        this.add(this.rightPanel, BorderLayout.CENTER);
     }
 
     JPanel createLeftPanel() {
@@ -83,7 +85,6 @@ public class PersonPanel extends JPanel {
         createPersonButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         createPersonButton.addActionListener(e -> {
             addUser();
-            updatePersonList();
         });
         leftPanel.add(createPersonButton);
 
@@ -99,33 +100,47 @@ public class PersonPanel extends JPanel {
         personJList.setFont(style.getListFont());
         personJList.setForeground(style.getListForegroundColor());
         personJList.setBackground(style.getListBackgroundColor());
-        updatePersonList();
+        personJList.addListSelectionListener(this);
         leftPanel.add(personJList);
         return leftPanel;
     }
 
-    JPanel createRightPanel() throws NullPointerException {
+    JPanel createRightPanel(Person person) throws NullPointerException {
         JPanel rightPanel = new JPanel();
         rightPanel.setBackground(style.getBackgroundSecondaryColor());
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
 
         //personInView = personJList.getSelectedValue();
         // Add top with name and buttons
-        JPanel topContainer = createTopContainer();
+        JPanel topContainer = createTopContainer(person.getName());
         rightPanel.add(topContainer);
 
         // Add username with button to change name
-        JPanel usernameContainer = createUsernameContainer();
+        JPanel usernameContainer = createUsernameContainer(person.getName());
         rightPanel.add(usernameContainer);
 
         // Add Id
-        JPanel userIdContainer = createUserIdContainer();
+        JPanel userIdContainer = createUserIdContainer(person.getId());
         rightPanel.add(userIdContainer);
 
         return rightPanel;
     }
 
-    private JPanel createUsernameContainer() {
+    JPanel createEmptyRightPanel() {
+        JPanel rightPanel = new JPanel();
+        rightPanel.setBackground(style.getBackgroundSecondaryColor());
+        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+
+        //personInView = personJList.getSelectedValue();
+        // Add top with name and buttons
+        JPanel topContainer = createTopContainer("");
+        rightPanel.add(topContainer);
+
+        return rightPanel;
+    }
+
+
+    private JPanel createUsernameContainer(String name) {
         JPanel usernameContainer = new JPanel();
         usernameContainer.setLayout(new BoxLayout(usernameContainer, BoxLayout.X_AXIS));
         usernameContainer.setBackground(style.getBackgroundSecondaryColor());
@@ -142,7 +157,7 @@ public class PersonPanel extends JPanel {
 
         usernameContainer.add(usernameLabel);
 
-        JLabel personInViewLabel = new JLabel("Dummy");
+        JLabel personInViewLabel = new JLabel(name);
         personInViewLabel.setMaximumSize(new Dimension(screenSize.width / 6, 100));
         personInViewLabel.setForeground(style.getButton1ForegroundColor());
         personInViewLabel.setFont(style.getTextFont());
@@ -163,7 +178,7 @@ public class PersonPanel extends JPanel {
         return usernameContainer;
     }
 
-    private JPanel createUserIdContainer() {
+    private JPanel createUserIdContainer(Long id) {
         JPanel userIdContainer = new JPanel();
         userIdContainer.setLayout(new BoxLayout(userIdContainer, BoxLayout.X_AXIS));
         userIdContainer.setBackground(style.getBackgroundSecondaryColor());
@@ -180,7 +195,7 @@ public class PersonPanel extends JPanel {
 
         userIdContainer.add(userIdLabel);
 
-        JLabel personInViewLabel = new JLabel("Dummy");
+        JLabel personInViewLabel = new JLabel(String.valueOf(String.valueOf(id)));
         personInViewLabel.setMaximumSize(new Dimension(screenSize.width / 6, 100));
         personInViewLabel.setForeground(style.getButton1ForegroundColor());
         personInViewLabel.setFont(style.getTextFont());
@@ -192,7 +207,7 @@ public class PersonPanel extends JPanel {
         return userIdContainer;
     }
 
-    private JPanel createTopContainer() {
+    private JPanel createTopContainer(String name) {
         // Create container for top panel
         JPanel topContainer = new JPanel() {
             @Override
@@ -215,7 +230,7 @@ public class PersonPanel extends JPanel {
         topContainer.add(Box.createHorizontalStrut(horizontalOffset));
 
         // Name of the person in view
-        JLabel personName = new JLabel("Dummy");
+        JLabel personName = new JLabel(name);
         personName.setMaximumSize(new Dimension(screenSize.width / 2, 100));
         personName.setForeground(style.getButton1ForegroundColor());
         personName.setFont(style.getBoldSubtitleFont());
@@ -251,11 +266,12 @@ public class PersonPanel extends JPanel {
         return topContainer;
     }
 
-    private void updatePersonList() {
+    public void updatePersonList() {
         listModel.clear();
         for (Person person : personDatabase.getAll()) {
             listModel.addElement(person);
         }
+        personJList.setModel(listModel);
     }
 
     private void addUser() {
@@ -274,7 +290,17 @@ public class PersonPanel extends JPanel {
             return;
         }
         JOptionPane.showMessageDialog(null, "Successfully created person: %s".formatted(optionalPerson.get().getName()));
+    }
 
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        Person selectedPerson = this.personJList.getSelectedValue();
+        if (selectedPerson == null){
+            this.rightPanelLayout.show(this.rightPanel,"EmptyPanel");
+        } else {
+            this.rightPanel.add(createRightPanel(selectedPerson),"rightPanel");
+            this.rightPanelLayout.show(this.rightPanel,"rightPanel");
+        }
     }
 
     // Private object so that we can pass a Person in to the list, but only show its name and id
@@ -288,10 +314,8 @@ public class PersonPanel extends JPanel {
             if (value instanceof Person person) {
                 setText(person.getName() + "   #" + person.getId()); // Assuming getName() is the desired property
             }
-
             return c;
         }
     }
-
 }
 

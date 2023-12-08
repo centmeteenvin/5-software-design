@@ -9,6 +9,7 @@ import models.Ticket;
 import models.TicketCategory;
 import views.View;
 import views.gui.components.ViewFrame;
+import views.gui.components.observers.PersonDatabaseObserver;
 import views.gui.components.panels.HomePanel;
 import views.gui.components.panels.PersonPanel;
 import views.gui.components.panels.SamplePanel;
@@ -21,10 +22,23 @@ import java.awt.*;
 public class ViewJ2D extends View {
     JFrame frame = new ViewFrame();
     JPanel container = new JPanel();
+    HomePanel homePanel;
+    PersonPanel personPanel;
 
 
     public ViewJ2D(Database<Person> personDatabase, Database<Ticket> ticketDatabase, Database<TicketCategory> ticketCategoryDatabase, PersonController personController, TicketController ticketController, TicketCategoryController ticketCategoryController) {
         super(personDatabase, ticketDatabase, ticketCategoryDatabase, personController, ticketController, ticketCategoryController);
+
+        PersonDatabaseObserver personDatabaseObserver = new PersonDatabaseObserver(personDatabase,personController,this);
+        personDatabase.addListener(personDatabaseObserver);
+    }
+
+    public HomePanel getHomePanel() {
+        return homePanel;
+    }
+
+    public PersonPanel getPersonPanel() {
+        return personPanel;
     }
 
     @Override
@@ -43,9 +57,13 @@ public class ViewJ2D extends View {
         CardLayout layout = new CardLayout();
         container.setLayout(layout);
 
+        // Create different panels
+        this.homePanel = new HomePanel(container,style);
+        this.personPanel = new PersonPanel(container,style, getPersonDatabase(), getPersonController());
+
         // Add every panel to the container
-        container.add(new HomePanel(container,style), "HomePanel");
-        container.add(new PersonPanel(container,style, getPersonDatabase(), getPersonController()), "PersonPanel");
+        container.add(this.homePanel, "HomePanel");
+        container.add(this.personPanel, "PersonPanel");
         container.add(new SamplePanel(2,style), "TicketPanel");
 
         // Show the homepanel
