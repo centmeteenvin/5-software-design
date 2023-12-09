@@ -2,6 +2,7 @@ package views.gui.components.panels;
 
 import controllers.PersonController;
 import database.Database;
+import database.Property;
 import models.Person;
 import views.gui.styles.Style;
 
@@ -9,9 +10,11 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Optional;
 
-public class PersonPanel extends JPanel implements ListSelectionListener {
+public class PersonPanel extends JPanel implements ListSelectionListener, PropertyChangeListener {
     JPanel layoutPanel;
     Style style;
     Database<Person> personDatabase;
@@ -40,7 +43,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener {
         this.add(createLeftPanel(), BorderLayout.LINE_START);
 
         this.rightPanel.setLayout(rightPanelLayout);
-        rightPanel.add(createEmptyRightPanel(),"EmptyPanel");
+        rightPanel.add(createEmptyRightPanel(), "EmptyPanel");
         this.add(this.rightPanel, BorderLayout.CENTER);
     }
 
@@ -292,15 +295,36 @@ public class PersonPanel extends JPanel implements ListSelectionListener {
         JOptionPane.showMessageDialog(null, "Successfully created person: %s".formatted(optionalPerson.get().getName()));
     }
 
+    /**
+     * This function will run every time a different value is selected in the Jlist
+     * @param e the event that characterizes the change.
+     */
     @Override
     public void valueChanged(ListSelectionEvent e) {
         Person selectedPerson = this.personJList.getSelectedValue();
-        if (selectedPerson == null){
-            this.rightPanelLayout.show(this.rightPanel,"EmptyPanel");
+        if (selectedPerson == null) {
+            this.rightPanelLayout.show(this.rightPanel, "EmptyPanel");
         } else {
-            this.rightPanel.add(createRightPanel(selectedPerson),"rightPanel");
-            this.rightPanelLayout.show(this.rightPanel,"rightPanel");
+            this.rightPanel.add(createRightPanel(selectedPerson), "rightPanel");
+            this.rightPanelLayout.show(this.rightPanel, "rightPanel");
         }
+    }
+
+    /**
+     * This function will update this object whenever a change happens in the PersonDatabase
+     * @param evt A PropertyChangeEvent object describing the event source
+     *          and the property that has changed.
+     */
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(Property.CREATE.name)) {
+            updatePersonList();
+        } else if (evt.getPropertyName().equals(Property.UPDATE.name)) {
+            updatePersonList();
+        } else if (evt.getPropertyName().equals(Property.DELETE.name)) {
+
+        }
+
     }
 
     // Private object so that we can pass a Person in to the list, but only show its name and id

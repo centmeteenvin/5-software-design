@@ -9,7 +9,6 @@ import models.Ticket;
 import models.TicketCategory;
 import views.View;
 import views.gui.components.ViewFrame;
-import views.gui.components.observers.PersonDatabaseObserver;
 import views.gui.components.panels.HomePanel;
 import views.gui.components.panels.PersonPanel;
 import views.gui.components.panels.SamplePanel;
@@ -28,9 +27,6 @@ public class ViewJ2D extends View {
 
     public ViewJ2D(Database<Person> personDatabase, Database<Ticket> ticketDatabase, Database<TicketCategory> ticketCategoryDatabase, PersonController personController, TicketController ticketController, TicketCategoryController ticketCategoryController) {
         super(personDatabase, ticketDatabase, ticketCategoryDatabase, personController, ticketController, ticketCategoryController);
-
-        PersonDatabaseObserver personDatabaseObserver = new PersonDatabaseObserver(personDatabase,personController,this);
-        personDatabase.addListener(personDatabaseObserver);
     }
 
     public HomePanel getHomePanel() {
@@ -60,6 +56,7 @@ public class ViewJ2D extends View {
         // Create different panels
         this.homePanel = new HomePanel(container,style);
         this.personPanel = new PersonPanel(container,style, getPersonDatabase(), getPersonController());
+        getPersonDatabase().addListener(this.personPanel);
 
         // Add every panel to the container
         container.add(this.homePanel, "HomePanel");
