@@ -12,6 +12,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Map;
 import java.util.Optional;
 
 public class PersonPanel extends JPanel implements ListSelectionListener, PropertyChangeListener {
@@ -23,6 +24,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
     JList<Person> personJList;
     JPanel rightPanel;
     CardLayout rightPanelLayout;
+    LabelFactory labelFactory;
 
     int horizontalOffset = 10;
 
@@ -36,7 +38,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         this.listModel = new DefaultListModel<>();
         this.rightPanel = new JPanel();
         this.rightPanelLayout = new CardLayout();
-
+        this.labelFactory = new LabelFactory(this.style);
 
         this.setLayout(new BorderLayout());
 
@@ -108,33 +110,89 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         return leftPanel;
     }
 
-    JPanel createRightPanel(Person person) throws NullPointerException {
-        JPanel rightPanel = new JPanel();
+    Box createRightPanel(Person person) throws NullPointerException {
+        Box rightPanel = Box.createVerticalBox();
         rightPanel.setBackground(style.getBackgroundSecondaryColor());
-        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+        rightPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        rightPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
 
-        //personInView = personJList.getSelectedValue();
         // Add top with name and buttons
         JPanel topContainer = createTopContainer(person.getName());
         rightPanel.add(topContainer);
 
         // Add username with button to change name
-        JPanel usernameContainer = createUsernameContainer(person.getName());
+        Box usernameContainer = createUsernameContainer(person.getName());
         rightPanel.add(usernameContainer);
 
         // Add Id
-        JPanel userIdContainer = createUserIdContainer(person.getId());
+        Box userIdContainer = createUserIdContainer(person.getId());
         rightPanel.add(userIdContainer);
+
+        // Add debts
+        Box userDebtContainer = Box.createVerticalBox();
+        userDebtContainer.setBackground(style.getBackgroundSecondaryColor());
+        userDebtContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 1000));
+        userDebtContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        userDebtContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        Box debtLabelContainer = Box.createHorizontalBox();
+        debtLabelContainer.setMaximumSize(new Dimension(2 * screenSize.width, 75));
+        debtLabelContainer.add(Box.createHorizontalStrut(horizontalOffset));
+        debtLabelContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        debtLabelContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        JLabel userDebtLabel = labelFactory.getSecondaryNormalLabel("Debts :");
+        userDebtLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
+        debtLabelContainer.add(userDebtLabel);
+
+        userDebtContainer.add(debtLabelContainer);
+        // Column 1 with subtitle
+        Map<Long, Double> debts = person.getDebts();
+
+        for (Long key : debts.keySet()) {
+            Optional<Person> optDebtHolder = personDatabase.getById(key);
+            if (optDebtHolder.isEmpty()) continue;
+            Box row = labelFactory.getSmallRow(optDebtHolder.get().getName(), debts.get(key));
+            userDebtContainer.add(row);
+        }
+
+        rightPanel.add(userDebtContainer);
 
         return rightPanel;
     }
 
-    JPanel createEmptyRightPanel() {
-        JPanel rightPanel = new JPanel();
-        rightPanel.setBackground(style.getBackgroundSecondaryColor());
-        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+    private Box createUsernameContainer(String name) {
+        Box usernameContainer = Box.createHorizontalBox();
+        usernameContainer.setBackground(style.getBackgroundSecondaryColor());
+        usernameContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
+        usernameContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        usernameContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
 
-        //personInView = personJList.getSelectedValue();
+        usernameContainer.add(Box.createHorizontalStrut(horizontalOffset));
+
+        JLabel usernameLabel = labelFactory.getSecondaryNormalLabel("Username :");
+        usernameLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
+
+        usernameContainer.add(usernameLabel);
+
+        JLabel personInViewLabel = labelFactory.getSecondaryNormalLabel(name);
+        personInViewLabel.setMaximumSize(new Dimension(screenSize.width / 6, 75));
+
+        usernameContainer.add(personInViewLabel);
+
+        JButton changeNameButton = labelFactory.getPrimaryButton("change name");
+        changeNameButton.addActionListener(e -> {
+            System.out.println("Change name");
+        });
+        changeNameButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+        usernameContainer.add(changeNameButton);
+        return usernameContainer;
+    }
+
+    Box createEmptyRightPanel() {
+        Box rightPanel = Box.createVerticalBox();
+        rightPanel.setBackground(style.getBackgroundSecondaryColor());
+
         // Add top with name and buttons
         JPanel topContainer = createTopContainer("");
         rightPanel.add(topContainer);
@@ -143,68 +201,21 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
     }
 
 
-    private JPanel createUsernameContainer(String name) {
-        JPanel usernameContainer = new JPanel();
-        usernameContainer.setLayout(new BoxLayout(usernameContainer, BoxLayout.X_AXIS));
-        usernameContainer.setBackground(style.getBackgroundSecondaryColor());
-        usernameContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
-
-        usernameContainer.add(Box.createHorizontalStrut(horizontalOffset));
-
-        JLabel usernameLabel = new JLabel("Username :");
-        usernameLabel.setMaximumSize(new Dimension(screenSize.width / 7, 100));
-        usernameLabel.setForeground(style.getButton1ForegroundColor());
-        usernameLabel.setFont(style.getTextFont());
-        usernameLabel.setHorizontalAlignment(SwingConstants.LEFT);
-        usernameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        usernameContainer.add(usernameLabel);
-
-        JLabel personInViewLabel = new JLabel(name);
-        personInViewLabel.setMaximumSize(new Dimension(screenSize.width / 6, 100));
-        personInViewLabel.setForeground(style.getButton1ForegroundColor());
-        personInViewLabel.setFont(style.getTextFont());
-        personInViewLabel.setHorizontalAlignment(SwingConstants.LEFT);
-        personInViewLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        usernameContainer.add(personInViewLabel);
-
-        JButton changeNameButton = new JButton("change name");
-        changeNameButton.setForeground(style.getButton1BackgroundColor());
-        changeNameButton.setBackground(style.getButton1ForegroundColor());
-        changeNameButton.setFont(style.getButtonFont());
-        changeNameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        changeNameButton.addActionListener(e -> {
-            System.out.println("Change name");
-        });
-        usernameContainer.add(changeNameButton);
-        return usernameContainer;
-    }
-
-    private JPanel createUserIdContainer(Long id) {
-        JPanel userIdContainer = new JPanel();
-        userIdContainer.setLayout(new BoxLayout(userIdContainer, BoxLayout.X_AXIS));
+    private Box createUserIdContainer(Long id) {
+        Box userIdContainer = Box.createHorizontalBox();
         userIdContainer.setBackground(style.getBackgroundSecondaryColor());
         userIdContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
+        userIdContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        userIdContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
 
         userIdContainer.add(Box.createHorizontalStrut(horizontalOffset));
 
-        JLabel userIdLabel = new JLabel("Id :");
-        userIdLabel.setMaximumSize(new Dimension(screenSize.width / 7, 100));
-        userIdLabel.setForeground(style.getButton1ForegroundColor());
-        userIdLabel.setFont(style.getTextFont());
-        userIdLabel.setHorizontalAlignment(SwingConstants.LEFT);
-        userIdLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
+        JLabel userIdLabel = labelFactory.getSecondaryNormalLabel("Id :");
+        userIdLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
         userIdContainer.add(userIdLabel);
 
-        JLabel personInViewLabel = new JLabel(String.valueOf(String.valueOf(id)));
+        JLabel personInViewLabel = labelFactory.getSecondaryNormalLabel(String.valueOf(String.valueOf(id)));
         personInViewLabel.setMaximumSize(new Dimension(screenSize.width / 6, 100));
-        personInViewLabel.setForeground(style.getButton1ForegroundColor());
-        personInViewLabel.setFont(style.getTextFont());
-        personInViewLabel.setHorizontalAlignment(SwingConstants.LEFT);
-        personInViewLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         userIdContainer.add(personInViewLabel);
 
         return userIdContainer;
@@ -231,41 +242,33 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         topContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 100));
         topContainer.setLayout(new BoxLayout(topContainer, BoxLayout.X_AXIS));
         topContainer.add(Box.createHorizontalStrut(horizontalOffset));
+        topContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Name of the person in view
-        JLabel personName = new JLabel(name);
+        JLabel personName = labelFactory.getSubtitleLabel(name);
         personName.setMaximumSize(new Dimension(screenSize.width / 2, 100));
-        personName.setForeground(style.getButton1ForegroundColor());
-        personName.setFont(style.getBoldSubtitleFont());
-        personName.setHorizontalAlignment(SwingConstants.LEFT);
-        personName.setAlignmentX(Component.LEFT_ALIGNMENT);
+        personName.setAlignmentY(Component.CENTER_ALIGNMENT);
         topContainer.add(personName);
 
         // Button to homepage
-        JButton homepageButton = new JButton("Homepage");
-        homepageButton.setForeground(style.getButton1BackgroundColor());
-        homepageButton.setBackground(style.getButton1ForegroundColor());
-        homepageButton.setFont(style.getButtonFont());
-        homepageButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JButton homepageButton = labelFactory.getPrimaryButton("Homepage");
         homepageButton.addActionListener(e -> {
             CardLayout layout = (CardLayout) layoutPanel.getLayout();
             layout.show(layoutPanel, "HomePanel");
         });
+        homepageButton.setAlignmentY(Component.CENTER_ALIGNMENT);
         topContainer.add(homepageButton);
 
         topContainer.add(Box.createHorizontalStrut(horizontalOffset));
 
         // Button to ticketpage
-        JButton ticketpanelButton = new JButton("Ticketpage");
-        ticketpanelButton.setForeground(style.getButton1BackgroundColor());
-        ticketpanelButton.setBackground(style.getButton1ForegroundColor());
-        ticketpanelButton.setFont(style.getButtonFont());
-        ticketpanelButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        ticketpanelButton.addActionListener(e -> {
+        JButton ticketpageButton = labelFactory.getPrimaryButton("Ticketpage");
+        ticketpageButton.addActionListener(e -> {
             CardLayout layout = (CardLayout) layoutPanel.getLayout();
             layout.show(layoutPanel, "TicketPanel");
         });
-        topContainer.add(ticketpanelButton);
+        ticketpageButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+        topContainer.add(ticketpageButton);
         return topContainer;
     }
 
@@ -297,6 +300,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
 
     /**
      * This function will run every time a different value is selected in the Jlist
+     *
      * @param e the event that characterizes the change.
      */
     @Override
@@ -312,8 +316,9 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
 
     /**
      * This function will update this object whenever a change happens in the PersonDatabase
+     *
      * @param evt A PropertyChangeEvent object describing the event source
-     *          and the property that has changed.
+     *            and the property that has changed.
      */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -322,9 +327,8 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         } else if (evt.getPropertyName().equals(Property.UPDATE.name)) {
             updatePersonList();
         } else if (evt.getPropertyName().equals(Property.DELETE.name)) {
-
+            updatePersonList();
         }
-
     }
 
     // Private object so that we can pass a Person in to the list, but only show its name and id
@@ -339,6 +343,119 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
                 setText(person.getName() + "   #" + person.getId()); // Assuming getName() is the desired property
             }
             return c;
+        }
+    }
+
+    private class LabelFactory {
+        Style style;
+
+        public LabelFactory(Style style) {
+            this.style = style;
+        }
+
+        public Box getSmallRow(String name, double amount) {
+            Box box = Box.createHorizontalBox();
+            box.setMaximumSize(new Dimension(screenSize.width / 2, 50));
+            box.setAlignmentX(Component.LEFT_ALIGNMENT);
+            box.setAlignmentY(Component.CENTER_ALIGNMENT);
+            box.add(Box.createHorizontalStrut(3 * horizontalOffset));
+
+            JLabel personLabel = getSecondarySmallLabel(name + ":");
+            personLabel.setMaximumSize(new Dimension(300, 50));
+
+            JLabel debtLabel = getSecondarySmallLabel("€ " + amount);
+            debtLabel.setMaximumSize(new Dimension(200, 50));
+
+            box.add(personLabel);
+            box.add(debtLabel);
+
+            if (amount >= 0.) {
+                debtLabel.setForeground(new Color(0, 153, 51));
+            } else {
+                debtLabel.setForeground(Color.red);
+
+                JButton payButton = getPrimaryButton("Pay");
+                payButton.setMaximumSize(new Dimension(100, 50));
+                payButton.addActionListener(e -> {
+                    System.out.println("Pay");
+                });
+                box.add(payButton);
+            }
+            return box;
+        }
+
+        public JLabel getPrimaryNormalLabel(String text) {
+            JLabel label = new JLabel(text);
+            label.setBackground(null);
+            label.setForeground(this.style.getButton2ForegroundColor());
+            label.setFont(this.style.getTextFont());
+            label.setHorizontalAlignment(SwingConstants.LEFT);
+            label.setAlignmentX(Component.LEFT_ALIGNMENT);
+            label.setAlignmentY(Component.CENTER_ALIGNMENT);
+            return label;
+        }
+
+        public JLabel getSecondaryNormalLabel(String text) {
+            JLabel label = new JLabel(text);
+            label.setBackground(null);
+            label.setForeground(this.style.getButton1ForegroundColor());
+            label.setFont(this.style.getTextFont());
+            label.setHorizontalAlignment(SwingConstants.LEFT);
+            label.setAlignmentX(Component.LEFT_ALIGNMENT);
+            label.setAlignmentY(Component.CENTER_ALIGNMENT);
+            return label;
+        }
+
+        public JLabel getPrimarySmallLabel(String text) {
+            JLabel label = new JLabel(text);
+            label.setBackground(null);
+            label.setForeground(this.style.getButton2ForegroundColor());
+            label.setFont(this.style.getSmallTextFont());
+            label.setHorizontalAlignment(SwingConstants.LEFT);
+            label.setAlignmentX(Component.LEFT_ALIGNMENT);
+            label.setAlignmentY(Component.CENTER_ALIGNMENT);
+            return label;
+        }
+
+        public JLabel getSubtitleLabel(String text) {
+            JLabel label = new JLabel(text);
+            label.setForeground(style.getButton1ForegroundColor());
+            label.setFont(style.getBoldSubtitleFont());
+            label.setHorizontalAlignment(SwingConstants.LEFT);
+            label.setAlignmentX(Component.LEFT_ALIGNMENT);
+            label.setAlignmentY(Component.CENTER_ALIGNMENT);
+            return label;
+        }
+
+        public JLabel getSecondarySmallLabel(String text) {
+            JLabel label = new JLabel(text);
+            label.setBackground(null);
+            label.setForeground(this.style.getButton1ForegroundColor());
+            label.setFont(this.style.getSmallTextFont());
+            label.setHorizontalAlignment(SwingConstants.LEFT);
+            label.setAlignmentX(Component.LEFT_ALIGNMENT);
+            label.setAlignmentY(Component.CENTER_ALIGNMENT);
+            return label;
+        }
+
+        public JButton getPrimaryButton(String text) {
+            JButton button = new JButton(text);
+            button.setForeground(style.getButton1BackgroundColor());
+            button.setBackground(style.getButton1ForegroundColor());
+            button.setFont(style.getButtonFont());
+            button.setAlignmentX(Component.LEFT_ALIGNMENT);
+            button.setAlignmentY(Component.CENTER_ALIGNMENT);
+            return button;
+        }
+
+        public JButton getSecondaryButton(String text) {
+            JButton button = new JButton(text);
+            button.setForeground(style.getButton2BackgroundColor());
+            button.setBackground(style.getButton2ForegroundColor());
+            button.setFont(style.getButtonFont());
+            button.setAlignmentX(Component.LEFT_ALIGNMENT);
+            button.setAlignmentY(Component.CENTER_ALIGNMENT);
+            return button;
         }
     }
 }

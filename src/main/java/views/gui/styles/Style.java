@@ -31,6 +31,7 @@ public interface Style {
     Font getButtonFont();
     Font getListFont();
     Font getTextFont();
+    Font getSmallTextFont();
 
 
     default Font addFont(String fontName, float size) {

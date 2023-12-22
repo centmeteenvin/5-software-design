@@ -34,5 +34,6 @@ public class StyleBlueWhite implements Style{
     private Font boldSubtitleFont = addFont("OpenSans-Bold", 54);
     private Font buttonFont = addFont("OpenSans-Bold", 30);
     private Font listFont = addFont("OpenSans-Bold", 25);
-    private Font textFont = addFont("Opensans-Medium", 30);
+    private Font textFont = addFont("Opensans-Medium", 35);
+    private Font smallTextFont = addFont("Opensans-Medium", 30);
 }

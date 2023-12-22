@@ -17,6 +17,7 @@ import views.gui.styles.StyleBlueWhite;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Optional;
 
 public class ViewJ2D extends View {
     JFrame frame = new ViewFrame();
@@ -42,7 +43,7 @@ public class ViewJ2D extends View {
         setupFrame();
     }
 
-    public void setupFrame(){
+    public void setupFrame() {
         // Determine style
         Style style = new StyleBlueWhite();
 
@@ -54,17 +55,25 @@ public class ViewJ2D extends View {
         container.setLayout(layout);
 
         // Create different panels
-        this.homePanel = new HomePanel(container,style);
-        this.personPanel = new PersonPanel(container,style, getPersonDatabase(), getPersonController());
+        this.homePanel = new HomePanel(container, style);
+        this.personPanel = new PersonPanel(container, style, getPersonDatabase(), getPersonController());
         getPersonDatabase().addListener(this.personPanel);
 
         // Add every panel to the container
         container.add(this.homePanel, "HomePanel");
         container.add(this.personPanel, "PersonPanel");
-        container.add(new SamplePanel(2,style), "TicketPanel");
+        container.add(new SamplePanel(2, style), "TicketPanel");
 
         // Show the homepanel
-        layout.show(container,"HomePanel");
+        layout.show(container, "PersonPanel");
+
+        Optional<Person> person1 = getPersonController().create("Foo");
+        Optional<Person> person2 = getPersonController().create("Bar");
+        Optional<Person> person3 = getPersonController().create("Baz");
+
+        getPersonController().modifyDebt(person1.get().getId(), person2.get().getId(), -10.2);
+        getPersonController().modifyDebt(person1.get().getId(), person3.get().getId(), 102);
+
 
         // Add the container to the frame
         frame.add(container);
