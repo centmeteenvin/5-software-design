@@ -15,20 +15,41 @@ import java.beans.PropertyChangeListener;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Will hold all the information and lay-out of the person panel.
+ * <p>
+ * This object holds everything about the lay-out. The style can be changed by choosing another {@link Style}.
+ * </p>
+ *
+ * <p>
+ * This object will also act as:
+ * - {@link ListSelectionListener} to update itself whenever an item from the list is picked
+ * - {@link PropertyChangeListener} to update itself whenever a change happens in the {@link Database<Person>}
+ * </p>
+ */
 public class PersonPanel extends JPanel implements ListSelectionListener, PropertyChangeListener {
-    JPanel layoutPanel;
+    // The style object that determines the colors and fonts used in the lay-out
     Style style;
-    Database<Person> personDatabase;
-    PersonController personController;
-    DefaultListModel<Person> listModel;
-    JList<Person> personJList;
+
+    // The different panels that need to be updated across the whole object
+    JPanel layoutPanel;
     JPanel rightPanel;
     CardLayout rightPanelLayout;
-    LabelFactory labelFactory;
 
-    int horizontalOffset = 10;
+    // The objects to modify the persons and also to update the list with person names
+    Database<Person> personDatabase;
+    PersonController personController;
 
+    // Objects to read and modify the left panel list with person names
+    DefaultListModel<Person> listModel;
+    JList<Person> personJList;
+
+    // A private object that makes specific labels and buttons for this specific object
+    ComponentFactory componentFactory;
+
+    // Variables for lay-out
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    int horizontalOffset = 10;
 
     public PersonPanel(JPanel layoutPanel, Style style, Database<Person> personDatabase, PersonController personController) {
         this.layoutPanel = layoutPanel;
@@ -38,24 +59,34 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         this.listModel = new DefaultListModel<>();
         this.rightPanel = new JPanel();
         this.rightPanelLayout = new CardLayout();
-        this.labelFactory = new LabelFactory(this.style);
+        this.componentFactory = new ComponentFactory(this.style);
 
         this.setLayout(new BorderLayout());
 
+        // Add the left panel
         this.add(createLeftPanel(), BorderLayout.LINE_START);
 
+        // Add the right panel. For this we use the CardLayout, so we can switch between an empty panel and one with information on it
         this.rightPanel.setLayout(rightPanelLayout);
         rightPanel.add(createEmptyRightPanel(), "EmptyPanel");
         this.add(this.rightPanel, BorderLayout.CENTER);
     }
 
-    JPanel createLeftPanel() {
-        JPanel leftPanel = new JPanel();
-        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+    /**
+     * Method that creates the whole left part of the screen. It holds:
+     * - The title "Users"
+     * - The "add user" button which is connected to the personDatabase {@link Database<Person>}
+     * - The list with users in the personDatabase that can be modified
+     *
+     * @return The whole left side of the lay-out in 1 panel
+     */
+    Box createLeftPanel() {
+        // Create the panel and initialize its color/size
+        Box leftPanel = Box.createVerticalBox();
         leftPanel.setPreferredSize(new Dimension(screenSize.width / 4, screenSize.height));
         leftPanel.setBackground(style.getBackgroundPrimaryColor());
 
-        // Title (box 1)
+        // Title of left panel
         JLabel userLabel = new JLabel("Users") {
             @Override
             protected void paintComponent(Graphics g) {
@@ -82,11 +113,8 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         // Add buffer
         leftPanel.add(Box.createVerticalStrut(10));
 
-        // Add Person button (Box2)
-        JButton createPersonButton = new JButton("+ Add User");
-        createPersonButton.setForeground(style.getButton1ForegroundColor());
-        createPersonButton.setBackground(style.getButton1BackgroundColor());
-        createPersonButton.setFont(style.getButtonFont());
+        // Add Person button
+        JButton createPersonButton = componentFactory.getPrimaryButton("+ Add User");
         createPersonButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         createPersonButton.addActionListener(e -> {
             addUser();
@@ -98,7 +126,10 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
 
         // Add list
         personJList = new JList<>(listModel);
+
+        // Added a custom ListCellRenderer so it holds a Person but show only it's name
         personJList.setCellRenderer(new PersonListCellRenderer());
+
         personJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         personJList.setFixedCellHeight(screenSize.height / 20);
         personJList.setFixedCellWidth(screenSize.width / 5);
@@ -110,7 +141,21 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         return leftPanel;
     }
 
-    Box createRightPanel(Person person) throws NullPointerException {
+    /**
+     * Method that creates the whole right part of the lay-out. It holds
+     * - The chosen person name and id
+     * - The changeName button to change the chosen persons name
+     * - The debtHolders and pay buttons to repay the debt
+     *
+     * <p>
+     * The values given depends on the selected person in the PersonJList on the left panel
+     * </p>
+     *
+     * @param person the person who's values will be displayed
+     * @return the rightPanel
+     */
+    Box createRightPanel(Person person) {
+        // A VerticalBox is just a JPanel with BoxLayout in the Y-axis
         Box rightPanel = Box.createVerticalBox();
         rightPanel.setBackground(style.getBackgroundSecondaryColor());
         rightPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -121,7 +166,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         rightPanel.add(topContainer);
 
         // Add username with button to change name
-        Box usernameContainer = createUsernameContainer(person.getName());
+        Box usernameContainer = createUsernameContainer(person);
         rightPanel.add(usernameContainer);
 
         // Add Id
@@ -129,60 +174,76 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         rightPanel.add(userIdContainer);
 
         // Add debts
+        Box userDebtContainer = createUserDebtContainer(person);
+        rightPanel.add(userDebtContainer);
+
+        return rightPanel;
+    }
+
+    /**
+     * This methods will read all the persons in the displayed persons debts.
+     * If his debt is negative (aka he needs to pay them) there will be a button to repay the debt
+     *
+     * @param person The current person that is displayed
+     * @return a box
+     */
+    private Box createUserDebtContainer(Person person) {
+        // Create the overal box that will hold the "Debts" label and the different Debts
         Box userDebtContainer = Box.createVerticalBox();
         userDebtContainer.setBackground(style.getBackgroundSecondaryColor());
         userDebtContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 1000));
         userDebtContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
         userDebtContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
 
+        // Create the "Debts" label container
         Box debtLabelContainer = Box.createHorizontalBox();
         debtLabelContainer.setMaximumSize(new Dimension(2 * screenSize.width, 75));
         debtLabelContainer.add(Box.createHorizontalStrut(horizontalOffset));
         debtLabelContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
         debtLabelContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
 
-        JLabel userDebtLabel = labelFactory.getSecondaryNormalLabel("Debts :");
+        // Create the "Debts" label
+        JLabel userDebtLabel = componentFactory.getSecondaryNormalLabel("Debts :");
         userDebtLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
         debtLabelContainer.add(userDebtLabel);
 
         userDebtContainer.add(debtLabelContainer);
-        // Column 1 with subtitle
+
+        // Go over all the debts of the displayed persons and show them in different rows
         Map<Long, Double> debts = person.getDebts();
 
         for (Long key : debts.keySet()) {
             Optional<Person> optDebtHolder = personDatabase.getById(key);
             if (optDebtHolder.isEmpty()) continue;
-            Box row = labelFactory.getSmallRow(optDebtHolder.get().getName(), debts.get(key));
+            Box row = componentFactory.getSmallRow(person, optDebtHolder.get(), debts.get(key));
             userDebtContainer.add(row);
         }
-
-        rightPanel.add(userDebtContainer);
-
-        return rightPanel;
+        return userDebtContainer;
     }
 
-    private Box createUsernameContainer(String name) {
+    private Box createUsernameContainer(Person person) {
         Box usernameContainer = Box.createHorizontalBox();
         usernameContainer.setBackground(style.getBackgroundSecondaryColor());
         usernameContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
+        usernameContainer.setOpaque(true);
         usernameContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
         usernameContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
 
         usernameContainer.add(Box.createHorizontalStrut(horizontalOffset));
 
-        JLabel usernameLabel = labelFactory.getSecondaryNormalLabel("Username :");
+        JLabel usernameLabel = componentFactory.getSecondaryNormalLabel("Username :");
         usernameLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
 
         usernameContainer.add(usernameLabel);
 
-        JLabel personInViewLabel = labelFactory.getSecondaryNormalLabel(name);
+        JLabel personInViewLabel = componentFactory.getSecondaryNormalLabel(person.getName());
         personInViewLabel.setMaximumSize(new Dimension(screenSize.width / 6, 75));
 
         usernameContainer.add(personInViewLabel);
 
-        JButton changeNameButton = labelFactory.getPrimaryButton("change name");
+        JButton changeNameButton = componentFactory.getPrimaryButton("change name");
         changeNameButton.addActionListener(e -> {
-            System.out.println("Change name");
+            changeUserName(person);
         });
         changeNameButton.setAlignmentY(Component.CENTER_ALIGNMENT);
         usernameContainer.add(changeNameButton);
@@ -210,11 +271,11 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
 
         userIdContainer.add(Box.createHorizontalStrut(horizontalOffset));
 
-        JLabel userIdLabel = labelFactory.getSecondaryNormalLabel("Id :");
+        JLabel userIdLabel = componentFactory.getSecondaryNormalLabel("Id :");
         userIdLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
         userIdContainer.add(userIdLabel);
 
-        JLabel personInViewLabel = labelFactory.getSecondaryNormalLabel(String.valueOf(String.valueOf(id)));
+        JLabel personInViewLabel = componentFactory.getSecondaryNormalLabel(String.valueOf(String.valueOf(id)));
         personInViewLabel.setMaximumSize(new Dimension(screenSize.width / 6, 100));
         userIdContainer.add(personInViewLabel);
 
@@ -245,13 +306,13 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         topContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Name of the person in view
-        JLabel personName = labelFactory.getSubtitleLabel(name);
+        JLabel personName = componentFactory.getSubtitleLabel(name);
         personName.setMaximumSize(new Dimension(screenSize.width / 2, 100));
         personName.setAlignmentY(Component.CENTER_ALIGNMENT);
         topContainer.add(personName);
 
         // Button to homepage
-        JButton homepageButton = labelFactory.getPrimaryButton("Homepage");
+        JButton homepageButton = componentFactory.getPrimaryButton("Homepage");
         homepageButton.addActionListener(e -> {
             CardLayout layout = (CardLayout) layoutPanel.getLayout();
             layout.show(layoutPanel, "HomePanel");
@@ -262,7 +323,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         topContainer.add(Box.createHorizontalStrut(horizontalOffset));
 
         // Button to ticketpage
-        JButton ticketpageButton = labelFactory.getPrimaryButton("Ticketpage");
+        JButton ticketpageButton = componentFactory.getPrimaryButton("Ticketpage");
         ticketpageButton.addActionListener(e -> {
             CardLayout layout = (CardLayout) layoutPanel.getLayout();
             layout.show(layoutPanel, "TicketPanel");
@@ -298,6 +359,16 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         JOptionPane.showMessageDialog(null, "Successfully created person: %s".formatted(optionalPerson.get().getName()));
     }
 
+    private void changeUserName(Person person) {
+        String name = JOptionPane.showInputDialog(null, "Enter your new name");
+        if (name == null) {
+            return;
+        }
+        personController.rename(person.getId(), name);
+
+        JOptionPane.showMessageDialog(null, "Successfully changed name: %s".formatted(person.getName()));
+    }
+
     /**
      * This function will run every time a different value is selected in the Jlist
      *
@@ -331,6 +402,10 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         }
     }
 
+    private void payTo(Person receiver, Person payer, Double amount) {
+        personController.pay(payer.getId(), receiver.getId(), -amount);
+    }
+
     // Private object so that we can pass a Person in to the list, but only show its name and id
     private class PersonListCellRenderer extends DefaultListCellRenderer {
         @Override
@@ -346,21 +421,21 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         }
     }
 
-    private class LabelFactory {
+    private class ComponentFactory {
         Style style;
 
-        public LabelFactory(Style style) {
+        public ComponentFactory(Style style) {
             this.style = style;
         }
 
-        public Box getSmallRow(String name, double amount) {
+        public Box getSmallRow(Person mainPerson, Person debtHolderPerson, double amount) {
             Box box = Box.createHorizontalBox();
             box.setMaximumSize(new Dimension(screenSize.width / 2, 50));
             box.setAlignmentX(Component.LEFT_ALIGNMENT);
             box.setAlignmentY(Component.CENTER_ALIGNMENT);
             box.add(Box.createHorizontalStrut(3 * horizontalOffset));
 
-            JLabel personLabel = getSecondarySmallLabel(name + ":");
+            JLabel personLabel = getSecondarySmallLabel(debtHolderPerson.getName() + ":");
             personLabel.setMaximumSize(new Dimension(300, 50));
 
             JLabel debtLabel = getSecondarySmallLabel("€ " + amount);
@@ -377,7 +452,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
                 JButton payButton = getPrimaryButton("Pay");
                 payButton.setMaximumSize(new Dimension(100, 50));
                 payButton.addActionListener(e -> {
-                    System.out.println("Pay");
+                    payTo(debtHolderPerson, mainPerson, amount);
                 });
                 box.add(payButton);
             }
