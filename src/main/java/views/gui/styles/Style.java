@@ -9,6 +9,10 @@ public interface Style {
     Color getBackgroundPrimaryColor();
     Color getBackgroundSecondaryColor();
 
+    default Color getTransparantColor(){
+        return new Color(0,0,0,0);
+    };
+
     Color getButton1ForegroundColor();
     Color getButton1BackgroundColor();
     Color getButton2ForegroundColor();
