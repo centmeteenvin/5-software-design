@@ -49,10 +49,10 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         this.add(this.rightPanel, BorderLayout.CENTER);
     }
 
-    JPanel createLeftPanel() {
-        JPanel leftPanel = new JPanel();
-        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+    Box createLeftPanel() {
+        Box leftPanel = Box.createVerticalBox();
         leftPanel.setPreferredSize(new Dimension(screenSize.width / 4, screenSize.height));
+        leftPanel.setOpaque(true);
         leftPanel.setBackground(style.getBackgroundPrimaryColor());
 
         // Title (box 1)
@@ -126,6 +126,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
     Box createRightPanel(Person person) {
         // A VerticalBox is just a JPanel with BoxLayout in the Y-axis
         Box rightPanel = Box.createVerticalBox();
+        rightPanel.setOpaque(true);
         rightPanel.setBackground(style.getBackgroundSecondaryColor());
         rightPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         rightPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
@@ -166,7 +167,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         for (Long key : debts.keySet()) {
             Optional<Person> optDebtHolder = personDatabase.getById(key);
             if (optDebtHolder.isEmpty()) continue;
-            Box row = componentFactory.getSmallRow(optDebtHolder.get().getName(), debts.get(key));
+            Box row = componentFactory.getSmallRow(optDebtHolder.get(), person, debts.get(key));
             userDebtContainer.add(row);
         }
 
@@ -203,6 +204,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
 
     Box createEmptyRightPanel() {
         Box rightPanel = Box.createVerticalBox();
+        rightPanel.setOpaque(true);
         rightPanel.setBackground(style.getBackgroundSecondaryColor());
 
         // Add top with name and buttons
@@ -215,6 +217,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
 
     private Box createUserIdContainer(Long id) {
         Box userIdContainer = Box.createHorizontalBox();
+        userIdContainer.setOpaque(true);
         userIdContainer.setBackground(style.getTransparantColor());
         userIdContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
         userIdContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -253,6 +256,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         };
         topContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 100));
         topContainer.setPreferredSize(new Dimension(3 * screenSize.width / 4, 100));
+        topContainer.setBackground(style.getTransparantColor());
         topContainer.setLayout(new BoxLayout(topContainer, BoxLayout.X_AXIS));
         topContainer.add(Box.createHorizontalStrut(horizontalOffset));
         topContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -322,6 +326,11 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         JOptionPane.showMessageDialog(null, "Successfully created person: %s".formatted(optionalPerson.get().getName()));
     }
 
+
+    private void payTo(Person receiver, Person payer, Double amount) {
+        personController.pay(payer.getId(), receiver.getId(), -amount);
+    }
+
     /**
      * This function will run every time a different value is selected in the JList
      *
@@ -377,14 +386,16 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
             this.style = style;
         }
 
-        public Box getSmallRow(String name, double amount) {
+        public Box getSmallRow(Person debtHolderPerson, Person mainPerson, double amount) {
             Box box = Box.createHorizontalBox();
+            box.setOpaque(true);
+            box.setBackground(this.style.getTransparantColor());
             box.setMaximumSize(new Dimension(screenSize.width / 2, 50));
             box.setAlignmentX(Component.LEFT_ALIGNMENT);
             box.setAlignmentY(Component.CENTER_ALIGNMENT);
             box.add(Box.createHorizontalStrut(3 * horizontalOffset));
 
-            JLabel personLabel = getSecondarySmallLabel(name + ":");
+            JLabel personLabel = getSecondarySmallLabel(debtHolderPerson.getName() + ":");
             personLabel.setMaximumSize(new Dimension(300, 50));
 
             JLabel debtLabel = getSecondarySmallLabel("€ " + amount);
@@ -400,7 +411,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
 
                 JButton payButton = getPrimaryButton("Pay");
                 payButton.setMaximumSize(new Dimension(100, 50));
-                //payButton.addActionListener(e -> payTo(debtHolderPerson, mainPerson, amount));
+                payButton.addActionListener(e -> payTo(debtHolderPerson, mainPerson, amount));
                 box.add(payButton);
             }
             return box;
