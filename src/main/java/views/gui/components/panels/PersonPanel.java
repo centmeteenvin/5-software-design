@@ -49,10 +49,10 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         this.add(this.rightPanel, BorderLayout.CENTER);
     }
 
-    JPanel createLeftPanel() {
-        JPanel leftPanel = new JPanel();
-        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+    Box createLeftPanel() {
+        Box leftPanel = Box.createVerticalBox();
         leftPanel.setPreferredSize(new Dimension(screenSize.width / 4, screenSize.height));
+        leftPanel.setOpaque(true);
         leftPanel.setBackground(style.getBackgroundPrimaryColor());
 
         // Title (box 1)
@@ -126,6 +126,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
     Box createRightPanel(Person person) {
         // A VerticalBox is just a JPanel with BoxLayout in the Y-axis
         Box rightPanel = Box.createVerticalBox();
+        rightPanel.setOpaque(true);
         rightPanel.setBackground(style.getBackgroundSecondaryColor());
         rightPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         rightPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
@@ -203,6 +204,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
 
     Box createEmptyRightPanel() {
         Box rightPanel = Box.createVerticalBox();
+        rightPanel.setOpaque(true);
         rightPanel.setBackground(style.getBackgroundSecondaryColor());
 
         // Add top with name and buttons
@@ -215,6 +217,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
 
     private Box createUserIdContainer(Long id) {
         Box userIdContainer = Box.createHorizontalBox();
+        userIdContainer.setOpaque(true);
         userIdContainer.setBackground(style.getTransparantColor());
         userIdContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
         userIdContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -253,6 +256,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         };
         topContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 100));
         topContainer.setPreferredSize(new Dimension(3 * screenSize.width / 4, 100));
+        topContainer.setBackground(style.getTransparantColor());
         topContainer.setLayout(new BoxLayout(topContainer, BoxLayout.X_AXIS));
         topContainer.add(Box.createHorizontalStrut(horizontalOffset));
         topContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -384,6 +388,8 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
 
         public Box getSmallRow(Person debtHolderPerson, Person mainPerson, double amount) {
             Box box = Box.createHorizontalBox();
+            box.setOpaque(true);
+            box.setBackground(this.style.getTransparantColor());
             box.setMaximumSize(new Dimension(screenSize.width / 2, 50));
             box.setAlignmentX(Component.LEFT_ALIGNMENT);
             box.setAlignmentY(Component.CENTER_ALIGNMENT);
