@@ -166,7 +166,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         for (Long key : debts.keySet()) {
             Optional<Person> optDebtHolder = personDatabase.getById(key);
             if (optDebtHolder.isEmpty()) continue;
-            Box row = componentFactory.getSmallRow(optDebtHolder.get().getName(), debts.get(key));
+            Box row = componentFactory.getSmallRow(optDebtHolder.get(), person, debts.get(key));
             userDebtContainer.add(row);
         }
 
@@ -322,6 +322,11 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         JOptionPane.showMessageDialog(null, "Successfully created person: %s".formatted(optionalPerson.get().getName()));
     }
 
+
+    private void payTo(Person receiver, Person payer, Double amount) {
+        personController.pay(payer.getId(), receiver.getId(), -amount);
+    }
+
     /**
      * This function will run every time a different value is selected in the JList
      *
@@ -377,14 +382,14 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
             this.style = style;
         }
 
-        public Box getSmallRow(String name, double amount) {
+        public Box getSmallRow(Person debtHolderPerson, Person mainPerson, double amount) {
             Box box = Box.createHorizontalBox();
             box.setMaximumSize(new Dimension(screenSize.width / 2, 50));
             box.setAlignmentX(Component.LEFT_ALIGNMENT);
             box.setAlignmentY(Component.CENTER_ALIGNMENT);
             box.add(Box.createHorizontalStrut(3 * horizontalOffset));
 
-            JLabel personLabel = getSecondarySmallLabel(name + ":");
+            JLabel personLabel = getSecondarySmallLabel(debtHolderPerson.getName() + ":");
             personLabel.setMaximumSize(new Dimension(300, 50));
 
             JLabel debtLabel = getSecondarySmallLabel("€ " + amount);
@@ -400,7 +405,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
 
                 JButton payButton = getPrimaryButton("Pay");
                 payButton.setMaximumSize(new Dimension(100, 50));
-                //payButton.addActionListener(e -> payTo(debtHolderPerson, mainPerson, amount));
+                payButton.addActionListener(e -> payTo(debtHolderPerson, mainPerson, amount));
                 box.add(payButton);
             }
             return box;
