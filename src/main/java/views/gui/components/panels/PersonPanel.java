@@ -135,7 +135,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         rightPanel.add(topContainer);
 
         // Add username with button to change name
-        Box usernameContainer = createUsernameContainer(person.getName());
+        Box usernameContainer = createUsernameContainer(person);
         rightPanel.add(usernameContainer);
 
         // Add Id
@@ -175,7 +175,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         return rightPanel;
     }
 
-    private Box createUsernameContainer(String name) {
+    private Box createUsernameContainer(Person person) {
         Box usernameContainer = Box.createHorizontalBox();
         usernameContainer.setBackground(style.getTransparantColor());
         usernameContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
@@ -189,13 +189,13 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
 
         usernameContainer.add(usernameLabel);
 
-        JLabel personInViewLabel = componentFactory.getSecondaryNormalLabel(name);
+        JLabel personInViewLabel = componentFactory.getSecondaryNormalLabel(person.getName());
         personInViewLabel.setMaximumSize(new Dimension(screenSize.width / 6, 75));
 
         usernameContainer.add(personInViewLabel);
 
         JButton changeNameButton = componentFactory.getPrimaryButton("change name");
-        //changeNameButton.addActionListener(e -> changeUserName(person));
+        changeNameButton.addActionListener(e -> changeUserName(person));
         changeNameButton.setAlignmentY(Component.CENTER_ALIGNMENT);
         usernameContainer.add(changeNameButton);
         return usernameContainer;
@@ -292,6 +292,16 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
             listModel.addElement(person);
         }
         personJList.setModel(listModel);
+    }
+
+    private void changeUserName(Person person) {
+        String name = JOptionPane.showInputDialog(null, "Enter your new name");
+        if (name == null) {
+            return;
+        }
+        personController.rename(person.getId(), name);
+
+        JOptionPane.showMessageDialog(null, "Successfully changed name: %s".formatted(person.getName()));
     }
 
     private void addUser() {
