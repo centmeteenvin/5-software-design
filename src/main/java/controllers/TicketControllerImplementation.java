@@ -7,8 +7,6 @@ import models.TicketCategory;
 
 import java.util.*;
 
-import static java.lang.Long.sum;
-
 
 public class TicketControllerImplementation extends TicketController {
 
@@ -25,19 +23,23 @@ public class TicketControllerImplementation extends TicketController {
         Optional<TicketCategory> category = ticketCategoryDatabase.getById(categoryId);
         if (category.isEmpty()) return Optional.empty();
 
-        List<Person> people = new ArrayList<>();
-        for (Long personId : personsId) {
-            Optional<Person> person = personDatabase.getById(personId);
-            if (person.isEmpty()) return Optional.empty();
-            people.add(person.get());
+        if (personsId != null) {
+            List<Person> people = new ArrayList<>();
+            for (Long personId : personsId) {
+                Optional<Person> person = personDatabase.getById(personId);
+                if (person.isEmpty()) return Optional.empty();
+                people.add(person.get());
+            }
         }
 
         Optional<Ticket> ticket = ticketDatabase.create(new Ticket(System.nanoTime(), totalCost, categoryId));
         if (ticket.isEmpty()) return Optional.empty();
         ticketCategoryController.addTicket(categoryId, ticket.get().getId());
-        for (Long personId : personsId) {
-            personController.addTicket(personId, ticket.get().getId());
-            ticket.get().getDistribution().put(personId, totalCost / personsId.size());
+        if (personsId != null) {
+            for (Long personId : personsId) {
+                personController.addTicket(personId, ticket.get().getId());
+                ticket.get().getDistribution().put(personId, totalCost / personsId.size());
+            }
         }
         return ticket;
     }
@@ -128,7 +130,7 @@ public class TicketControllerImplementation extends TicketController {
     }
 
     /**
-
+     *
      */
     @Override
     public void calculate(Long id) {
@@ -179,7 +181,7 @@ public class TicketControllerImplementation extends TicketController {
     @Override
     public void calculateAll() {
         List<Person> persons = personDatabase.getAll();
-        for (Person person : persons){
+        for (Person person : persons) {
             Long id = person.getId();
             personController.resetDebt(id);
         }

@@ -11,7 +11,7 @@ import views.View;
 import views.gui.components.ViewFrame;
 import views.gui.components.panels.HomePanel;
 import views.gui.components.panels.PersonPanel;
-import views.gui.components.panels.SamplePanel;
+import views.gui.components.panels.TicketPanel;
 import views.gui.styles.Style;
 import views.gui.styles.StyleBlueWhite;
 
@@ -24,6 +24,7 @@ public class ViewJ2D extends View {
     JPanel container = new JPanel();
     HomePanel homePanel;
     PersonPanel personPanel;
+    TicketPanel ticketPanel;
 
 
     public ViewJ2D(Database<Person> personDatabase, Database<Ticket> ticketDatabase, Database<TicketCategory> ticketCategoryDatabase, PersonController personController, TicketController ticketController, TicketCategoryController ticketCategoryController) {
@@ -57,15 +58,20 @@ public class ViewJ2D extends View {
         // Create different panels
         this.homePanel = new HomePanel(container, style);
         this.personPanel = new PersonPanel(container, style, getPersonDatabase(), getPersonController());
+        this.ticketPanel = new TicketPanel(container, style, getTicketDatabase(), getTicketCategoryDatabase(), getTicketController());
         getPersonDatabase().addListener(this.personPanel);
+        getTicketDatabase().addListener(this.ticketPanel);
 
         // Add every panel to the container
         container.add(this.homePanel, "HomePanel");
         container.add(this.personPanel, "PersonPanel");
-        container.add(new SamplePanel(2, style), "TicketPanel");
+        container.add(this.ticketPanel, "TicketPanel");
 
         // Show the homepanel
-        layout.show(container, "PersonPanel");
+        layout.show(container, "TicketPanel");
+
+
+        getTicketCategoryController().create("Cat0");
 
         Optional<Person> person1 = getPersonController().create("Foo");
         Optional<Person> person2 = getPersonController().create("Bar");
