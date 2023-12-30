@@ -60,6 +60,7 @@ public class ViewJ2D extends View {
         this.personPanel = new PersonPanel(container, style, getPersonDatabase(), getPersonController(), getTicketController(), getTicketCategoryController());
         this.ticketPanel = new TicketPanel(container, style, getTicketDatabase(), getTicketCategoryDatabase(), getPersonDatabase(), getTicketController(), getTicketCategoryController());
         getPersonDatabase().addListener(this.personPanel);
+        getTicketDatabase().addListener(this.personPanel);
         getTicketDatabase().addListener(this.ticketPanel);
         getPersonDatabase().addListener(this.ticketPanel);
 

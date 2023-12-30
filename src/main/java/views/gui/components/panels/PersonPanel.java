@@ -11,9 +11,11 @@ import views.gui.styles.Style;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.Optional;
 
@@ -379,14 +381,41 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         JOptionPane.showMessageDialog(null, "Successfully created person: %s".formatted(optionalPerson.get().getName()));
     }
 
-    private void deleteUser(Person person){
-        if (person != null){
+    private void deleteUser(Person person) {
+        if (person != null) {
             this.personController.delete(person.getId());
         }
     }
 
     private void payTo(Person receiver, Person payer, Double amount) {
-        personController.pay(receiver.getId(), payer.getId(), amount);
+        DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+        NumberFormatter formatter = new NumberFormatter(decimalFormat);
+        formatter.setValueClass(Double.class);
+        formatter.setAllowsInvalid(false); // Only accept valid numbers
+
+        // Create the JFormattedTextField and set the formatter
+        JFormattedTextField decimalTextField = new JFormattedTextField(formatter);
+        decimalTextField.setColumns(10);
+
+        Object[] message = {"Give payed amount: ", decimalTextField};
+
+        decimalTextField.setInputVerifier(new InputVerifier() {
+            @Override
+            public boolean verify(JComponent input) {
+                JFormattedTextField textField = (JFormattedTextField) input;
+                return textField.isEditValid(); // Return true only if the input is valid
+            }
+        });
+
+        while (decimalTextField.getValue() == null) {
+            JOptionPane.showConfirmDialog(null, message, "Payed amount", JOptionPane.DEFAULT_OPTION);
+        }
+
+        double amountPayed = (double) decimalTextField.getValue();
+
+
+        personController.pay(receiver.getId(), payer.getId(), amountPayed);
+        ticketController.calculateAll();
     }
 
 
@@ -420,10 +449,16 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(Property.CREATE.name)) {
             updatePersonList();
+            this.rightPanel.revalidate();
+            this.rightPanel.repaint();
         } else if (evt.getPropertyName().equals(Property.UPDATE.name)) {
             updatePersonList();
+            this.rightPanel.revalidate();
+            this.rightPanel.repaint();
         } else if (evt.getPropertyName().equals(Property.DELETE.name)) {
             updatePersonList();
+            this.rightPanel.revalidate();
+            this.rightPanel.repaint();
         }
     }
 

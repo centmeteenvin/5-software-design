@@ -565,12 +565,15 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         if (evt.getPropertyName().equals(Property.UPDATE.name)) {
             updateTicketList();
             updateRightPanel();
+            this.rightPanel.revalidate();
         } else if (evt.getPropertyName().equals(Property.CREATE.name)) {
             updateTicketList();
             updateRightPanel();
+            this.rightPanel.revalidate();
         } else if (evt.getPropertyName().equals(Property.DELETE.name)) {
             updateTicketList();
             updateRightPanel();
+            this.rightPanel.revalidate();
         }
     }
 
