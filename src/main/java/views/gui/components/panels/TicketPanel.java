@@ -14,6 +14,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,9 +37,8 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
     ComponentFactory componentFactory;
 
     int horizontalOffset = 10;
-    private Ticket selectedTicket;
-
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    private Ticket selectedTicket;
 
     public TicketPanel(JPanel layoutPanel, Style style, Database<Ticket> ticketDatabase, Database<TicketCategory> categoryDatabase, Database<Person> personDatabase, TicketController ticketController) {
         this.layoutPanel = layoutPanel;
@@ -61,6 +61,11 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         rightPanel.add(createEmptyRightPanel(), "EmptyPanel");
         this.add(this.rightPanel, BorderLayout.CENTER);
     }
+
+    // ========================================================================================== //
+    // Left panel + components
+    // ========================================================================================== //
+
 
     Box createLeftPanel() {
         Box leftPanel = Box.createVerticalBox();
@@ -123,142 +128,6 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         return leftPanel;
     }
 
-    /**
-     * Method that creates the whole right part of the lay-out. It holds
-     * - The chosen ticket name and id
-     * - The changeName button to change the chosen tickets name
-     * - The ditrsibutionHolders and pay buttons to repay the ditrsibution
-     *
-     * <p>
-     * The values given depends on the selected ticket in the TicketJList on the left panel
-     * </p>
-     *
-     * @param ticket the ticket whose values will be displayed
-     * @return the rightPanel
-     */
-    Box createRightPanel(Ticket ticket) {
-        // A VerticalBox is just a JPanel with BoxLayout in the Y-axis
-        Box rightPanel = Box.createVerticalBox();
-        rightPanel.setOpaque(true);
-        rightPanel.setBackground(style.getBackgroundSecondaryColor());
-        rightPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        rightPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
-
-        // Add top with name and buttons
-        JPanel topContainer = createTopContainer(String.valueOf(ticket.getId()));
-        rightPanel.add(topContainer);
-
-        // Add username with button to change name
-        Box usernameContainer = createCategoryContainer(ticket);
-        rightPanel.add(usernameContainer);
-
-        // Add Id
-        Box userIdContainer = createPayerIdContainer(ticket);
-        rightPanel.add(userIdContainer);
-
-        // Add ditrsibutions
-        Box userDebtContainer = Box.createVerticalBox();
-        userDebtContainer.setBackground(style.getTransparantColor());
-        userDebtContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 1000));
-        userDebtContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
-        userDebtContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
-
-        Box ditrsibutionLabelContainer = Box.createHorizontalBox();
-        ditrsibutionLabelContainer.setMaximumSize(new Dimension(2 * screenSize.width, 75));
-        ditrsibutionLabelContainer.add(Box.createHorizontalStrut(horizontalOffset));
-        ditrsibutionLabelContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
-        ditrsibutionLabelContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
-
-        JLabel userDebtLabel = componentFactory.getSecondaryNormalLabel("Debts :");
-        userDebtLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
-        ditrsibutionLabelContainer.add(userDebtLabel);
-
-        userDebtContainer.add(ditrsibutionLabelContainer);
-        // Column 1 with subtitle
-        Map<Long, Double> ditrsibutions = ticket.getDistribution();
-
-        for (Long key : ditrsibutions.keySet()) {
-            Optional<Ticket> optDebtHolder = ticketDatabase.getById(key);
-            if (optDebtHolder.isEmpty()) continue;
-            Box row = componentFactory.getSmallRow(optDebtHolder.get(), ticket, ditrsibutions.get(key));
-            userDebtContainer.add(row);
-        }
-
-        rightPanel.add(userDebtContainer);
-
-        return rightPanel;
-    }
-
-    private Box createCategoryContainer(Ticket ticket) {
-        Box usernameContainer = Box.createHorizontalBox();
-        usernameContainer.setBackground(style.getTransparantColor());
-        usernameContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
-        usernameContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
-        usernameContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
-
-        usernameContainer.add(Box.createHorizontalStrut(horizontalOffset));
-
-        JLabel usernameLabel = componentFactory.getSecondaryNormalLabel("Category :");
-        usernameLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
-
-        usernameContainer.add(usernameLabel);
-
-        JLabel ticketInViewLabel = componentFactory.getSecondaryNormalLabel(String.valueOf(categoryDatabase.getById(ticket.getTicketCategoryId()).get().getName()));
-        ticketInViewLabel.setMaximumSize(new Dimension(screenSize.width / 6, 75));
-
-        usernameContainer.add(ticketInViewLabel);
-
-        JButton changeNameButton = componentFactory.getPrimaryButton("change category");
-        changeNameButton.addActionListener(e -> changeTicketCategory(ticket));
-        changeNameButton.setAlignmentY(Component.CENTER_ALIGNMENT);
-        usernameContainer.add(changeNameButton);
-        return usernameContainer;
-    }
-
-    Box createEmptyRightPanel() {
-        Box rightPanel = Box.createVerticalBox();
-        rightPanel.setOpaque(true);
-        rightPanel.setBackground(style.getBackgroundSecondaryColor());
-
-        // Add top with name and buttons
-        JPanel topContainer = createTopContainer("");
-        rightPanel.add(topContainer);
-
-        return rightPanel;
-    }
-
-
-    private Box createPayerIdContainer(Ticket ticket) {
-        Box userIdContainer = Box.createHorizontalBox();
-        userIdContainer.setOpaque(true);
-        userIdContainer.setBackground(style.getTransparantColor());
-        userIdContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
-        userIdContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
-        userIdContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
-
-        userIdContainer.add(Box.createHorizontalStrut(horizontalOffset));
-
-        JLabel userIdLabel = componentFactory.getSecondaryNormalLabel("Payer :");
-        userIdLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
-        userIdContainer.add(userIdLabel);
-
-        JLabel ticketInViewLabel;
-        if (ticket.getPayerId() != null) {
-            ticketInViewLabel = componentFactory.getSecondaryNormalLabel(personDatabase.getById(ticket.getPayerId()).get().getName());
-        } else {
-            ticketInViewLabel = componentFactory.getSecondaryNormalLabel("");
-        }
-        ticketInViewLabel.setMaximumSize(new Dimension(screenSize.width / 6, 100));
-        userIdContainer.add(ticketInViewLabel);
-
-        JButton changeNameButton = componentFactory.getPrimaryButton("change payer");
-        changeNameButton.addActionListener(e -> changePayer(ticket));
-        changeNameButton.setAlignmentY(Component.CENTER_ALIGNMENT);
-        userIdContainer.add(changeNameButton);
-
-        return userIdContainer;
-    }
-
     private JPanel createTopContainer(String name) {
         // Create container for top panel
         JPanel topContainer = new JPanel() {
@@ -313,21 +182,203 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         return topContainer;
     }
 
-    public void updateTicketList() {
-        listModel.clear();
-        for (Ticket ticket : ticketDatabase.getAll()) {
-            listModel.addElement(ticket);
-        }
-        ticketJList.setModel(listModel);
+    // ========================================================================================== //
+    // Right panel + components
+    // ========================================================================================== //
+
+    Box createEmptyRightPanel() {
+        Box rightPanel = Box.createVerticalBox();
+        rightPanel.setOpaque(true);
+        rightPanel.setBackground(style.getBackgroundSecondaryColor());
+
+        // Add top with name and buttons
+        JPanel topContainer = createTopContainer("");
+        rightPanel.add(topContainer);
+
+        return rightPanel;
     }
 
-    public void updateRightPanel() {
-        if (this.selectedTicket == null) {
-            this.rightPanelLayout.show(this.rightPanel, "EmptyPanel");
+    /**
+     * Method that creates the whole right part of the lay-out. It holds
+     * - The chosen ticket name and id
+     * - The changeName button to change the chosen tickets name
+     * - The ditrsibutionHolders and pay buttons to repay the ditrsibution
+     *
+     * <p>
+     * The values given depends on the selected ticket in the TicketJList on the left panel
+     * </p>
+     *
+     * @param ticket the ticket whose values will be displayed
+     * @return the rightPanel
+     */
+    Box createRightPanel(Ticket ticket) {
+        // A VerticalBox is just a JPanel with BoxLayout in the Y-axis
+        Box rightPanel = Box.createVerticalBox();
+        rightPanel.setOpaque(true);
+        rightPanel.setBackground(style.getBackgroundSecondaryColor());
+        rightPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        rightPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        // Add top with name and buttons
+        JPanel topContainer = createTopContainer(String.valueOf(ticket.getId()));
+        rightPanel.add(topContainer);
+
+        // Add username with button to change name
+        Box usernameContainer = createCategoryContainer(ticket);
+        rightPanel.add(usernameContainer);
+
+        // Add Id
+        Box userIdContainer = createPayerIdContainer(ticket);
+        rightPanel.add(userIdContainer);
+
+        // Add distributions
+        rightPanel.add(createDistributionContainer(ticket));
+
+        return rightPanel;
+    }
+
+    private Box createCategoryContainer(Ticket ticket) {
+        Box usernameContainer = Box.createHorizontalBox();
+        usernameContainer.setBackground(style.getTransparantColor());
+        usernameContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
+        usernameContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        usernameContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        usernameContainer.add(Box.createHorizontalStrut(horizontalOffset));
+
+        JLabel usernameLabel = componentFactory.getSecondaryNormalLabel("Category :");
+        usernameLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
+
+        usernameContainer.add(usernameLabel);
+
+        JLabel ticketInViewLabel = componentFactory.getSecondaryNormalLabel(String.valueOf(categoryDatabase.getById(ticket.getTicketCategoryId()).get().getName()));
+        ticketInViewLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
+
+        usernameContainer.add(ticketInViewLabel);
+
+        JButton changeNameButton = componentFactory.getPrimaryButton("change category");
+        changeNameButton.addActionListener(e -> changeTicketCategory(ticket));
+        changeNameButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+        usernameContainer.add(changeNameButton);
+        return usernameContainer;
+    }
+
+    private Box createPayerIdContainer(Ticket ticket) {
+        Box userIdContainer = Box.createHorizontalBox();
+        userIdContainer.setOpaque(true);
+        userIdContainer.setBackground(style.getTransparantColor());
+        userIdContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
+        userIdContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        userIdContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        userIdContainer.add(Box.createHorizontalStrut(horizontalOffset));
+
+        JLabel userIdLabel = componentFactory.getSecondaryNormalLabel("Payer :");
+        userIdLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
+        userIdContainer.add(userIdLabel);
+
+        JLabel ticketInViewLabel;
+        if (ticket.getPayerId() != null) {
+            ticketInViewLabel = componentFactory.getSecondaryNormalLabel(personDatabase.getById(ticket.getPayerId()).get().getName());
         } else {
-            this.rightPanel.add(createRightPanel(this.selectedTicket), "rightPanel");
-            this.rightPanelLayout.show(this.rightPanel, "rightPanel");
+            ticketInViewLabel = componentFactory.getSecondaryNormalLabel("");
         }
+        ticketInViewLabel.setMaximumSize(new Dimension(screenSize.width / 7, 100));
+        userIdContainer.add(ticketInViewLabel);
+
+        JButton changeNameButton = componentFactory.getPrimaryButton("change payer");
+        changeNameButton.addActionListener(e -> changePayer(ticket));
+        changeNameButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+        userIdContainer.add(changeNameButton);
+
+        return userIdContainer;
+    }
+
+    private Box createDistributionContainer(Ticket ticket) {
+        Box distributionContainer = Box.createVerticalBox();
+        distributionContainer.setOpaque(true);
+        distributionContainer.setBackground(style.getTransparantColor());
+        distributionContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 1000));
+        distributionContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        distributionContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        Box distributionLabelContainer = Box.createHorizontalBox();
+        distributionLabelContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
+        distributionLabelContainer.add(Box.createHorizontalStrut(horizontalOffset));
+        distributionLabelContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        distributionLabelContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        JLabel distributionLabel = componentFactory.getSecondaryNormalLabel("Distribution :");
+        distributionLabel.setMaximumSize(new Dimension(2 * screenSize.width / 7, 75));
+        distributionLabelContainer.add(distributionLabel);
+
+        JButton changeDistributionButton = componentFactory.getPrimaryButton("change distribution");
+        changeDistributionButton.setMaximumSize(new Dimension(screenSize.width/5,50));
+        changeDistributionButton.addActionListener(e -> updateDistribution(ticket));
+        changeDistributionButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+        distributionLabelContainer.add(changeDistributionButton);
+
+        distributionContainer.add(distributionLabelContainer);
+        // Column 1 with subtitle
+        Map<Long, Double> distribution = ticket.getDistribution();
+
+        for (Long key : distribution.keySet()) {
+            Optional<Person> optDistributionHolder = personDatabase.getById(key);
+            if (optDistributionHolder.isEmpty()) continue;
+            Box row = componentFactory.getSmallRow(optDistributionHolder.get(), distribution.get(key));
+            distributionContainer.add(row);
+        }
+        return distributionContainer;
+    }
+
+
+    // ========================================================================================== //
+    // Button actions
+    // ========================================================================================== //
+    // TODO: change this method
+    private void addTicket() {
+        // Get category
+        List<TicketCategory> categories = this.categoryDatabase.getAll();
+        List<String> categoriesStringList = categories.stream().map(TicketCategory::getName).toList();
+        Object[] categoriesStringArray = categoriesStringList.toArray();
+
+        Object category = JOptionPane.showInputDialog(null, "Choose your category", "Choose category", JOptionPane.PLAIN_MESSAGE, null, categoriesStringArray, categoriesStringArray[0]);
+
+        int index = categoriesStringList.indexOf(category);
+        Long categoryId = categories.get(index).getId();
+
+        // Get payerId
+        List<Person> persons = this.personDatabase.getAll();
+        List<String> personsStringList = persons.stream().map(Person::getName).toList();
+        Object[] personsStringArray = personsStringList.toArray();
+
+        Object payerPerson = JOptionPane.showInputDialog(null, "Choose your payer", "Choose payer", JOptionPane.PLAIN_MESSAGE, null, personsStringArray,null);
+
+        int payerIndex = personsStringList.indexOf(payerPerson);
+        Long payerId = persons.get(payerIndex).getId();
+
+        // Get personsInvolved
+        JList<Object> list = new JList<>(personsStringArray);
+        JScrollPane jscrollpane = new JScrollPane();
+        jscrollpane.setViewportView(list);
+
+        Object[] message = {"Select persons involved:", jscrollpane};
+
+        JOptionPane.showConfirmDialog(null, message, "Login", JOptionPane.DEFAULT_OPTION);
+
+        int[] indexes = list.getSelectedIndices();
+        List<Long> personsInvolved = Arrays.stream(indexes).mapToObj(i -> persons.get(i).getId()).toList();
+
+        Optional<Ticket> optionalTicket = ticketController.create(categoryId, 100, personsInvolved);
+
+        if (optionalTicket.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "An Error occurred creating the ticket");
+            return;
+        }
+
+        ticketController.setPayer(optionalTicket.get().getId(), payerId);
+
+        JOptionPane.showMessageDialog(null, "Successfully created ticket: %s".formatted(optionalTicket.get().getId()));
     }
 
     private void changeTicketCategory(Ticket ticket) {
@@ -351,7 +402,6 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         List<String> optionsStringList = options.stream().map(Person::getName).toList();
         Object[] optionsStringArray = optionsStringList.toArray();
 
-
         Object person = JOptionPane.showInputDialog(null, "Choose your payer", "Choose payer", JOptionPane.PLAIN_MESSAGE, null, optionsStringArray, optionsStringArray[0]);
 
         int index = optionsStringList.indexOf(person);
@@ -362,26 +412,13 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         JOptionPane.showMessageDialog(null, "Successfully changed category to %s".formatted(options.get(index).getName()));
     }
 
-    // TODO: change this method
-    private void addTicket() {
-        List<TicketCategory> options = this.categoryDatabase.getAll();
-        List<String> optionsStringList = options.stream().map(TicketCategory::getName).toList();
-        Object[] optionsStringArray = optionsStringList.toArray();
+    private void updateDistribution(Ticket ticket) {
 
-
-        Object category = JOptionPane.showInputDialog(null, "Choose your category", "Choose category", JOptionPane.PLAIN_MESSAGE, null, optionsStringArray, optionsStringArray[0]);
-
-        int index = optionsStringList.indexOf(category);
-        Long categoryId = options.get(index).getId();
-
-        Optional<Ticket> optionalTicket = ticketController.create(categoryId, 100, null);
-
-        if (optionalTicket.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "An Error occurred creating the ticket");
-            return;
-        }
-        JOptionPane.showMessageDialog(null, "Successfully created ticket: %s".formatted(optionalTicket.get().getId()));
     }
+
+    // ========================================================================================== //
+    // Value/Property changes + reactions
+    // ========================================================================================== //
 
 
     /**
@@ -415,6 +452,27 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         }
     }
 
+    public void updateTicketList() {
+        listModel.clear();
+        for (Ticket ticket : ticketDatabase.getAll()) {
+            listModel.addElement(ticket);
+        }
+        ticketJList.setModel(listModel);
+    }
+
+    public void updateRightPanel() {
+        if (this.selectedTicket == null) {
+            this.rightPanelLayout.show(this.rightPanel, "EmptyPanel");
+        } else {
+            this.rightPanel.add(createRightPanel(this.selectedTicket), "rightPanel");
+            this.rightPanelLayout.show(this.rightPanel, "rightPanel");
+        }
+    }
+
+    // ========================================================================================== //
+    // Extra lay-out objects
+    // ========================================================================================== //
+
     // Private object so that we can pass a Ticket in to the list, but only show its name and id
     private static class TicketListCellRenderer extends DefaultListCellRenderer {
         @Override
@@ -437,7 +495,7 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
             this.style = style;
         }
 
-        public Box getSmallRow(Ticket ditrsibutionHolderTicket, Ticket mainTicket, double amount) {
+        public Box getSmallRow(Person distributionHolder, double amount) {
             Box box = Box.createHorizontalBox();
             box.setOpaque(true);
             box.setBackground(this.style.getTransparantColor());
@@ -446,7 +504,7 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
             box.setAlignmentY(Component.CENTER_ALIGNMENT);
             box.add(Box.createHorizontalStrut(3 * horizontalOffset));
 
-            JLabel ticketLabel = getSecondarySmallLabel(ditrsibutionHolderTicket.getId() + ":");
+            JLabel ticketLabel = getSecondarySmallLabel(distributionHolder.getName() + ":");
             ticketLabel.setMaximumSize(new Dimension(300, 50));
 
             JLabel ditrsibutionLabel = getSecondarySmallLabel("€ " + amount);
@@ -459,11 +517,6 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
                 ditrsibutionLabel.setForeground(new Color(0, 153, 51));
             } else {
                 ditrsibutionLabel.setForeground(Color.red);
-
-                JButton payButton = getPrimaryButton("Pay");
-                payButton.setMaximumSize(new Dimension(100, 50));
-                payButton.addActionListener(e -> System.out.println("Something"));
-                box.add(payButton);
             }
             return box;
         }

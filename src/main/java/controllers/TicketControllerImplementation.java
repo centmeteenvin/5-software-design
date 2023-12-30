@@ -23,24 +23,22 @@ public class TicketControllerImplementation extends TicketController {
         Optional<TicketCategory> category = ticketCategoryDatabase.getById(categoryId);
         if (category.isEmpty()) return Optional.empty();
 
-        if (personsId != null) {
-            List<Person> people = new ArrayList<>();
-            for (Long personId : personsId) {
-                Optional<Person> person = personDatabase.getById(personId);
-                if (person.isEmpty()) return Optional.empty();
-                people.add(person.get());
-            }
+        List<Person> people = new ArrayList<>();
+        for (Long personId : personsId) {
+            Optional<Person> person = personDatabase.getById(personId);
+            if (person.isEmpty()) return Optional.empty();
+            people.add(person.get());
+
         }
 
         Optional<Ticket> ticket = ticketDatabase.create(new Ticket(System.nanoTime(), totalCost, categoryId));
         if (ticket.isEmpty()) return Optional.empty();
         ticketCategoryController.addTicket(categoryId, ticket.get().getId());
-        if (personsId != null) {
-            for (Long personId : personsId) {
-                personController.addTicket(personId, ticket.get().getId());
-                ticket.get().getDistribution().put(personId, totalCost / personsId.size());
-            }
+        for (Long personId : personsId) {
+            personController.addTicket(personId, ticket.get().getId());
+            ticket.get().getDistribution().put(personId, totalCost / personsId.size());
         }
+
         return ticket;
     }
 
