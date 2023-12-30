@@ -126,7 +126,29 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         ticketJList.setForeground(style.getListForegroundColor());
         ticketJList.setBackground(style.getListBackgroundColor());
         ticketJList.addListSelectionListener(this);
-        leftPanel.add(ticketJList);
+
+        JScrollPane ticketScrollPane = new JScrollPane(ticketJList);
+        ticketScrollPane.setBackground(style.getTransparantColor());
+        ticketScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
+        Box scrollPaneBox = Box.createVerticalBox();
+        scrollPaneBox.setOpaque(true);
+        scrollPaneBox.setBackground(style.getTransparantColor());
+        scrollPaneBox.add(ticketScrollPane);
+        scrollPaneBox.setMaximumSize(new Dimension(screenSize.width / 4, screenSize.height / 2));
+        scrollPaneBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        leftPanel.add(scrollPaneBox);
+
+        leftPanel.add(Box.createVerticalStrut(screenSize.height/20));
+
+        JButton calculateButton = componentFactory.getSecondaryButton("Calculate");
+        calculateButton.setMaximumSize(new Dimension(screenSize.width / 4, 100));
+        calculateButton.setPreferredSize(new Dimension(screenSize.width / 4, 100));
+        calculateButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        calculateButton.addActionListener(e -> {
+            ticketController.calculateAll();
+        });
+
+        leftPanel.add(calculateButton);
         return leftPanel;
     }
 
@@ -174,10 +196,10 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         topContainer.add(Box.createHorizontalStrut(horizontalOffset));
 
         // Button to ticketpage
-        JButton ticketpageButton = componentFactory.getPrimaryButton("Ticketpage");
+        JButton ticketpageButton = componentFactory.getPrimaryButton("Userpage");
         ticketpageButton.addActionListener(e -> {
             CardLayout layout = (CardLayout) layoutPanel.getLayout();
-            layout.show(layoutPanel, "TicketPanel");
+            layout.show(layoutPanel, "PersonPanel");
         });
         ticketpageButton.setAlignmentY(Component.CENTER_ALIGNMENT);
         topContainer.add(ticketpageButton);
@@ -371,7 +393,9 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
             }
         });
 
-        JOptionPane.showConfirmDialog(null, message, "Payed amount", JOptionPane.DEFAULT_OPTION);
+        while (decimalTextField.getValue() == null) {
+            JOptionPane.showConfirmDialog(null, message, "Payed amount", JOptionPane.DEFAULT_OPTION);
+        }
 
         double amountPayed = (double) decimalTextField.getValue();
 

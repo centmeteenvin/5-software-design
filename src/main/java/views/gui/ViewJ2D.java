@@ -57,7 +57,7 @@ public class ViewJ2D extends View {
 
         // Create different panels
         this.homePanel = new HomePanel(container, style);
-        this.personPanel = new PersonPanel(container, style, getPersonDatabase(), getPersonController());
+        this.personPanel = new PersonPanel(container, style, getPersonDatabase(), getPersonController(), getTicketController());
         this.ticketPanel = new TicketPanel(container, style, getTicketDatabase(), getTicketCategoryDatabase(), getPersonDatabase(), getTicketController());
         getPersonDatabase().addListener(this.personPanel);
         getTicketDatabase().addListener(this.ticketPanel);

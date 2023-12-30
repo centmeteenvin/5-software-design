@@ -1,6 +1,7 @@
 package views.gui.components.panels;
 
 import controllers.PersonController;
+import controllers.TicketController;
 import database.Database;
 import database.Property;
 import models.Person;
@@ -20,6 +21,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
     Style style;
     Database<Person> personDatabase;
     PersonController personController;
+    TicketController ticketController;
     DefaultListModel<Person> listModel;
     JList<Person> personJList;
     JPanel rightPanel;
@@ -30,11 +32,12 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
 
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-    public PersonPanel(JPanel layoutPanel, Style style, Database<Person> personDatabase, PersonController personController) {
+    public PersonPanel(JPanel layoutPanel, Style style, Database<Person> personDatabase, PersonController personController, TicketController ticketController) {
         this.layoutPanel = layoutPanel;
         this.style = style;
         this.personDatabase = personDatabase;
         this.personController = personController;
+        this.ticketController = ticketController;
         this.listModel = new DefaultListModel<>();
         this.rightPanel = new JPanel();
         this.rightPanelLayout = new CardLayout();
@@ -106,7 +109,29 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         personJList.setForeground(style.getListForegroundColor());
         personJList.setBackground(style.getListBackgroundColor());
         personJList.addListSelectionListener(this);
-        leftPanel.add(personJList);
+
+        JScrollPane ticketScrollPane = new JScrollPane(personJList);
+        ticketScrollPane.setBackground(style.getTransparantColor());
+        ticketScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
+        Box scrollPaneBox = Box.createVerticalBox();
+        scrollPaneBox.setOpaque(true);
+        scrollPaneBox.setBackground(style.getTransparantColor());
+        scrollPaneBox.add(ticketScrollPane);
+        scrollPaneBox.setMaximumSize(new Dimension(screenSize.width / 4, screenSize.height / 2));
+        scrollPaneBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        leftPanel.add(scrollPaneBox);
+
+        leftPanel.add(Box.createVerticalStrut(screenSize.height/20));
+
+        JButton calculateButton = componentFactory.getSecondaryButton("Calculate");
+        calculateButton.setMaximumSize(new Dimension(screenSize.width / 4, 100));
+        calculateButton.setPreferredSize(new Dimension(screenSize.width / 4, 100));
+        calculateButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        calculateButton.addActionListener(e -> {
+            ticketController.calculateAll();
+        });
+
+        leftPanel.add(calculateButton);
         return leftPanel;
     }
 
