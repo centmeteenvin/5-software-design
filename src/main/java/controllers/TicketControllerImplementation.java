@@ -7,8 +7,6 @@ import models.TicketCategory;
 
 import java.util.*;
 
-import static java.lang.Long.sum;
-
 
 public class TicketControllerImplementation extends TicketController {
 
@@ -30,6 +28,7 @@ public class TicketControllerImplementation extends TicketController {
             Optional<Person> person = personDatabase.getById(personId);
             if (person.isEmpty()) return Optional.empty();
             people.add(person.get());
+
         }
 
         Optional<Ticket> ticket = ticketDatabase.create(new Ticket(System.nanoTime(), totalCost, categoryId));
@@ -39,6 +38,7 @@ public class TicketControllerImplementation extends TicketController {
             personController.addTicket(personId, ticket.get().getId());
             ticket.get().getDistribution().put(personId, totalCost / personsId.size());
         }
+
         return ticket;
     }
 
@@ -128,7 +128,7 @@ public class TicketControllerImplementation extends TicketController {
     }
 
     /**
-
+     *
      */
     @Override
     public void calculate(Long id) {
@@ -179,7 +179,7 @@ public class TicketControllerImplementation extends TicketController {
     @Override
     public void calculateAll() {
         List<Person> persons = personDatabase.getAll();
-        for (Person person : persons){
+        for (Person person : persons) {
             Long id = person.getId();
             personController.resetDebt(id);
         }
