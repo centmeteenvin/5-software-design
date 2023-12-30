@@ -11,9 +11,11 @@ import views.gui.styles.Style;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -313,7 +315,7 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         distributionLabelContainer.add(distributionLabel);
 
         JButton changeDistributionButton = componentFactory.getPrimaryButton("change distribution");
-        changeDistributionButton.setMaximumSize(new Dimension(screenSize.width/5,50));
+        changeDistributionButton.setMaximumSize(new Dimension(screenSize.width / 5, 50));
         changeDistributionButton.addActionListener(e -> updateDistribution(ticket));
         changeDistributionButton.setAlignmentY(Component.CENTER_ALIGNMENT);
         distributionLabelContainer.add(changeDistributionButton);
@@ -337,6 +339,42 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
     // ========================================================================================== //
     // TODO: change this method
     private void addTicket() {
+        // Get payerId
+        List<Person> persons = this.personDatabase.getAll();
+        List<String> personsStringList = persons.stream().map(Person::getName).toList();
+        Object[] personsStringArray = personsStringList.toArray();
+
+        Object payerPerson = JOptionPane.showInputDialog(null, "Choose your payer", "Choose payer", JOptionPane.PLAIN_MESSAGE, null, personsStringArray, null);
+
+        int payerIndex = personsStringList.indexOf(payerPerson);
+        Long payerId = persons.get(payerIndex).getId();
+
+        // Get amount
+        // Create a NumberFormatter with a decimal format pattern
+        DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+        NumberFormatter formatter = new NumberFormatter(decimalFormat);
+        formatter.setValueClass(Double.class);
+        formatter.setAllowsInvalid(false); // Only accept valid numbers
+
+        // Create the JFormattedTextField and set the formatter
+        JFormattedTextField decimalTextField = new JFormattedTextField(formatter);
+        decimalTextField.setColumns(10);
+
+        Object[] message = {"Give payed amount: ", decimalTextField};
+
+        // Add an InputVerifier to validate the entered value
+        decimalTextField.setInputVerifier(new InputVerifier() {
+            @Override
+            public boolean verify(JComponent input) {
+                JFormattedTextField textField = (JFormattedTextField) input;
+                return textField.isEditValid(); // Return true only if the input is valid
+            }
+        });
+
+        JOptionPane.showConfirmDialog(null, message, "Payed amount", JOptionPane.DEFAULT_OPTION);
+
+        double amountPayed = (double) decimalTextField.getValue();
+
         // Get category
         List<TicketCategory> categories = this.categoryDatabase.getAll();
         List<String> categoriesStringList = categories.stream().map(TicketCategory::getName).toList();
@@ -347,29 +385,20 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         int index = categoriesStringList.indexOf(category);
         Long categoryId = categories.get(index).getId();
 
-        // Get payerId
-        List<Person> persons = this.personDatabase.getAll();
-        List<String> personsStringList = persons.stream().map(Person::getName).toList();
-        Object[] personsStringArray = personsStringList.toArray();
-
-        Object payerPerson = JOptionPane.showInputDialog(null, "Choose your payer", "Choose payer", JOptionPane.PLAIN_MESSAGE, null, personsStringArray,null);
-
-        int payerIndex = personsStringList.indexOf(payerPerson);
-        Long payerId = persons.get(payerIndex).getId();
 
         // Get personsInvolved
         JList<Object> list = new JList<>(personsStringArray);
         JScrollPane jscrollpane = new JScrollPane();
         jscrollpane.setViewportView(list);
 
-        Object[] message = {"Select persons involved:", jscrollpane};
+        Object[] message2 = {"Select persons involved:", jscrollpane};
 
-        JOptionPane.showConfirmDialog(null, message, "Login", JOptionPane.DEFAULT_OPTION);
+        JOptionPane.showConfirmDialog(null, message2, "Login", JOptionPane.DEFAULT_OPTION);
 
         int[] indexes = list.getSelectedIndices();
         List<Long> personsInvolved = Arrays.stream(indexes).mapToObj(i -> persons.get(i).getId()).toList();
 
-        Optional<Ticket> optionalTicket = ticketController.create(categoryId, 100, personsInvolved);
+        Optional<Ticket> optionalTicket = ticketController.create(categoryId, amountPayed, personsInvolved);
 
         if (optionalTicket.isEmpty()) {
             JOptionPane.showMessageDialog(null, "An Error occurred creating the ticket");
