@@ -93,13 +93,28 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         leftPanel.add(Box.createVerticalStrut(10));
 
         // Add Person button (Box2)
-        JButton createPersonButton = new JButton("+ Add User");
-        createPersonButton.setForeground(style.getButton1ForegroundColor());
-        createPersonButton.setBackground(style.getButton1BackgroundColor());
-        createPersonButton.setFont(style.getButtonFont());
-        createPersonButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        createPersonButton.addActionListener(e -> addUser());
-        leftPanel.add(createPersonButton);
+        Box buttonBox = Box.createHorizontalBox();
+        buttonBox.setOpaque(true);
+        buttonBox.setBackground(style.getTransparantColor());
+        buttonBox.setMaximumSize(new Dimension(screenSize.width / 4, 50));
+
+        buttonBox.add(Box.createHorizontalGlue());
+
+        JButton createTicketButton = componentFactory.getSecondaryButton("+ Add");
+        createTicketButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        createTicketButton.addActionListener(e -> addUser());
+        buttonBox.add(createTicketButton);
+
+        buttonBox.add(Box.createHorizontalGlue());
+
+        JButton deleteTicketButton = componentFactory.getSecondaryButton("- Delete");
+        deleteTicketButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        deleteTicketButton.addActionListener(e -> deleteUser(this.personJList.getSelectedValue()));
+        buttonBox.add(deleteTicketButton);
+
+        buttonBox.add(Box.createHorizontalGlue());
+
+        leftPanel.add(buttonBox);
 
         // Add buffer
         leftPanel.add(Box.createVerticalStrut(screenSize.height / 20));
@@ -362,6 +377,12 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
             return;
         }
         JOptionPane.showMessageDialog(null, "Successfully created person: %s".formatted(optionalPerson.get().getName()));
+    }
+
+    private void deleteUser(Person person){
+        if (person != null){
+            this.personController.delete(person.getId());
+        }
     }
 
     private void payTo(Person receiver, Person payer, Double amount) {

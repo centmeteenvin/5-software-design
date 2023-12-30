@@ -104,13 +104,28 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         leftPanel.add(Box.createVerticalStrut(10));
 
         // Add Ticket button (Box2)
-        JButton createTicketButton = new JButton("+ Add Ticket");
-        createTicketButton.setForeground(style.getButton1ForegroundColor());
-        createTicketButton.setBackground(style.getButton1BackgroundColor());
-        createTicketButton.setFont(style.getButtonFont());
+        Box buttonBox = Box.createHorizontalBox();
+        buttonBox.setOpaque(true);
+        buttonBox.setBackground(style.getTransparantColor());
+        buttonBox.setMaximumSize(new Dimension(screenSize.width / 4, 50));
+
+        buttonBox.add(Box.createHorizontalGlue());
+
+        JButton createTicketButton = componentFactory.getSecondaryButton("+ Add");
         createTicketButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         createTicketButton.addActionListener(e -> addTicket());
-        leftPanel.add(createTicketButton);
+        buttonBox.add(createTicketButton);
+
+        buttonBox.add(Box.createHorizontalGlue());
+
+        JButton deleteTicketButton = componentFactory.getSecondaryButton("- Delete");
+        deleteTicketButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        deleteTicketButton.addActionListener(e -> deleteTicket(this.ticketJList.getSelectedValue()));
+        buttonBox.add(deleteTicketButton);
+
+        buttonBox.add(Box.createHorizontalGlue());
+
+        leftPanel.add(buttonBox);
 
         // Add buffer
         leftPanel.add(Box.createVerticalStrut(screenSize.height / 20));
@@ -141,16 +156,22 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
 
         leftPanel.add(Box.createVerticalStrut(screenSize.height / 20));
 
-        JButton calculateButton = componentFactory.getSecondaryButton("Calculate");
-        calculateButton.setMaximumSize(new Dimension(screenSize.width / 4, 100));
-        calculateButton.setPreferredSize(new Dimension(screenSize.width / 4, 100));
-        calculateButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        calculateButton.addActionListener(e -> {
-            ticketController.calculateAll();
+        JButton createCategoryButton = componentFactory.getSecondaryButton("+ add category");
+        createCategoryButton.setMaximumSize(new Dimension(screenSize.width / 4, 100));
+        createCategoryButton.setPreferredSize(new Dimension(screenSize.width / 4, 100));
+        createCategoryButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        createCategoryButton.addActionListener(e -> {
+            createCategory();
         });
 
-        leftPanel.add(calculateButton);
+        leftPanel.add(createCategoryButton);
         return leftPanel;
+    }
+
+    private void deleteTicket(Ticket selectedValue) {
+        if (selectedValue != null){
+            ticketController.delete(selectedValue.getId());
+        }
     }
 
     private JPanel createTopContainer(String name) {
@@ -207,10 +228,10 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         return topContainer;
     }
 
+
     // ========================================================================================== //
     // Right panel + components
     // ========================================================================================== //
-
     Box createEmptyRightPanel() {
         Box rightPanel = Box.createVerticalBox();
         rightPanel.setOpaque(true);
@@ -391,8 +412,8 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
     // ========================================================================================== //
     // Button actions
     // ========================================================================================== //
-
     // TODO: change this method
+
     private void addTicket() {
         // Get payerId
         List<Person> persons = this.personDatabase.getAll();
@@ -498,6 +519,24 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
 
     private void updateDistribution(Ticket ticket) {
 
+    }
+
+    private void createCategory() {
+        String name = JOptionPane.showInputDialog(null, "Enter your full name");
+        while (name != null && name.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Invalid input, please enter a correct name");
+            name = JOptionPane.showInputDialog(null, "Enter your full name");
+        }
+        if (name == null) {
+            return;
+        }
+        Optional<TicketCategory> optionalCategory = ticketCategoryController.create(name);
+
+        if (optionalCategory.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "An Error occurred creating the person");
+            return;
+        }
+        JOptionPane.showMessageDialog(null, "Successfully created person: %s".formatted(optionalCategory.get().getName()));
     }
 
     // ========================================================================================== //
