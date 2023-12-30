@@ -1,5 +1,6 @@
 package views.gui.components.panels;
 
+import controllers.TicketCategoryController;
 import controllers.TicketController;
 import database.Database;
 import database.Property;
@@ -16,10 +17,8 @@ import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class TicketPanel extends JPanel implements ListSelectionListener, PropertyChangeListener {
     JPanel layoutPanel;
@@ -30,6 +29,7 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
     Database<Person> personDatabase;
 
     TicketController ticketController;
+    TicketCategoryController ticketCategoryController;
 
 
     DefaultListModel<Ticket> listModel;
@@ -42,13 +42,14 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     private Ticket selectedTicket;
 
-    public TicketPanel(JPanel layoutPanel, Style style, Database<Ticket> ticketDatabase, Database<TicketCategory> categoryDatabase, Database<Person> personDatabase, TicketController ticketController) {
+    public TicketPanel(JPanel layoutPanel, Style style, Database<Ticket> ticketDatabase, Database<TicketCategory> categoryDatabase, Database<Person> personDatabase, TicketController ticketController, TicketCategoryController ticketCategoryController) {
         this.layoutPanel = layoutPanel;
         this.style = style;
         this.ticketDatabase = ticketDatabase;
         this.categoryDatabase = categoryDatabase;
         this.personDatabase = personDatabase;
         this.ticketController = ticketController;
+        this.ticketCategoryController = ticketCategoryController;
         this.listModel = new DefaultListModel<>();
         this.rightPanel = new JPanel();
         this.rightPanelLayout = new CardLayout();
@@ -138,7 +139,7 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         scrollPaneBox.setAlignmentX(Component.CENTER_ALIGNMENT);
         leftPanel.add(scrollPaneBox);
 
-        leftPanel.add(Box.createVerticalStrut(screenSize.height/20));
+        leftPanel.add(Box.createVerticalStrut(screenSize.height / 20));
 
         JButton calculateButton = componentFactory.getSecondaryButton("Calculate");
         calculateButton.setMaximumSize(new Dimension(screenSize.width / 4, 100));
@@ -251,6 +252,10 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         Box usernameContainer = createCategoryContainer(ticket);
         rightPanel.add(usernameContainer);
 
+        // Add the total cost of the ticket
+        Box totalCostContainer = createTotalCostContainer(ticket.getCost());
+        rightPanel.add(totalCostContainer);
+
         // Add Id
         Box userIdContainer = createPayerIdContainer(ticket);
         rightPanel.add(userIdContainer);
@@ -275,7 +280,12 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
 
         usernameContainer.add(usernameLabel);
 
-        JLabel ticketInViewLabel = componentFactory.getSecondaryNormalLabel(String.valueOf(categoryDatabase.getById(ticket.getTicketCategoryId()).get().getName()));
+        JLabel ticketInViewLabel;
+        if (ticket.getTicketCategoryId() != 0L) {
+            ticketInViewLabel = componentFactory.getSecondaryNormalLabel(String.valueOf(categoryDatabase.getById(ticket.getTicketCategoryId()).get().getName()));
+        } else {
+            ticketInViewLabel = componentFactory.getSecondaryNormalLabel("InternalPay");
+        }
         ticketInViewLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
 
         usernameContainer.add(ticketInViewLabel);
@@ -285,6 +295,28 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         changeNameButton.setAlignmentY(Component.CENTER_ALIGNMENT);
         usernameContainer.add(changeNameButton);
         return usernameContainer;
+    }
+
+    private Box createTotalCostContainer(double cost) {
+        Box totalCostContainer = Box.createHorizontalBox();
+        totalCostContainer.setBackground(style.getTransparantColor());
+        totalCostContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
+        totalCostContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        totalCostContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        totalCostContainer.add(Box.createHorizontalStrut(horizontalOffset));
+
+        JLabel totalCostLabel = componentFactory.getSecondaryNormalLabel("Total Cost :");
+        totalCostLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
+
+        totalCostContainer.add(totalCostLabel);
+
+        JLabel ticketInViewLabel = componentFactory.getSecondaryNormalLabel("€ " + cost);
+        ticketInViewLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
+
+        totalCostContainer.add(ticketInViewLabel);
+
+        return totalCostContainer;
     }
 
     private Box createPayerIdContainer(Ticket ticket) {
@@ -364,7 +396,7 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
     private void addTicket() {
         // Get payerId
         List<Person> persons = this.personDatabase.getAll();
-        List<String> personsStringList = persons.stream().map(Person::getName).toList();
+        List<String> personsStringList = persons.stream().sorted(Comparator.comparing(Person::getName)).map(Person::getName).toList();
         Object[] personsStringArray = personsStringList.toArray();
 
         Object payerPerson = JOptionPane.showInputDialog(null, "Choose your payer", "Choose payer", JOptionPane.PLAIN_MESSAGE, null, personsStringArray, null);
@@ -402,14 +434,12 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
 
         // Get category
         List<TicketCategory> categories = this.categoryDatabase.getAll();
-        List<String> categoriesStringList = categories.stream().map(TicketCategory::getName).toList();
+        List<String> categoriesStringList = categories.stream().sorted(Comparator.comparing(TicketCategory::getName)).map(TicketCategory::getName).toList();
         Object[] categoriesStringArray = categoriesStringList.toArray();
 
         Object category = JOptionPane.showInputDialog(null, "Choose your category", "Choose category", JOptionPane.PLAIN_MESSAGE, null, categoriesStringArray, categoriesStringArray[0]);
-
         int index = categoriesStringList.indexOf(category);
         Long categoryId = categories.get(index).getId();
-
 
         // Get personsInvolved
         JList<Object> list = new JList<>(personsStringArray);
@@ -560,17 +590,14 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
             JLabel ticketLabel = getSecondarySmallLabel(distributionHolder.getName() + ":");
             ticketLabel.setMaximumSize(new Dimension(300, 50));
 
-            JLabel ditrsibutionLabel = getSecondarySmallLabel("€ " + amount);
-            ditrsibutionLabel.setMaximumSize(new Dimension(200, 50));
+            JLabel distributionLabel = getSecondarySmallLabel("€ " + amount);
+            distributionLabel.setMaximumSize(new Dimension(200, 50));
 
             box.add(ticketLabel);
-            box.add(ditrsibutionLabel);
+            box.add(distributionLabel);
 
-            if (amount >= 0.) {
-                ditrsibutionLabel.setForeground(new Color(0, 153, 51));
-            } else {
-                ditrsibutionLabel.setForeground(Color.red);
-            }
+            distributionLabel.setForeground(Color.red);
+
             return box;
         }
 

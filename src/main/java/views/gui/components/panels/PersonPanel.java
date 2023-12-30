@@ -1,6 +1,7 @@
 package views.gui.components.panels;
 
 import controllers.PersonController;
+import controllers.TicketCategoryController;
 import controllers.TicketController;
 import database.Database;
 import database.Property;
@@ -22,6 +23,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
     Database<Person> personDatabase;
     PersonController personController;
     TicketController ticketController;
+    TicketCategoryController categoryController;
     DefaultListModel<Person> listModel;
     JList<Person> personJList;
     JPanel rightPanel;
@@ -32,12 +34,13 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
 
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-    public PersonPanel(JPanel layoutPanel, Style style, Database<Person> personDatabase, PersonController personController, TicketController ticketController) {
+    public PersonPanel(JPanel layoutPanel, Style style, Database<Person> personDatabase, PersonController personController, TicketController ticketController, TicketCategoryController categoryController) {
         this.layoutPanel = layoutPanel;
         this.style = style;
         this.personDatabase = personDatabase;
         this.personController = personController;
         this.ticketController = ticketController;
+        this.categoryController = categoryController;
         this.listModel = new DefaultListModel<>();
         this.rightPanel = new JPanel();
         this.rightPanelLayout = new CardLayout();
@@ -320,8 +323,11 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         for (Long key : debts.keySet()) {
             Optional<Person> optDebtHolder = personDatabase.getById(key);
             if (optDebtHolder.isEmpty()) continue;
-            Box row = componentFactory.getSmallRow(optDebtHolder.get(), person, debts.get(key));
-            userDebtContainer.add(row);
+
+            if (debts.get(key) != 0) {
+                Box row = componentFactory.getSmallRow(optDebtHolder.get(), person, debts.get(key));
+                userDebtContainer.add(row);
+            }
         }
         return userDebtContainer;
     }
@@ -359,7 +365,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
     }
 
     private void payTo(Person receiver, Person payer, Double amount) {
-        personController.pay(payer.getId(), receiver.getId(), -amount);
+        personController.pay(receiver.getId(), payer.getId(), amount);
     }
 
 
@@ -452,7 +458,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
             box.add(personLabel);
             box.add(debtLabel);
 
-            if (amount >= 0.) {
+            if (amount < 0.) {
                 debtLabel.setForeground(new Color(0, 153, 51));
             } else {
                 debtLabel.setForeground(Color.red);

@@ -20,18 +20,20 @@ public class TicketControllerImplementation extends TicketController {
      */
     @Override
     public Optional<Ticket> create(Long categoryId, double totalCost, List<Long> personsId) {
-        Optional<TicketCategory> category = ticketCategoryDatabase.getById(categoryId);
-        if (category.isEmpty()) return Optional.empty();
+        if (categoryId != 0L){
+            Optional<TicketCategory> category = ticketCategoryDatabase.getById(categoryId);
+            if (category.isEmpty()) return Optional.empty();
+        }
 
         List<Person> people = new ArrayList<>();
         for (Long personId : personsId) {
             Optional<Person> person = personDatabase.getById(personId);
             if (person.isEmpty()) return Optional.empty();
             people.add(person.get());
-
         }
 
         Optional<Ticket> ticket = ticketDatabase.create(new Ticket(System.nanoTime(), totalCost, categoryId));
+
         if (ticket.isEmpty()) return Optional.empty();
         ticketCategoryController.addTicket(categoryId, ticket.get().getId());
         for (Long personId : personsId) {
@@ -128,7 +130,9 @@ public class TicketControllerImplementation extends TicketController {
     }
 
     /**
-     *
+     * Will go over the ticket and:
+     * - Add positive debt (needs to pay) equal to the distribution of the ticket to the persons involved
+     * - Add negative debt (needs to receive) equal to the total cost of the ticket to the person who payed
      */
     @Override
     public void calculate(Long id) {
@@ -140,22 +144,19 @@ public class TicketControllerImplementation extends TicketController {
         Map<Long, Double> distribution = ticket.get().getDistribution();
         if (distribution.values().stream().reduce(0., Double::sum) != ticket.get().getCost()) return;
 
-        Optional<Person> payer;
+        Optional<Person> payer = personDatabase.getById(ticket.get().getPayerId());
         // Check if the payer is not null
-        if (ticket.get().getPayerId() != null) {
-            // Check if the payer still exists
-            payer = personDatabase.getById(ticket.get().getPayerId());
-            if (payer.isEmpty()) return;
+        if (payer.isEmpty()) return;
 
-            for (Long debtHolder : distribution.keySet()) {
-                // Check if the debtHolder still exists
-                Optional<Person> person = personDatabase.getById(debtHolder);
-                if (person.isEmpty()) return;
+        // Check if the payer still exists
+        for (Long debtHolder : distribution.keySet()) {
+            // Check if the debtHolder still exists
+            Optional<Person> person = personDatabase.getById(debtHolder);
+            if (person.isEmpty()) return;
 
-                double difference = distribution.get(person.get().getId());
-                personController.modifyDebt(payer.get().getId(), debtHolder, difference);
-                personController.modifyDebt(debtHolder, payer.get().getId(), -difference);
-            }
+            double difference = distribution.get(person.get().getId());
+            personController.modifyDebt(payer.get().getId(), debtHolder, -difference);
+            personController.modifyDebt(debtHolder, payer.get().getId(), difference);
         }
     }
 
@@ -176,14 +177,19 @@ public class TicketControllerImplementation extends TicketController {
         }
     }
 
+    /**
+     * Will go over all the tickets and calculate how much everyone needs to pay to each other
+     */
     @Override
     public void calculateAll() {
+        // Reset all the debts of avery person in the database
         List<Person> persons = personDatabase.getAll();
         for (Person person : persons) {
             Long id = person.getId();
             personController.resetDebt(id);
         }
 
+        // Go over al the tickets in the database and add the debt to the right persons
         List<Ticket> tickets = ticketDatabase.getAll();
         for (Ticket ticket : tickets) {
             Long id = ticket.getId();

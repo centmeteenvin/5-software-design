@@ -57,11 +57,14 @@ public class ViewJ2D extends View {
 
         // Create different panels
         this.homePanel = new HomePanel(container, style);
-        this.personPanel = new PersonPanel(container, style, getPersonDatabase(), getPersonController(), getTicketController());
-        this.ticketPanel = new TicketPanel(container, style, getTicketDatabase(), getTicketCategoryDatabase(), getPersonDatabase(), getTicketController());
+        this.personPanel = new PersonPanel(container, style, getPersonDatabase(), getPersonController(), getTicketController(), getTicketCategoryController());
+        this.ticketPanel = new TicketPanel(container, style, getTicketDatabase(), getTicketCategoryDatabase(), getPersonDatabase(), getTicketController(), getTicketCategoryController());
         getPersonDatabase().addListener(this.personPanel);
         getTicketDatabase().addListener(this.ticketPanel);
         getPersonDatabase().addListener(this.ticketPanel);
+
+        //Put in some test objects
+        createTestObjects();
 
         // Add every panel to the container
         container.add(this.homePanel, "HomePanel");
@@ -71,7 +74,13 @@ public class ViewJ2D extends View {
         // Show the homepanel
         layout.show(container, "TicketPanel");
 
+        // Add the container to the frame
+        frame.add(container);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    }
 
+    private void createTestObjects() {
         getTicketCategoryController().create("Cat0");
         getTicketCategoryController().create("Cat1");
 
@@ -79,13 +88,8 @@ public class ViewJ2D extends View {
         Optional<Person> person2 = getPersonController().create("Bar");
         Optional<Person> person3 = getPersonController().create("Baz");
 
-        getPersonController().modifyDebt(person1.get().getId(), person2.get().getId(), -10.2);
-        getPersonController().modifyDebt(person1.get().getId(), person3.get().getId(), 102);
+        //getPersonController().modifyDebt(person1.get().getId(), person2.get().getId(), -10.2);
+        //getPersonController().modifyDebt(person1.get().getId(), person3.get().getId(), 102);
 
-
-        // Add the container to the frame
-        frame.add(container);
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 }

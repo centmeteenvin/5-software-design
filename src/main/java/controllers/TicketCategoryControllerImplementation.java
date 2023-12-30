@@ -16,7 +16,6 @@ public class TicketCategoryControllerImplementation extends TicketCategoryContro
     public Optional<TicketCategory> create(String name) {
         long id = System.nanoTime();
         Optional<TicketCategory> ticketCategory = ticketCategoryDatabase.create(new TicketCategory(id, name));
-
         return ticketCategory;
     }
 
