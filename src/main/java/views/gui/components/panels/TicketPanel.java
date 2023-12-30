@@ -359,6 +359,7 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
     // ========================================================================================== //
     // Button actions
     // ========================================================================================== //
+
     // TODO: change this method
     private void addTicket() {
         // Get payerId
@@ -472,7 +473,6 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
     // ========================================================================================== //
     // Value/Property changes + reactions
     // ========================================================================================== //
-
 
     /**
      * This function will run every time a different value is selected in the JList

@@ -52,6 +52,10 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         this.add(this.rightPanel, BorderLayout.CENTER);
     }
 
+    // ========================================================================================== //
+    // Left panel + components
+    // ========================================================================================== //
+
     Box createLeftPanel() {
         Box leftPanel = Box.createVerticalBox();
         leftPanel.setPreferredSize(new Dimension(screenSize.width / 4, screenSize.height));
@@ -121,7 +125,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         scrollPaneBox.setAlignmentX(Component.CENTER_ALIGNMENT);
         leftPanel.add(scrollPaneBox);
 
-        leftPanel.add(Box.createVerticalStrut(screenSize.height/20));
+        leftPanel.add(Box.createVerticalStrut(screenSize.height / 20));
 
         JButton calculateButton = componentFactory.getSecondaryButton("Calculate");
         calculateButton.setMaximumSize(new Dimension(screenSize.width / 4, 100));
@@ -133,132 +137,6 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
 
         leftPanel.add(calculateButton);
         return leftPanel;
-    }
-
-    /**
-     * Method that creates the whole right part of the lay-out. It holds
-     * - The chosen person name and id
-     * - The changeName button to change the chosen persons name
-     * - The debtHolders and pay buttons to repay the debt
-     *
-     * <p>
-     * The values given depends on the selected person in the PersonJList on the left panel
-     * </p>
-     *
-     * @param person the person whose values will be displayed
-     * @return the rightPanel
-     */
-    Box createRightPanel(Person person) {
-        // A VerticalBox is just a JPanel with BoxLayout in the Y-axis
-        Box rightPanel = Box.createVerticalBox();
-        rightPanel.setOpaque(true);
-        rightPanel.setBackground(style.getBackgroundSecondaryColor());
-        rightPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        rightPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
-
-        // Add top with name and buttons
-        JPanel topContainer = createTopContainer(person.getName());
-        rightPanel.add(topContainer);
-
-        // Add username with button to change name
-        Box usernameContainer = createUsernameContainer(person);
-        rightPanel.add(usernameContainer);
-
-        // Add Id
-        Box userIdContainer = createUserIdContainer(person.getId());
-        rightPanel.add(userIdContainer);
-
-        // Add debts
-        Box userDebtContainer = Box.createVerticalBox();
-        userDebtContainer.setBackground(style.getTransparantColor());
-        userDebtContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 1000));
-        userDebtContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
-        userDebtContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
-
-        Box debtLabelContainer = Box.createHorizontalBox();
-        debtLabelContainer.setMaximumSize(new Dimension(2 * screenSize.width, 75));
-        debtLabelContainer.add(Box.createHorizontalStrut(horizontalOffset));
-        debtLabelContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
-        debtLabelContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
-
-        JLabel userDebtLabel = componentFactory.getSecondaryNormalLabel("Debts :");
-        userDebtLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
-        debtLabelContainer.add(userDebtLabel);
-
-        userDebtContainer.add(debtLabelContainer);
-        // Column 1 with subtitle
-        Map<Long, Double> debts = person.getDebts();
-
-        for (Long key : debts.keySet()) {
-            Optional<Person> optDebtHolder = personDatabase.getById(key);
-            if (optDebtHolder.isEmpty()) continue;
-            Box row = componentFactory.getSmallRow(optDebtHolder.get(), person, debts.get(key));
-            userDebtContainer.add(row);
-        }
-
-        rightPanel.add(userDebtContainer);
-
-        return rightPanel;
-    }
-
-    private Box createUsernameContainer(Person person) {
-        Box usernameContainer = Box.createHorizontalBox();
-        usernameContainer.setBackground(style.getTransparantColor());
-        usernameContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
-        usernameContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
-        usernameContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
-
-        usernameContainer.add(Box.createHorizontalStrut(horizontalOffset));
-
-        JLabel usernameLabel = componentFactory.getSecondaryNormalLabel("Username :");
-        usernameLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
-
-        usernameContainer.add(usernameLabel);
-
-        JLabel personInViewLabel = componentFactory.getSecondaryNormalLabel(person.getName());
-        personInViewLabel.setMaximumSize(new Dimension(screenSize.width / 6, 75));
-
-        usernameContainer.add(personInViewLabel);
-
-        JButton changeNameButton = componentFactory.getPrimaryButton("change name");
-        changeNameButton.addActionListener(e -> changeUserName(person));
-        changeNameButton.setAlignmentY(Component.CENTER_ALIGNMENT);
-        usernameContainer.add(changeNameButton);
-        return usernameContainer;
-    }
-
-    Box createEmptyRightPanel() {
-        Box rightPanel = Box.createVerticalBox();
-        rightPanel.setOpaque(true);
-        rightPanel.setBackground(style.getBackgroundSecondaryColor());
-
-        // Add top with name and buttons
-        JPanel topContainer = createTopContainer("");
-        rightPanel.add(topContainer);
-
-        return rightPanel;
-    }
-
-
-    private Box createUserIdContainer(Long id) {
-        Box userIdContainer = Box.createHorizontalBox();
-        userIdContainer.setOpaque(true);
-        userIdContainer.setBackground(style.getTransparantColor());
-        userIdContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
-        userIdContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
-        userIdContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
-
-        userIdContainer.add(Box.createHorizontalStrut(horizontalOffset));
-
-        JLabel userIdLabel = componentFactory.getSecondaryNormalLabel("Id :");
-        userIdLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
-        userIdContainer.add(userIdLabel);
-
-        JLabel personInViewLabel = componentFactory.getSecondaryNormalLabel(String.valueOf(String.valueOf(id)));
-        personInViewLabel.setMaximumSize(new Dimension(screenSize.width / 3, 100));
-        userIdContainer.add(personInViewLabel);
-
-        return userIdContainer;
     }
 
     private JPanel createTopContainer(String name) {
@@ -315,13 +193,142 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         return topContainer;
     }
 
-    public void updatePersonList() {
-        listModel.clear();
-        for (Person person : personDatabase.getAll()) {
-            listModel.addElement(person);
-        }
-        personJList.setModel(listModel);
+    // ========================================================================================== //
+    // Right panel + components
+    // ========================================================================================== //
+
+    Box createEmptyRightPanel() {
+        Box rightPanel = Box.createVerticalBox();
+        rightPanel.setOpaque(true);
+        rightPanel.setBackground(style.getBackgroundSecondaryColor());
+
+        // Add top with name and buttons
+        JPanel topContainer = createTopContainer("");
+        rightPanel.add(topContainer);
+
+        return rightPanel;
     }
+
+    /**
+     * Method that creates the whole right part of the lay-out. It holds
+     * - The chosen person name and id
+     * - The changeName button to change the chosen persons name
+     * - The debtHolders and pay buttons to repay the debt
+     *
+     * <p>
+     * The values given depends on the selected person in the PersonJList on the left panel
+     * </p>
+     *
+     * @param person the person whose values will be displayed
+     * @return the rightPanel
+     */
+    Box createRightPanel(Person person) {
+        // A VerticalBox is just a JPanel with BoxLayout in the Y-axis
+        Box rightPanel = Box.createVerticalBox();
+        rightPanel.setOpaque(true);
+        rightPanel.setBackground(style.getBackgroundSecondaryColor());
+        rightPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        rightPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        // Add top with name and buttons
+        JPanel topContainer = createTopContainer(person.getName());
+        rightPanel.add(topContainer);
+
+        // Add username with button to change name
+        Box usernameContainer = createUsernameContainer(person);
+        rightPanel.add(usernameContainer);
+
+        // Add Id
+        Box userIdContainer = createUserIdContainer(person.getId());
+        rightPanel.add(userIdContainer);
+
+        // Add debts
+        Box userDebtContainer = createUserDebtContainer(person);
+        rightPanel.add(userDebtContainer);
+
+        return rightPanel;
+    }
+
+    private Box createUsernameContainer(Person person) {
+        Box usernameContainer = Box.createHorizontalBox();
+        usernameContainer.setBackground(style.getTransparantColor());
+        usernameContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
+        usernameContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        usernameContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        usernameContainer.add(Box.createHorizontalStrut(horizontalOffset));
+
+        JLabel usernameLabel = componentFactory.getSecondaryNormalLabel("Username :");
+        usernameLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
+
+        usernameContainer.add(usernameLabel);
+
+        JLabel personInViewLabel = componentFactory.getSecondaryNormalLabel(person.getName());
+        personInViewLabel.setMaximumSize(new Dimension(screenSize.width / 6, 75));
+
+        usernameContainer.add(personInViewLabel);
+
+        JButton changeNameButton = componentFactory.getPrimaryButton("change name");
+        changeNameButton.addActionListener(e -> changeUserName(person));
+        changeNameButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+        usernameContainer.add(changeNameButton);
+        return usernameContainer;
+    }
+
+    private Box createUserIdContainer(Long id) {
+        Box userIdContainer = Box.createHorizontalBox();
+        userIdContainer.setOpaque(true);
+        userIdContainer.setBackground(style.getTransparantColor());
+        userIdContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
+        userIdContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        userIdContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        userIdContainer.add(Box.createHorizontalStrut(horizontalOffset));
+
+        JLabel userIdLabel = componentFactory.getSecondaryNormalLabel("Id :");
+        userIdLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
+        userIdContainer.add(userIdLabel);
+
+        JLabel personInViewLabel = componentFactory.getSecondaryNormalLabel(String.valueOf(String.valueOf(id)));
+        personInViewLabel.setMaximumSize(new Dimension(screenSize.width / 3, 100));
+        userIdContainer.add(personInViewLabel);
+
+        return userIdContainer;
+    }
+
+    private Box createUserDebtContainer(Person person) {
+        Box userDebtContainer = Box.createVerticalBox();
+        userDebtContainer.setBackground(style.getTransparantColor());
+        userDebtContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 1000));
+        userDebtContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        userDebtContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        Box debtLabelContainer = Box.createHorizontalBox();
+        debtLabelContainer.setMaximumSize(new Dimension(2 * screenSize.width, 75));
+        debtLabelContainer.add(Box.createHorizontalStrut(horizontalOffset));
+        debtLabelContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        debtLabelContainer.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        JLabel userDebtLabel = componentFactory.getSecondaryNormalLabel("Debts :");
+        userDebtLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
+        debtLabelContainer.add(userDebtLabel);
+
+        userDebtContainer.add(debtLabelContainer);
+        // Column 1 with subtitle
+        Map<Long, Double> debts = person.getDebts();
+
+        for (Long key : debts.keySet()) {
+            Optional<Person> optDebtHolder = personDatabase.getById(key);
+            if (optDebtHolder.isEmpty()) continue;
+            Box row = componentFactory.getSmallRow(optDebtHolder.get(), person, debts.get(key));
+            userDebtContainer.add(row);
+        }
+        return userDebtContainer;
+    }
+
+    // ========================================================================================== //
+    // Button actions
+    // ========================================================================================== //
 
     private void changeUserName(Person person) {
         String name = JOptionPane.showInputDialog(null, "Enter your new name");
@@ -351,10 +358,14 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         JOptionPane.showMessageDialog(null, "Successfully created person: %s".formatted(optionalPerson.get().getName()));
     }
 
-
     private void payTo(Person receiver, Person payer, Double amount) {
         personController.pay(payer.getId(), receiver.getId(), -amount);
     }
+
+
+    // ========================================================================================== //
+    // Value/Property changes + reactions
+    // ========================================================================================== //
 
     /**
      * This function will run every time a different value is selected in the JList
@@ -388,6 +399,18 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
             updatePersonList();
         }
     }
+
+    public void updatePersonList() {
+        listModel.clear();
+        for (Person person : personDatabase.getAll()) {
+            listModel.addElement(person);
+        }
+        personJList.setModel(listModel);
+    }
+
+    // ========================================================================================== //
+    // Extra lay-out objects
+    // ========================================================================================== //
 
     // Private object so that we can pass a Person in to the list, but only show its name and id
     private static class PersonListCellRenderer extends DefaultListCellRenderer {
