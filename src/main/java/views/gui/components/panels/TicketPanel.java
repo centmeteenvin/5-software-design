@@ -3,6 +3,7 @@ package views.gui.components.panels;
 import controllers.TicketController;
 import database.Database;
 import database.Property;
+import models.Person;
 import models.Ticket;
 import models.TicketCategory;
 import views.gui.styles.Style;
@@ -13,11 +14,9 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class TicketPanel extends JPanel implements ListSelectionListener, PropertyChangeListener {
     JPanel layoutPanel;
@@ -25,6 +24,7 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
 
     Database<Ticket> ticketDatabase;
     Database<TicketCategory> categoryDatabase;
+    Database<Person> personDatabase;
 
     TicketController ticketController;
 
@@ -36,19 +36,22 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
     ComponentFactory componentFactory;
 
     int horizontalOffset = 10;
+    private Ticket selectedTicket;
 
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-    public TicketPanel(JPanel layoutPanel, Style style, Database<Ticket> ticketDatabase, Database<TicketCategory> categoryDatabase, TicketController ticketController) {
+    public TicketPanel(JPanel layoutPanel, Style style, Database<Ticket> ticketDatabase, Database<TicketCategory> categoryDatabase, Database<Person> personDatabase, TicketController ticketController) {
         this.layoutPanel = layoutPanel;
         this.style = style;
         this.ticketDatabase = ticketDatabase;
         this.categoryDatabase = categoryDatabase;
+        this.personDatabase = personDatabase;
         this.ticketController = ticketController;
         this.listModel = new DefaultListModel<>();
         this.rightPanel = new JPanel();
         this.rightPanelLayout = new CardLayout();
         this.componentFactory = new ComponentFactory(this.style);
+        this.selectedTicket = null;
 
         this.setLayout(new BorderLayout());
 
@@ -146,11 +149,11 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         rightPanel.add(topContainer);
 
         // Add username with button to change name
-        Box usernameContainer = createUsernameContainer(ticket);
+        Box usernameContainer = createCategoryContainer(ticket);
         rightPanel.add(usernameContainer);
 
         // Add Id
-        Box userIdContainer = createUserIdContainer(ticket.getId());
+        Box userIdContainer = createPayerIdContainer(ticket);
         rightPanel.add(userIdContainer);
 
         // Add ditrsibutions
@@ -186,7 +189,7 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         return rightPanel;
     }
 
-    private Box createUsernameContainer(Ticket ticket) {
+    private Box createCategoryContainer(Ticket ticket) {
         Box usernameContainer = Box.createHorizontalBox();
         usernameContainer.setBackground(style.getTransparantColor());
         usernameContainer.setMaximumSize(new Dimension(3 * screenSize.width / 4, 75));
@@ -195,18 +198,18 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
 
         usernameContainer.add(Box.createHorizontalStrut(horizontalOffset));
 
-        JLabel usernameLabel = componentFactory.getSecondaryNormalLabel("Username :");
+        JLabel usernameLabel = componentFactory.getSecondaryNormalLabel("Category :");
         usernameLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
 
         usernameContainer.add(usernameLabel);
 
-        JLabel ticketInViewLabel = componentFactory.getSecondaryNormalLabel(String.valueOf(ticket.getId()));
+        JLabel ticketInViewLabel = componentFactory.getSecondaryNormalLabel(String.valueOf(categoryDatabase.getById(ticket.getTicketCategoryId()).get().getName()));
         ticketInViewLabel.setMaximumSize(new Dimension(screenSize.width / 6, 75));
 
         usernameContainer.add(ticketInViewLabel);
 
-        JButton changeNameButton = componentFactory.getPrimaryButton("change name");
-        changeNameButton.addActionListener(e -> changeUserName(ticket));
+        JButton changeNameButton = componentFactory.getPrimaryButton("change category");
+        changeNameButton.addActionListener(e -> changeTicketCategory(ticket));
         changeNameButton.setAlignmentY(Component.CENTER_ALIGNMENT);
         usernameContainer.add(changeNameButton);
         return usernameContainer;
@@ -225,7 +228,7 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
     }
 
 
-    private Box createUserIdContainer(Long id) {
+    private Box createPayerIdContainer(Ticket ticket) {
         Box userIdContainer = Box.createHorizontalBox();
         userIdContainer.setOpaque(true);
         userIdContainer.setBackground(style.getTransparantColor());
@@ -235,13 +238,23 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
 
         userIdContainer.add(Box.createHorizontalStrut(horizontalOffset));
 
-        JLabel userIdLabel = componentFactory.getSecondaryNormalLabel("Id :");
+        JLabel userIdLabel = componentFactory.getSecondaryNormalLabel("Payer :");
         userIdLabel.setMaximumSize(new Dimension(screenSize.width / 7, 75));
         userIdContainer.add(userIdLabel);
 
-        JLabel ticketInViewLabel = componentFactory.getSecondaryNormalLabel(String.valueOf(String.valueOf(id)));
-        ticketInViewLabel.setMaximumSize(new Dimension(screenSize.width / 3, 100));
+        JLabel ticketInViewLabel;
+        if (ticket.getPayerId() != null) {
+            ticketInViewLabel = componentFactory.getSecondaryNormalLabel(personDatabase.getById(ticket.getPayerId()).get().getName());
+        } else {
+            ticketInViewLabel = componentFactory.getSecondaryNormalLabel("");
+        }
+        ticketInViewLabel.setMaximumSize(new Dimension(screenSize.width / 6, 100));
         userIdContainer.add(ticketInViewLabel);
+
+        JButton changeNameButton = componentFactory.getPrimaryButton("change payer");
+        changeNameButton.addActionListener(e -> changePayer(ticket));
+        changeNameButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+        userIdContainer.add(changeNameButton);
 
         return userIdContainer;
     }
@@ -308,10 +321,45 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         ticketJList.setModel(listModel);
     }
 
-    private void changeUserName(Ticket ticket) {
-        String name = JOptionPane.showInputDialog(null, "Enter your new name");
-        if (name == null) {
+    public void updateRightPanel() {
+        if (this.selectedTicket == null) {
+            this.rightPanelLayout.show(this.rightPanel, "EmptyPanel");
+        } else {
+            this.rightPanel.add(createRightPanel(this.selectedTicket), "rightPanel");
+            this.rightPanelLayout.show(this.rightPanel, "rightPanel");
         }
+    }
+
+    private void changeTicketCategory(Ticket ticket) {
+        List<TicketCategory> options = this.categoryDatabase.getAll();
+        List<String> optionsStringList = options.stream().map(TicketCategory::getName).toList();
+        Object[] optionsStringArray = optionsStringList.toArray();
+
+
+        Object category = JOptionPane.showInputDialog(null, "Choose your category", "Choose category", JOptionPane.PLAIN_MESSAGE, null, optionsStringArray, optionsStringArray[0]);
+
+        int index = optionsStringList.indexOf(category);
+        Long categoryId = options.get(index).getId();
+
+        ticketController.changeCategory(ticket.getId(), categoryId);
+
+        JOptionPane.showMessageDialog(null, "Successfully changed category: %s".formatted(options.get(index).getName()));
+    }
+
+    private void changePayer(Ticket ticket) {
+        List<Person> options = this.personDatabase.getAll();
+        List<String> optionsStringList = options.stream().map(Person::getName).toList();
+        Object[] optionsStringArray = optionsStringList.toArray();
+
+
+        Object person = JOptionPane.showInputDialog(null, "Choose your payer", "Choose payer", JOptionPane.PLAIN_MESSAGE, null, optionsStringArray, optionsStringArray[0]);
+
+        int index = optionsStringList.indexOf(person);
+        Long personId = options.get(index).getId();
+
+        ticketController.setPayer(ticket.getId(), personId);
+
+        JOptionPane.showMessageDialog(null, "Successfully changed category to %s".formatted(options.get(index).getName()));
     }
 
     // TODO: change this method
@@ -321,12 +369,12 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         Object[] optionsStringArray = optionsStringList.toArray();
 
 
-        Object category = JOptionPane.showInputDialog(null, "Choose your category", "Choose category", JOptionPane.PLAIN_MESSAGE,null,optionsStringArray,optionsStringArray[0]);
+        Object category = JOptionPane.showInputDialog(null, "Choose your category", "Choose category", JOptionPane.PLAIN_MESSAGE, null, optionsStringArray, optionsStringArray[0]);
 
         int index = optionsStringList.indexOf(category);
         Long categoryId = options.get(index).getId();
 
-        Optional<Ticket> optionalTicket = ticketController.create(categoryId,100,null);
+        Optional<Ticket> optionalTicket = ticketController.create(categoryId, 100, null);
 
         if (optionalTicket.isEmpty()) {
             JOptionPane.showMessageDialog(null, "An Error occurred creating the ticket");
@@ -343,13 +391,8 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
      */
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        Ticket selectedTicket = this.ticketJList.getSelectedValue();
-        if (selectedTicket == null) {
-            this.rightPanelLayout.show(this.rightPanel, "EmptyPanel");
-        } else {
-            this.rightPanel.add(createRightPanel(selectedTicket), "rightPanel");
-            this.rightPanelLayout.show(this.rightPanel, "rightPanel");
-        }
+        this.selectedTicket = this.ticketJList.getSelectedValue();
+        updateRightPanel();
     }
 
     /**
@@ -360,12 +403,15 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
      */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(Property.CREATE.name)) {
+        if (evt.getPropertyName().equals(Property.UPDATE.name)) {
             updateTicketList();
-        } else if (evt.getPropertyName().equals(Property.UPDATE.name)) {
+            updateRightPanel();
+        } else if (evt.getPropertyName().equals(Property.CREATE.name)) {
             updateTicketList();
+            updateRightPanel();
         } else if (evt.getPropertyName().equals(Property.DELETE.name)) {
             updateTicketList();
+            updateRightPanel();
         }
     }
 

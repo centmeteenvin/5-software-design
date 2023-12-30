@@ -58,9 +58,10 @@ public class ViewJ2D extends View {
         // Create different panels
         this.homePanel = new HomePanel(container, style);
         this.personPanel = new PersonPanel(container, style, getPersonDatabase(), getPersonController());
-        this.ticketPanel = new TicketPanel(container, style, getTicketDatabase(), getTicketCategoryDatabase(), getTicketController());
+        this.ticketPanel = new TicketPanel(container, style, getTicketDatabase(), getTicketCategoryDatabase(), getPersonDatabase(), getTicketController());
         getPersonDatabase().addListener(this.personPanel);
         getTicketDatabase().addListener(this.ticketPanel);
+        getPersonDatabase().addListener(this.ticketPanel);
 
         // Add every panel to the container
         container.add(this.homePanel, "HomePanel");
@@ -72,6 +73,7 @@ public class ViewJ2D extends View {
 
 
         getTicketCategoryController().create("Cat0");
+        getTicketCategoryController().create("Cat1");
 
         Optional<Person> person1 = getPersonController().create("Foo");
         Optional<Person> person2 = getPersonController().create("Bar");
