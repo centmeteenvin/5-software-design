@@ -19,6 +19,8 @@ import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.lang.Math.round;
+
 public class PersonPanel extends JPanel implements ListSelectionListener, PropertyChangeListener {
     JPanel layoutPanel;
     Style style;
@@ -508,7 +510,8 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
             JLabel personLabel = getSecondarySmallLabel(debtHolderPerson.getName() + ":");
             personLabel.setMaximumSize(new Dimension(300, 50));
 
-            JLabel debtLabel = getSecondarySmallLabel("€ " + amount);
+            double amount_rounded = round(amount*100)/100.;
+            JLabel debtLabel = getSecondarySmallLabel("€ " + amount_rounded);
             debtLabel.setMaximumSize(new Dimension(200, 50));
 
             box.add(personLabel);

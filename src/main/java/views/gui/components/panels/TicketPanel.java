@@ -20,6 +20,8 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.*;
 
+import static java.lang.Math.round;
+
 public class TicketPanel extends JPanel implements ListSelectionListener, PropertyChangeListener {
     JPanel layoutPanel;
     Style style;
@@ -522,10 +524,10 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
     }
 
     private void createCategory() {
-        String name = JOptionPane.showInputDialog(null, "Enter your full name");
+        String name = JOptionPane.showInputDialog(null, "Enter category name");
         while (name != null && name.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Invalid input, please enter a correct name");
-            name = JOptionPane.showInputDialog(null, "Enter your full name");
+            name = JOptionPane.showInputDialog(null, "Enter category name");
         }
         if (name == null) {
             return;
@@ -536,7 +538,7 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
             JOptionPane.showMessageDialog(null, "An Error occurred creating the person");
             return;
         }
-        JOptionPane.showMessageDialog(null, "Successfully created person: %s".formatted(optionalCategory.get().getName()));
+        JOptionPane.showMessageDialog(null, "Successfully created new category: %s".formatted(optionalCategory.get().getName()));
     }
 
     // ========================================================================================== //
@@ -632,7 +634,8 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
             JLabel ticketLabel = getSecondarySmallLabel(distributionHolder.getName() + ":");
             ticketLabel.setMaximumSize(new Dimension(300, 50));
 
-            JLabel distributionLabel = getSecondarySmallLabel("€ " + amount);
+            double amount_rounded = round(amount*100)/100.;
+            JLabel distributionLabel = getSecondarySmallLabel("€ " + amount_rounded);
             distributionLabel.setMaximumSize(new Dimension(200, 50));
 
             box.add(ticketLabel);
