@@ -20,6 +20,7 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.*;
 
+import static java.lang.Math.abs;
 import static java.lang.Math.round;
 
 public class TicketPanel extends JPanel implements ListSelectionListener, PropertyChangeListener {
@@ -171,7 +172,7 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
     }
 
     private void deleteTicket(Ticket selectedValue) {
-        if (selectedValue != null){
+        if (selectedValue != null) {
             ticketController.delete(selectedValue.getId());
         }
     }
@@ -393,7 +394,7 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
 
         JButton changeDistributionButton = componentFactory.getPrimaryButton("change distribution");
         changeDistributionButton.setMaximumSize(new Dimension(screenSize.width / 5, 50));
-        changeDistributionButton.addActionListener(e -> updateDistribution(ticket));
+        changeDistributionButton.addActionListener(e -> changeDistribution(ticket));
         changeDistributionButton.setAlignmentY(Component.CENTER_ALIGNMENT);
         distributionLabelContainer.add(changeDistributionButton);
 
@@ -519,8 +520,46 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         JOptionPane.showMessageDialog(null, "Successfully changed category to %s".formatted(options.get(index).getName()));
     }
 
-    private void updateDistribution(Ticket ticket) {
+    private void changeDistribution(Ticket ticket) {
+        // Get distribution
+        Map<Long, Double> distribution = ticket.getDistribution();
+        Set<Long> keys = distribution.keySet();
 
+        Object[] message = new Object[keys.size() * 2];
+        Map<Long, JFormattedTextField> inputs = new HashMap<>();
+
+        int i = 0;
+        for (Long key : keys) {
+            Optional<Person> person = personDatabase.getById(key);
+            if (person.isEmpty()) continue;
+
+            message[i++] = person.get().getName();
+            JFormattedTextField input = getDecimalInputField();
+            input.setValue(distribution.get(key));
+            inputs.put(key, input);
+            message[i++] = input;
+        }
+        double costRounded = round(ticket.getCost() * 100) / 100.;
+
+        JOptionPane.showConfirmDialog(null, message, "Change distribution: total cost %.2f".formatted(costRounded), JOptionPane.DEFAULT_OPTION);
+        List<Double> values = inputs.values().stream().map(field -> Double.parseDouble(field.getText())).toList();
+        double sumOfValues = values.stream().reduce(0., Double::sum);
+        double diff = abs(sumOfValues - ticket.getCost());
+        JOptionPane.showMessageDialog(null, "Total amount: %.2f. Need %.2f more".formatted(sumOfValues,diff));
+
+        while (diff > 0.01) {
+            JOptionPane.showConfirmDialog(null, message, "Change distribution: total cost %.2f".formatted(costRounded), JOptionPane.DEFAULT_OPTION);
+            values = inputs.values().stream().map(field -> Double.parseDouble(field.getText())).toList();
+            sumOfValues = values.stream().reduce(0., Double::sum);
+            diff = abs(sumOfValues - ticket.getCost());
+            JOptionPane.showMessageDialog(null, "Total amount: %.2f. Need %.2f more".formatted(sumOfValues,diff));
+        }
+
+        for (Long key : keys) {
+            ticket.getDistribution().put(key, (Double) inputs.get(key).getValue());
+        }
+
+        JOptionPane.showMessageDialog(null, "Successfully updated distribution");
     }
 
     private void createCategory() {
@@ -600,6 +639,27 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
     // Extra lay-out objects
     // ========================================================================================== //
 
+    private JFormattedTextField getDecimalInputField() {
+        DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+        NumberFormatter formatter = new NumberFormatter(decimalFormat);
+        formatter.setValueClass(Double.class);
+        formatter.setAllowsInvalid(false); // Only accept valid numbers
+
+        // Create the JFormattedTextField and set the formatter
+        JFormattedTextField decimalTextField = new JFormattedTextField(formatter);
+        decimalTextField.setColumns(10);
+
+        decimalTextField.setInputVerifier(new InputVerifier() {
+            @Override
+            public boolean verify(JComponent input) {
+                JFormattedTextField textField = (JFormattedTextField) input;
+                return textField.isEditValid(); // Return true only if the input is valid
+            }
+        });
+
+        return decimalTextField;
+    }
+
     // Private object so that we can pass a Ticket in to the list, but only show its name and id
     private static class TicketListCellRenderer extends DefaultListCellRenderer {
         @Override
@@ -634,7 +694,7 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
             JLabel ticketLabel = getSecondarySmallLabel(distributionHolder.getName() + ":");
             ticketLabel.setMaximumSize(new Dimension(300, 50));
 
-            double amount_rounded = round(amount*100)/100.;
+            double amount_rounded = round(amount * 100) / 100.;
             JLabel distributionLabel = getSecondarySmallLabel("€ " + amount_rounded);
             distributionLabel.setMaximumSize(new Dimension(200, 50));
 
@@ -721,4 +781,6 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
             return button;
         }
     }
+
+
 }

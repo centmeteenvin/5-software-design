@@ -389,7 +389,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         }
     }
 
-    private void payTo(Person receiver, Person payer, Double amount) {
+    private void payTo(Person receiver, Person payer) {
         DecimalFormat decimalFormat = new DecimalFormat("#0.00");
         NumberFormatter formatter = new NumberFormatter(decimalFormat);
         formatter.setValueClass(Double.class);
@@ -399,7 +399,8 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         JFormattedTextField decimalTextField = new JFormattedTextField(formatter);
         decimalTextField.setColumns(10);
 
-        Object[] message = {"Give payed amount: ", decimalTextField};
+        double toPay_rounded = round(payer.getDebts().get(receiver.getId()) * 100) / 100.;
+        Object[] message = {"Give payed amount <=  %f".formatted(toPay_rounded), decimalTextField};
 
         decimalTextField.setInputVerifier(new InputVerifier() {
             @Override
@@ -409,7 +410,8 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
             }
         });
 
-        while (decimalTextField.getValue() == null) {
+        JOptionPane.showConfirmDialog(null, message, "Payed amount", JOptionPane.DEFAULT_OPTION);
+        while ((decimalTextField.getValue() == null) || ((double) decimalTextField.getValue() > payer.getDebts().get(receiver.getId()))) {
             JOptionPane.showConfirmDialog(null, message, "Payed amount", JOptionPane.DEFAULT_OPTION);
         }
 
@@ -419,7 +421,6 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         personController.pay(receiver.getId(), payer.getId(), amountPayed);
         ticketController.calculateAll();
     }
-
 
     // ========================================================================================== //
     // Value/Property changes + reactions
@@ -510,7 +511,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
             JLabel personLabel = getSecondarySmallLabel(debtHolderPerson.getName() + ":");
             personLabel.setMaximumSize(new Dimension(300, 50));
 
-            double amount_rounded = round(amount*100)/100.;
+            double amount_rounded = round(amount * 100) / 100.;
             JLabel debtLabel = getSecondarySmallLabel("€ " + amount_rounded);
             debtLabel.setMaximumSize(new Dimension(200, 50));
 
@@ -524,7 +525,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
 
                 JButton payButton = getPrimaryButton("Pay");
                 payButton.setMaximumSize(new Dimension(100, 50));
-                payButton.addActionListener(e -> payTo(debtHolderPerson, mainPerson, amount));
+                payButton.addActionListener(e -> payTo(debtHolderPerson, mainPerson));
                 box.add(payButton);
             }
             return box;
