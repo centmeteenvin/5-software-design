@@ -10,8 +10,6 @@ import models.TicketCategory;
 
 import java.util.*;
 
-import static java.lang.Long.sum;
-
 
 public class TicketControllerImplementation extends TicketController {
 
@@ -37,6 +35,7 @@ public class TicketControllerImplementation extends TicketController {
         }
 
         Optional<Ticket> ticket = ticketDatabase.create(new Ticket(System.nanoTime(), totalCost, categoryId));
+
         if (ticket.isEmpty()) return Optional.empty();
 
         if (categoryId != null) {
@@ -55,6 +54,7 @@ public class TicketControllerImplementation extends TicketController {
             }
             ticket.get().getDistribution().put(personId, totalCost / personsId.size());
         }
+
         return ticket;
     }
 
@@ -160,7 +160,9 @@ public class TicketControllerImplementation extends TicketController {
     }
 
     /**
-
+     * Will go over the ticket and:
+     * - Add positive debt (needs to pay) equal to the distribution of the ticket to the persons involved
+     * - Add negative debt (needs to receive) equal to the total cost of the ticket to the person who payed
      */
     @Override
     public void calculate(Long id) throws PersonNotFoundException, TicketNotFoundException {
@@ -172,22 +174,22 @@ public class TicketControllerImplementation extends TicketController {
         Map<Long, Double> distribution = ticket.get().getDistribution();
         if (distribution.values().stream().reduce(0., Double::sum) != ticket.get().getCost()) return;
 
-        Optional<Person> payer;
+
         // Check if the payer is not null
-        if (ticket.get().getPayerId() != null) {
-            // Check if the payer still exists
-            payer = personDatabase.getById(ticket.get().getPayerId());
-            if (payer.isEmpty()) throw new PersonNotFoundException(ticket.get().getPayerId());
+        if (ticket.get().getPayerId() == null) {
+            return;
+        }
+        // Check if the payer still exists
+        Optional<Person> payer = personDatabase.getById(ticket.get().getPayerId());
+        if (payer.isEmpty()) throw new PersonNotFoundException(ticket.get().getPayerId());
+        for (Long debtHolder : distribution.keySet()) {
+            // Check if the debtHolder still exists
+            Optional<Person> person = personDatabase.getById(debtHolder);
+            if (person.isEmpty()) return;
 
-            for (Long debtHolder : distribution.keySet()) {
-                // Check if the debtHolder still exists
-                Optional<Person> person = personDatabase.getById(debtHolder);
-                if (person.isEmpty()) continue;
-
-                double difference = distribution.get(person.get().getId());
-                personController.modifyDebt(payer.get().getId(), debtHolder, -difference);
-                personController.modifyDebt(debtHolder, payer.get().getId(), difference);
-            }
+            double difference = distribution.get(person.get().getId());
+            personController.modifyDebt(payer.get().getId(), debtHolder, -difference);
+            personController.modifyDebt(debtHolder, payer.get().getId(), difference);
         }
     }
 
@@ -209,10 +211,14 @@ public class TicketControllerImplementation extends TicketController {
         ticketDatabase.update(ticket.get());
     }
 
+    /**
+     * Will go over all the tickets and calculate how much everyone needs to pay to each other
+     */
     @Override
     public void calculateAll() {
+        // Reset all the debts of avery person in the database
         List<Person> persons = personDatabase.getAll();
-        for (Person person : persons){
+        for (Person person : persons) {
             Long id = person.getId();
             try {
                 personController.resetDebt(id);
@@ -221,6 +227,7 @@ public class TicketControllerImplementation extends TicketController {
             }
         }
 
+        // Go over al the tickets in the database and add the debt to the right persons
         List<Ticket> tickets = ticketDatabase.getAll();
         for (Ticket ticket : tickets) {
             Long id = ticket.getId();

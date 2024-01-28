@@ -18,7 +18,8 @@ public class TicketCategoryControllerImplementation extends TicketCategoryContro
     @Override
     public Optional<TicketCategory> create(String name) {
         long id = System.nanoTime();
-        return ticketCategoryDatabase.create(new TicketCategory(id, name));
+        Optional<TicketCategory> ticketCategory = ticketCategoryDatabase.create(new TicketCategory(id, name));
+        return ticketCategory;
     }
 
     @Override

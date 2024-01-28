@@ -7,7 +7,10 @@ import exceptions.notFoundExceptions.TicketNotFoundException;
 import models.Person;
 import models.Ticket;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 
 public class PersonControllerImplementation extends PersonController {
 
@@ -98,12 +101,15 @@ public class PersonControllerImplementation extends PersonController {
 
     /**
      * Adds the difference to the person's debt.
+     * This means there will be MORE debt to this person
      *
      * @param difference the difference that is ADDED to the current person's debt.
      */
     @Override
     public void modifyDebt(Long id, Long otherId, double difference) throws PersonNotFoundException {
+        // Get the person that will have more debt
         Optional<Person> person = personDatabase.getById(id);
+        // Get the person that will have less debt
         Optional<Person> subject = personDatabase.getById(otherId);
         if (person.isEmpty()) throw new PersonNotFoundException(id);
         if (subject.isEmpty()) throw new PersonNotFoundException(otherId);
@@ -160,8 +166,8 @@ public class PersonControllerImplementation extends PersonController {
         if (ticket.isEmpty()) return ticket;
 
         ticket.get().setPayerId(payerId);
-        ticket.get().getDistribution().put(receivingPersonId, payedAmount);
         ticket.get().getDistribution().put(payerId, 0.);
+        ticket.get().getDistribution().put(receivingPersonId, payedAmount);
         return ticket;
     }
 }

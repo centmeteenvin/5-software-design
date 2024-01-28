@@ -14,6 +14,7 @@ public abstract class PersonController {
     protected final Database<Person> personDatabase;
     protected final Database<Ticket> ticketDatabase;
     protected TicketController ticketController;
+
     public PersonController(Database<Person> personDatabase, Database<Ticket> ticketDatabase) {
         this.personDatabase = personDatabase;
         this.ticketDatabase = ticketDatabase;
@@ -51,14 +52,16 @@ public abstract class PersonController {
 
     /**
      * Modifies the person's debt.
-     * @param id The id of the person's debts we want to modify.
+     *
+     * @param id            The id of the person's debts we want to modify.
      * @param otherPersonId The id of the other person. This is the line in the Person's debt we want to change.
-     * @param difference the difference that is ADDED to the current person's debt.
+     * @param difference    the difference that is ADDED to the current person's debt.
      */
     public abstract void modifyDebt(Long id, Long otherPersonId, double difference) throws PersonNotFoundException;
 
     /**
      * Resets a persons debt
+     *
      * @param id The id of the person's debt we want to reset
      */
     public abstract void resetDebt(Long id) throws PersonNotFoundException;
