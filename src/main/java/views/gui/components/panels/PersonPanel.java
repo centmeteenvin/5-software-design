@@ -6,6 +6,7 @@ import controllers.TicketController;
 import database.Database;
 import database.Property;
 import models.Person;
+import views.gui.components.ComponentFactory;
 import views.gui.styles.Style;
 
 import javax.swing.*;
@@ -344,7 +345,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
             if (optDebtHolder.isEmpty()) continue;
 
             if (debts.get(key) != 0) {
-                Box row = componentFactory.getSmallRow(optDebtHolder.get(), person, debts.get(key));
+                Box row = getSmallRow(optDebtHolder.get(), person, debts.get(key));
                 userDebtContainer.add(row);
             }
         }
@@ -477,6 +478,38 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
     // Extra lay-out objects
     // ========================================================================================== //
 
+    public Box getSmallRow(Person debtHolderPerson, Person mainPerson, double amount) {
+        Box box = Box.createHorizontalBox();
+        box.setOpaque(true);
+        box.setBackground(this.style.getTransparantColor());
+        box.setMaximumSize(new Dimension(screenSize.width / 2, 50));
+        box.setAlignmentX(Component.LEFT_ALIGNMENT);
+        box.setAlignmentY(Component.CENTER_ALIGNMENT);
+        box.add(Box.createHorizontalStrut(3 * horizontalOffset));
+
+        JLabel personLabel = componentFactory.getSecondarySmallLabel(debtHolderPerson.getName() + ":");
+        personLabel.setMaximumSize(new Dimension(300, 50));
+
+        double amount_rounded = round(amount * 100) / 100.;
+        JLabel debtLabel = componentFactory.getSecondarySmallLabel("€ " + amount_rounded);
+        debtLabel.setMaximumSize(new Dimension(200, 50));
+
+        box.add(personLabel);
+        box.add(debtLabel);
+
+        if (amount < 0.) {
+            debtLabel.setForeground(new Color(0, 153, 51));
+        } else {
+            debtLabel.setForeground(Color.red);
+
+            JButton payButton = componentFactory.getPrimaryButton("Pay");
+            payButton.setMaximumSize(new Dimension(100, 50));
+            payButton.addActionListener(e -> payTo(debtHolderPerson, mainPerson));
+            box.add(payButton);
+        }
+        return box;
+    }
+
     // Private object so that we can pass a Person in to the list, but only show its name and id
     private static class PersonListCellRenderer extends DefaultListCellRenderer {
         @Override
@@ -492,119 +525,6 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
         }
     }
 
-    private class ComponentFactory {
-        Style style;
 
-        public ComponentFactory(Style style) {
-            this.style = style;
-        }
-
-        public Box getSmallRow(Person debtHolderPerson, Person mainPerson, double amount) {
-            Box box = Box.createHorizontalBox();
-            box.setOpaque(true);
-            box.setBackground(this.style.getTransparantColor());
-            box.setMaximumSize(new Dimension(screenSize.width / 2, 50));
-            box.setAlignmentX(Component.LEFT_ALIGNMENT);
-            box.setAlignmentY(Component.CENTER_ALIGNMENT);
-            box.add(Box.createHorizontalStrut(3 * horizontalOffset));
-
-            JLabel personLabel = getSecondarySmallLabel(debtHolderPerson.getName() + ":");
-            personLabel.setMaximumSize(new Dimension(300, 50));
-
-            double amount_rounded = round(amount * 100) / 100.;
-            JLabel debtLabel = getSecondarySmallLabel("€ " + amount_rounded);
-            debtLabel.setMaximumSize(new Dimension(200, 50));
-
-            box.add(personLabel);
-            box.add(debtLabel);
-
-            if (amount < 0.) {
-                debtLabel.setForeground(new Color(0, 153, 51));
-            } else {
-                debtLabel.setForeground(Color.red);
-
-                JButton payButton = getPrimaryButton("Pay");
-                payButton.setMaximumSize(new Dimension(100, 50));
-                payButton.addActionListener(e -> payTo(debtHolderPerson, mainPerson));
-                box.add(payButton);
-            }
-            return box;
-        }
-
-        public JLabel getPrimaryNormalLabel(String text) {
-            JLabel label = new JLabel(text);
-            label.setForeground(this.style.getLabel2ForegroundColor());
-            label.setBackground(this.style.getTransparantColor());
-            label.setFont(this.style.getTextFont());
-            label.setHorizontalAlignment(SwingConstants.LEFT);
-            label.setAlignmentX(Component.LEFT_ALIGNMENT);
-            label.setAlignmentY(Component.CENTER_ALIGNMENT);
-            return label;
-        }
-
-        public JLabel getSecondaryNormalLabel(String text) {
-            JLabel label = new JLabel(text);
-            label.setForeground(this.style.getLabel1ForegroundColor());
-            label.setBackground(this.style.getTransparantColor());
-            label.setFont(this.style.getTextFont());
-            label.setHorizontalAlignment(SwingConstants.LEFT);
-            label.setAlignmentX(Component.LEFT_ALIGNMENT);
-            label.setAlignmentY(Component.CENTER_ALIGNMENT);
-            return label;
-        }
-
-        public JLabel getPrimarySmallLabel(String text) {
-            JLabel label = new JLabel(text);
-            label.setForeground(this.style.getLabel2ForegroundColor());
-            label.setBackground(this.style.getTransparantColor());
-            label.setFont(this.style.getSmallTextFont());
-            label.setHorizontalAlignment(SwingConstants.LEFT);
-            label.setAlignmentX(Component.LEFT_ALIGNMENT);
-            label.setAlignmentY(Component.CENTER_ALIGNMENT);
-            return label;
-        }
-
-        public JLabel getSubtitleLabel(String text) {
-            JLabel label = new JLabel(text);
-            label.setForeground(this.style.getLabel1ForegroundColor());
-            label.setBackground(this.style.getTransparantColor());
-            label.setFont(this.style.getBoldSubtitleFont());
-            label.setHorizontalAlignment(SwingConstants.LEFT);
-            label.setAlignmentX(Component.LEFT_ALIGNMENT);
-            label.setAlignmentY(Component.CENTER_ALIGNMENT);
-            return label;
-        }
-
-        public JLabel getSecondarySmallLabel(String text) {
-            JLabel label = new JLabel(text);
-            label.setForeground(this.style.getLabel1ForegroundColor());
-            label.setBackground(this.style.getTransparantColor());
-            label.setFont(this.style.getSmallTextFont());
-            label.setHorizontalAlignment(SwingConstants.LEFT);
-            label.setAlignmentX(Component.LEFT_ALIGNMENT);
-            label.setAlignmentY(Component.CENTER_ALIGNMENT);
-            return label;
-        }
-
-        public JButton getPrimaryButton(String text) {
-            JButton button = new JButton(text);
-            button.setBackground(style.getButton1ForegroundColor());
-            button.setForeground(style.getButton1BackgroundColor());
-            button.setFont(style.getButtonFont());
-            button.setAlignmentX(Component.LEFT_ALIGNMENT);
-            button.setAlignmentY(Component.CENTER_ALIGNMENT);
-            return button;
-        }
-
-        public JButton getSecondaryButton(String text) {
-            JButton button = new JButton(text);
-            button.setBackground(style.getButton2ForegroundColor());
-            button.setForeground(style.getButton2BackgroundColor());
-            button.setFont(style.getButtonFont());
-            button.setAlignmentX(Component.LEFT_ALIGNMENT);
-            button.setAlignmentY(Component.CENTER_ALIGNMENT);
-            return button;
-        }
-    }
 }
 
