@@ -7,7 +7,7 @@ import javax.swing.border.Border;
 import java.awt.*;
 
 public class HomePanel extends JPanel {
-    Border testBorder = BorderFactory.createLineBorder(Color.RED, 1);
+    //Border testBorder = BorderFactory.createLineBorder(Color.RED, 1);
     Style style;
 
 
@@ -34,7 +34,7 @@ public class HomePanel extends JPanel {
         title.setAlignmentX(CENTER_ALIGNMENT);
 
 
-        JLabel subTitle = new JLabel("The Scripk Kiddo's Money Tracker");
+        JLabel subTitle = new JLabel("The Script Kiddo's Money Tracker");
         subTitle.setForeground(style.getLabel2ForegroundColor());
         subTitle.setFont(style.getSubtitleFont());
         subTitle.setAlignmentX(CENTER_ALIGNMENT);

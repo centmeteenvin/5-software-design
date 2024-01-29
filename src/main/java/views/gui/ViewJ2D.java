@@ -73,7 +73,7 @@ public class ViewJ2D extends View {
         container.add(this.ticketPanel, "TicketPanel");
 
         // Show the homepanel
-        layout.show(container, "TicketPanel");
+        layout.show(container, "HomePanel   ");
 
         // Add the container to the frame
         frame.add(container);
@@ -82,15 +82,12 @@ public class ViewJ2D extends View {
     }
 
     private void createTestObjects() {
-        getTicketCategoryController().create("Cat0");
-        getTicketCategoryController().create("Cat1");
+        getTicketCategoryController().create("Etentje");
+        getTicketCategoryController().create("Cinema");
 
-        Optional<Person> person1 = getPersonController().create("Foo");
-        Optional<Person> person2 = getPersonController().create("Bar");
-        Optional<Person> person3 = getPersonController().create("Baz");
-
-        //getPersonController().modifyDebt(person1.get().getId(), person2.get().getId(), -10.2);
-        //getPersonController().modifyDebt(person1.get().getId(), person3.get().getId(), 102);
+        getPersonController().create("Foo");
+        getPersonController().create("Bar");
+        getPersonController().create("Baz");
 
     }
 }

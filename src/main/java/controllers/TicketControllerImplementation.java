@@ -10,6 +10,8 @@ import models.TicketCategory;
 
 import java.util.*;
 
+import static java.lang.Math.abs;
+
 
 public class TicketControllerImplementation extends TicketController {
 
@@ -172,7 +174,7 @@ public class TicketControllerImplementation extends TicketController {
 
         // Check that the total payed by everyone in the group is equal to the total cost of the ticket
         Map<Long, Double> distribution = ticket.get().getDistribution();
-        if (distribution.values().stream().reduce(0., Double::sum) != ticket.get().getCost()) return;
+        if (abs(distribution.values().stream().reduce(0., Double::sum) - ticket.get().getCost()) > 0.01) return;
 
 
         // Check if the payer is not null

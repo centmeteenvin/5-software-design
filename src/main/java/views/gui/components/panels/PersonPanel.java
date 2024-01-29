@@ -21,6 +21,7 @@ import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.lang.Math.abs;
 import static java.lang.Math.round;
 
 public class PersonPanel extends JPanel implements ListSelectionListener, PropertyChangeListener {
@@ -345,7 +346,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
             Optional<Person> optDebtHolder = personDatabase.getById(key);
             if (optDebtHolder.isEmpty()) continue;
 
-            if (debts.get(key) != 0) {
+            if (abs(debts.get(key)) > 0.01) {
                 Box row = getSmallRow(optDebtHolder.get(), person, debts.get(key));
                 userDebtContainer.add(row);
             }
@@ -429,7 +430,7 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
 
 
         try {
-            personController.pay(receiver.getId(), payer.getId(), amountPayed);
+            personController.pay(payer.getId(), receiver.getId(), amountPayed);
         } catch (PersonNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -537,7 +538,5 @@ public class PersonPanel extends JPanel implements ListSelectionListener, Proper
             return c;
         }
     }
-
-
 }
 

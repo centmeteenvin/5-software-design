@@ -313,7 +313,7 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         usernameContainer.add(usernameLabel);
 
         JLabel ticketInViewLabel;
-        if (ticket.getTicketCategoryId() != 0L) {
+        if (ticket.getTicketCategoryId() != null) {
             ticketInViewLabel = componentFactory.getSecondaryNormalLabel(String.valueOf(categoryDatabase.getById(ticket.getTicketCategoryId()).get().getName()));
         } else {
             ticketInViewLabel = componentFactory.getSecondaryNormalLabel("InternalPay");
@@ -546,6 +546,8 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
     }
 
     private void changeDistribution(Ticket ticket) {
+        if (ticket.getTicketCategoryId() == null) return;
+
         // Get distribution
         Map<Long, Double> distribution = ticket.getDistribution();
         Set<Long> keys = distribution.keySet();
@@ -570,14 +572,14 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         List<Double> values = inputs.values().stream().map(field -> Double.parseDouble(field.getText())).toList();
         double sumOfValues = values.stream().reduce(0., Double::sum);
         double diff = abs(sumOfValues - ticket.getCost());
-        JOptionPane.showMessageDialog(null, "Total amount: %.2f. Need %.2f more".formatted(sumOfValues, diff));
+
 
         while (diff > 0.01) {
+            JOptionPane.showMessageDialog(null, "Total amount: %.2f. Need %.2f more".formatted(sumOfValues, diff));
             JOptionPane.showConfirmDialog(null, message, "Change distribution: total cost %.2f".formatted(costRounded), JOptionPane.DEFAULT_OPTION);
             values = inputs.values().stream().map(field -> Double.parseDouble(field.getText())).toList();
             sumOfValues = values.stream().reduce(0., Double::sum);
             diff = abs(sumOfValues - ticket.getCost());
-            JOptionPane.showMessageDialog(null, "Total amount: %.2f. Need %.2f more".formatted(sumOfValues, diff));
         }
 
         for (Long key : keys) {
