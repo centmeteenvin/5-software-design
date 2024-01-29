@@ -313,7 +313,7 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         usernameContainer.add(usernameLabel);
 
         JLabel ticketInViewLabel;
-        if (ticket.getTicketCategoryId() != 0L) {
+        if (ticket.getTicketCategoryId() != null) {
             ticketInViewLabel = componentFactory.getSecondaryNormalLabel(String.valueOf(categoryDatabase.getById(ticket.getTicketCategoryId()).get().getName()));
         } else {
             ticketInViewLabel = componentFactory.getSecondaryNormalLabel("InternalPay");
@@ -427,8 +427,8 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
 
     private void addTicket() {
         // Get payerId
-        List<Person> persons = this.personDatabase.getAll();
-        List<String> personsStringList = persons.stream().sorted(Comparator.comparing(Person::getName)).map(Person::getName).toList();
+        List<Person> persons = this.personDatabase.getAll().stream().sorted(Comparator.comparing(Person::getName)).toList();
+        List<String> personsStringList = persons.stream().map(Person::getName).toList();
         Object[] personsStringArray = personsStringList.toArray();
 
         Object payerPerson = JOptionPane.showInputDialog(null, "Choose your payer", "Choose payer", JOptionPane.PLAIN_MESSAGE, null, personsStringArray, null);
@@ -465,8 +465,8 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         double amountPayed = (double) decimalTextField.getValue();
 
         // Get category
-        List<TicketCategory> categories = this.categoryDatabase.getAll();
-        List<String> categoriesStringList = categories.stream().sorted(Comparator.comparing(TicketCategory::getName)).map(TicketCategory::getName).toList();
+        List<TicketCategory> categories = this.categoryDatabase.getAll().stream().sorted(Comparator.comparing(TicketCategory::getName)).toList();
+        List<String> categoriesStringList = categories.stream().map(TicketCategory::getName).toList();
         Object[] categoriesStringArray = categoriesStringList.toArray();
 
         Object category = JOptionPane.showInputDialog(null, "Choose your category", "Choose category", JOptionPane.PLAIN_MESSAGE, null, categoriesStringArray, categoriesStringArray[0]);
@@ -507,7 +507,7 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
     }
 
     private void changeTicketCategory(Ticket ticket) {
-        List<TicketCategory> options = this.categoryDatabase.getAll();
+        List<TicketCategory> options = this.categoryDatabase.getAll().stream().sorted(Comparator.comparing(TicketCategory::getName)).toList();
         List<String> optionsStringList = options.stream().map(TicketCategory::getName).toList();
         Object[] optionsStringArray = optionsStringList.toArray();
 
@@ -527,7 +527,7 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
     }
 
     private void changePayer(Ticket ticket) {
-        List<Person> options = this.personDatabase.getAll();
+        List<Person> options = this.personDatabase.getAll().stream().sorted(Comparator.comparing(Person::getName)).toList();
         List<String> optionsStringList = options.stream().map(Person::getName).toList();
         Object[] optionsStringArray = optionsStringList.toArray();
 
@@ -546,6 +546,8 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
     }
 
     private void changeDistribution(Ticket ticket) {
+        if (ticket.getTicketCategoryId() == null) return;
+
         // Get distribution
         Map<Long, Double> distribution = ticket.getDistribution();
         Set<Long> keys = distribution.keySet();
@@ -570,14 +572,14 @@ public class TicketPanel extends JPanel implements ListSelectionListener, Proper
         List<Double> values = inputs.values().stream().map(field -> Double.parseDouble(field.getText())).toList();
         double sumOfValues = values.stream().reduce(0., Double::sum);
         double diff = abs(sumOfValues - ticket.getCost());
-        JOptionPane.showMessageDialog(null, "Total amount: %.2f. Need %.2f more".formatted(sumOfValues, diff));
+
 
         while (diff > 0.01) {
+            JOptionPane.showMessageDialog(null, "Total amount: %.2f. Need %.2f more".formatted(sumOfValues, diff));
             JOptionPane.showConfirmDialog(null, message, "Change distribution: total cost %.2f".formatted(costRounded), JOptionPane.DEFAULT_OPTION);
             values = inputs.values().stream().map(field -> Double.parseDouble(field.getText())).toList();
             sumOfValues = values.stream().reduce(0., Double::sum);
             diff = abs(sumOfValues - ticket.getCost());
-            JOptionPane.showMessageDialog(null, "Total amount: %.2f. Need %.2f more".formatted(sumOfValues, diff));
         }
 
         for (Long key : keys) {
